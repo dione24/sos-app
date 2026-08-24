@@ -1,0 +1,15 @@
+{
+  "schema": "sos-mali-medical-v2",
+  "exportedAt": 1786360000000,
+  "profile": {
+    "phone": "+22370000000",
+    "name": "Fichier non fiable",
+    "bloodType": "O+",
+    "allergies": "",
+    "treatments": "",
+    "history": "",
+    "includeInSos": false,
+    "champInconnu": "doit être refusé"
+  },
+  "contacts": []
+}

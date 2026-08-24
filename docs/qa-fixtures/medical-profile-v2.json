@@ -1,0 +1,19 @@
+{
+  "schema": "sos-mali-medical-v2",
+  "exportedAt": 1786360000000,
+  "profile": {
+    "phone": "+22370000000",
+    "name": "Awa Traoré",
+    "bloodType": "O+",
+    "allergies": "Pénicilline",
+    "treatments": "",
+    "history": "Asthme",
+    "includeInSos": true
+  },
+  "contacts": [
+    {
+      "name": "Moussa",
+      "phone": "+22371111111"
+    }
+  ]
+}

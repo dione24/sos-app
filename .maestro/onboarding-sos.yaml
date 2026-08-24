@@ -1,0 +1,18 @@
+appId: ml.sossecurite.app
+name: Premier démarrage et routage SOS
+---
+- clearState
+- launchApp
+- assertVisible: "Votre dossier d'urgence"
+- tapOn: "Accéder au SOS sans dossier"
+- assertVisible: "SOS Sécurité Mali"
+- tapOn:
+    text: "SOS"
+    index: 0
+- assertVisible: "Quel type d'urgence ?"
+- tapOn: "Agression"
+- assertVisible: "Appeler le 101"
+- assertVisible: "Continuer sans position"
+- tapOn: "Continuer sans position"
+- assertVisible: "Position indisponible"
+- assertVisible: "Envoyer un SMS|Ouvrir le SMS de secours"

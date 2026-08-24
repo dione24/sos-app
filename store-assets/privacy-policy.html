@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Politique de confidentialité — SOS Sécurité Mali</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; background: #15120f; color: #f4eee5; line-height: 1.65; }
+    main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 80px; }
+    h1, h2 { line-height: 1.2; }
+    h1 { font-size: clamp(2rem, 7vw, 3.4rem); margin: 0 0 12px; }
+    h2 { margin-top: 40px; color: #ffad25; }
+    p, li { color: #d7cbbd; }
+    a { color: #7ee1a6; }
+    .meta { color: #ffad25; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .card { padding: 18px; border: 1px solid #3a3128; border-radius: 14px; background: #1e1a16; margin: 20px 0; }
+    strong { color: #fff9f1; }
+  </style>
+</head>
+<body>
+<main>
+  <p class="meta">Version 1.0 — applicable le 17 août 2026</p>
+  <h1>Politique de confidentialité</h1>
+  <p><strong>SOS Sécurité Mali</strong> est une application d'urgence et de premiers secours, <strong>gratuite</strong>, sans compte, sans publicité et sans profilage publicitaire.</p>
+
+  <div class="card">
+    <p><strong>Éditeur :</strong> SahelPay Technologies<br>
+    <strong>Représentant :</strong> Abdoulaye NIANGALY<br>
+    <strong>Siège :</strong> Bamako, République du Mali<br>
+    <strong>Site :</strong> <a href="https://sahelpay.ml">https://sahelpay.ml</a><br>
+    <strong>Support :</strong> <a href="mailto:support@sahelpay.ml">support@sahelpay.ml</a><br>
+    <strong>Confidentialité :</strong> <a href="mailto:privacy@sahelpay.ml">privacy@sahelpay.ml</a></p>
+  </div>
+
+  <h2>1. Plateformes</h2>
+  <p>Cette politique s'applique aux versions <strong>Android</strong> et <strong>iOS</strong> de SOS Sécurité Mali publiées par SahelPay Technologies (identifiants <code>ml.sossecurite.app</code>).</p>
+
+  <h2>2. Données traitées sur l'appareil</h2>
+  <p>L'application peut enregistrer localement un nom, un numéro de téléphone, des contacts d'urgence, une photo facultative, un groupe sanguin, des allergies, des traitements, des antécédents, des préférences, des consentements et un historique limité des alertes.</p>
+  <p>Ces informations sont stockées dans une base SQLCipher chiffrée. La clé est conservée dans le stockage sécurisé du système (<strong>Android Keystore</strong> / <strong>iOS Keychain</strong> via SecureStore). L'éditeur ne dispose d'aucun serveur central recevant ce dossier médical.</p>
+
+  <h2>3. Position et services externes</h2>
+  <p>Avec l'autorisation de l'utilisateur, la position peut servir à préparer un SOS, trier les lieux proches, demander une météo locale ou afficher une carte. La météo affiche Bamako par défaut et peut l'actualiser automatiquement. Les coordonnées précises de l'utilisateur ne sont transmises à <a href="https://open-meteo.com/en/terms" rel="noreferrer">Open-Meteo</a> qu'après activation séparée de l'option « Utiliser ma position pour la météo ».</p>
+  <p>Open-Meteo reçoit l'adresse IP et indique que ses journaux techniques peuvent contenir les coordonnées demandées pendant 90 jours. Si la carte en ligne est configurée et ouverte, <a href="https://www.maptiler.com/privacy-policy" rel="noreferrer">MapTiler</a> et son réseau de diffusion reçoivent l'adresse IP ainsi que la zone et les tuiles demandées. Ces requêtes ne contiennent jamais le dossier médical. Tous ces échanges utilisent HTTPS.</p>
+
+  <h2>4. Communications décidées par l'utilisateur</h2>
+  <ul>
+    <li>Un appel ouvre l'application Téléphone après confirmation dans l'app.</li>
+    <li>Un SMS ouvre le composeur natif avec le contenu et les destinataires choisis ; l'utilisateur confirme toujours l'envoi.</li>
+    <li>Un export QR ou JSON est créé seulement après une action explicite.</li>
+    <li>Le relais Bluetooth diffuse le type d'urgence, la position éventuelle, l'heure et un identifiant anonyme aux appareils proches. La version 1 ne diffuse aucune donnée médicale. Sur Android, une notification de service de premier plan permet d'arrêter la diffusion ; sur iOS, le Bluetooth de proximité peut être plus limité par le système.</li>
+  </ul>
+
+  <h2>5. Finalités et choix</h2>
+  <p>Les données servent uniquement aux fonctions demandées : préparation d'alerte, premiers secours, dossier local, lieux proches, météo, carte et relais Bluetooth. La position et le relais sont facultatifs. L'application reste utilisable avec des fonctions réduites si ces autorisations sont refusées. Aucune publicité, aucun traqueur publicitaire, aucun compte en ligne n'est imposé.</p>
+
+  <h2>6. Conservation et suppression</h2>
+  <p>Les données locales restent sur le téléphone jusqu'à leur suppression par l'utilisateur ou la désinstallation. L'écran Confidentialité permet d'effacer le dossier, les contacts, les préférences, les consentements et l'historique après deux confirmations. Les identifiants BLE déjà vus expirent automatiquement.</p>
+  <p>L'éditeur ne contrôle pas les copies que l'utilisateur décide d'envoyer par SMS, QR, fichier ou Bluetooth. Leur suppression doit être demandée au destinataire concerné.</p>
+
+  <h2>7. Sécurité</h2>
+  <p>La base locale est chiffrée ; la sauvegarde automatique Android de l'application est désactivée. Le relais applique une signature d'origine, une durée de validité, une limite de débit et un mécanisme anti-doublon lorsque le matériel le permet. Aucun système n'offre une sécurité absolue, notamment sur un téléphone compromis ou lors d'un partage volontaire.</p>
+
+  <h2>8. Mineurs et usage médical</h2>
+  <p>L'application n'est pas conçue pour cibler les enfants. Elle n'est pas un dispositif médical et ne diagnostique, ne traite, ne guérit ni ne prévient aucune affection. Pour tout conseil, diagnostic ou traitement, consultez un professionnel de santé. En urgence, appelez les secours et suivez leurs consignes.</p>
+
+  <h2>9. Droits et contact</h2>
+  <p>L'utilisateur peut consulter, corriger, exporter ou supprimer ses données depuis l'application. Pour toute question relative à la confidentialité ou aux droits prévus par la législation malienne applicable (notamment la loi n°2013-015 modifiée relative à la protection des données à caractère personnel), contacter <a href="mailto:privacy@sahelpay.ml">privacy@sahelpay.ml</a> ou le support <a href="mailto:support@sahelpay.ml">support@sahelpay.ml</a>.</p>
+
+  <h2>10. Modifications</h2>
+  <p>Cette politique pourra être mise à jour si les fonctions, les fournisseurs ou les obligations légales changent. La date d'application et la version seront modifiées sur cette page et dans l'application.</p>
+</main>
+</body>
+</html>

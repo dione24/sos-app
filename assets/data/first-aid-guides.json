@@ -1,0 +1,461 @@
+[
+  {
+    "id": "rcp",
+    "title": "Réanimation cardio-pulmonaire",
+    "bambaraTitle": "Jusigi ni fiɲɛ sɔrɔli",
+    "summary": "Personne inconsciente qui ne respire pas normalement.",
+    "summaryBm": "Mɔgɔ min hakili tɛ a la ani a tɛ fiɲɛ sɔrɔ ɲuman na.",
+    "icon": "heart-pulse",
+    "tone": "alert",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "securite",
+        "fr": "Vérifiez que le lieu est sûr pour vous, la victime et les témoins.",
+        "bm": "A lajɛ ko yɔrɔ in kɛnɛya bɛ i ye, mɔgɔ min banna ye, ani mɔgɔ minnu bɛ a ɲɛ.",
+        "icon": "shield-check",
+        "durationSeconds": 8
+      },
+      {
+        "id": "reaction",
+        "fr": "Parlez fort, touchez doucement les épaules et vérifiez la réaction.",
+        "bm": "Kuma gɛlɛya la, i bolow bila a kakilaw kan nɔgɔya la, ka a lajɛ a bɛ jaabi wa.",
+        "icon": "message-circle",
+        "durationSeconds": 10
+      },
+      {
+        "id": "respiration",
+        "fr": "Vérifiez la respiration pendant 10 secondes maximum. Des gasps ne sont pas une respiration normale.",
+        "bm": "A ka fiɲɛsɔrɔli lajɛ segonda 10 kɔnɔ. Ni a bɛ fiɲɛ ta gɛlɛya la dɔrɔn, o tɛ fiɲɛsɔrɔli ɲuman ye.",
+        "icon": "wind",
+        "durationSeconds": 10
+      },
+      {
+        "id": "appel",
+        "fr": "Appelez le 122 ou demandez à quelqu'un de le faire. Cherchez un défibrillateur s'il y en a un.",
+        "bm": "122 wele, walima mɔgɔ dɔ ɲininka ka a wele. Defibrilater ɲini ni a bɛ yɔrɔ in na.",
+        "icon": "phone-call",
+        "durationSeconds": 10
+      },
+      {
+        "id": "position",
+        "fr": "Allongez la personne sur le dos, sur une surface ferme. Placez deux mains au centre de la poitrine, bras tendus.",
+        "bm": "Mɔgɔ in bila a kɔ kan, yɔrɔ gɛlɛn kan. I bolow fila bila a sisan cɛmancɛ la, i bolow ɲɛsinnen.",
+        "icon": "hand",
+        "durationSeconds": 15
+      },
+      {
+        "id": "compressions",
+        "fr": "Faites 30 compressions, profondes d'environ 5 cm, à 100–120 par minute. Laissez la poitrine remonter entre chaque compression.",
+        "bm": "Digi kɛ 30, duguma 5 sɛntimɛtɛrɛ ɲɔgɔn, miniti kɔnɔ 100 ka se 120 ma. A to ka sisan wuli duguma digi kelen kelen cɛ.",
+        "icon": "activity",
+        "durationSeconds": 20
+      },
+      {
+        "id": "continuer",
+        "fr": "Si vous êtes formé, donnez 2 insufflations puis reprenez 30 compressions. Continuez jusqu'à l'arrivée des secours ou la reprise d'une respiration normale.",
+        "bm": "Ni i ye kalan sɔrɔ, fiɲɛ fila di a la, k'a daminɛ ka digi 30 kɛ. A to ka taa fo dɛmɛbagaw na, walima fo a ye fiɲɛsɔrɔli ɲuman daminɛ.",
+        "icon": "repeat",
+        "durationSeconds": 20
+      }
+    ]
+  },
+  {
+    "id": "hemorragie",
+    "title": "Hémorragie",
+    "bambaraTitle": "Joli bɔli caman",
+    "summary": "Saignement abondant ou qui ne s'arrête pas.",
+    "summaryBm": "Joli bɔli caman, walima min tɛ jɔ.",
+    "icon": "droplets",
+    "tone": "alert",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "protection",
+        "fr": "Protégez-vous si possible avec des gants ou un tissu propre.",
+        "bm": "I yɛrɛ ladon ni ganti ye, walima fini jɛman ye, ni a sɔrɔla.",
+        "icon": "shield",
+        "durationSeconds": 8
+      },
+      {
+        "id": "pression",
+        "fr": "Appuyez fermement et directement sur la plaie avec une compresse ou un tissu propre.",
+        "bm": "Digi gɛlɛya la farilankolo kan ni fini jɛman ye, walima komprɛsi ye.",
+        "icon": "hand",
+        "durationSeconds": 15
+      },
+      {
+        "id": "maintien",
+        "fr": "Maintenez la pression sans soulever le premier tissu. Ajoutez-en un autre par-dessus s'il est imbibé.",
+        "bm": "Digi to a la, k'a kan na fini fɔlɔ wuli. Ni a joli fa, fini wɛrɛ bila a san fɛ.",
+        "icon": "timer",
+        "durationSeconds": 20
+      },
+      {
+        "id": "appel",
+        "fr": "Appelez le 122. Allongez la personne, gardez-la au chaud et surveillez sa respiration.",
+        "bm": "122 wele. Mɔgɔ in bila a kɔ kan, a to ka sumaya sɔrɔ, k'a fiɲɛsɔrɔli lajɛ.",
+        "icon": "phone-call",
+        "durationSeconds": 15
+      }
+    ]
+  },
+  {
+    "id": "pls",
+    "title": "Position latérale de sécurité",
+    "bambaraTitle": "Yɔrɔ kɛrɛfɛ lajɛlen",
+    "summary": "Personne inconsciente qui respire normalement.",
+    "summaryBm": "Mɔgɔ min hakili tɛ a la nka a bɛ fiɲɛ sɔrɔ ɲuman na.",
+    "icon": "bed-single",
+    "tone": "blue",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "verifier",
+        "fr": "Vérifiez la réaction et la respiration pendant 10 secondes maximum.",
+        "bm": "A jaabi ni a fiɲɛsɔrɔli lajɛ segonda 10 kɔnɔ.",
+        "icon": "wind",
+        "durationSeconds": 10
+      },
+      {
+        "id": "appel",
+        "fr": "Appelez le 122 ou faites appeler les secours.",
+        "bm": "122 wele, walima mɔgɔ dɔ ɲininka ka dɛmɛbagaw wele.",
+        "icon": "phone-call",
+        "durationSeconds": 8
+      },
+      {
+        "id": "tourner",
+        "fr": "Placez le bras proche à angle droit, la main opposée contre la joue, pliez la jambe éloignée puis tournez doucement la personne vers vous.",
+        "bm": "Bolo min bɛ i kɛrɛ fɛ bila kɛnɛma la; bolo wɛrɛ tɛgɛ bila a tɛgɛ kan; sen min bɔra i la a nɔgɔya; o kɔfɛ mɔgɔ in kɔli i ma nɔgɔya la.",
+        "icon": "rotate-cw",
+        "durationSeconds": 20
+      },
+      {
+        "id": "surveiller",
+        "fr": "Stabilisez la jambe, ouvrez les voies aériennes et surveillez continuellement la respiration.",
+        "bm": "Sen in jɔ ɲuman na, a da yɛlɛ ka fiɲɛ sira yɛlɛ, k'a fiɲɛsɔrɔli lajɛ waati bɛɛ.",
+        "icon": "eye",
+        "durationSeconds": 20
+      }
+    ]
+  },
+  {
+    "id": "brulure",
+    "title": "Brûlure",
+    "bambaraTitle": "Jene",
+    "summary": "Brûlure thermique, chimique ou électrique.",
+    "summaryBm": "Jene ka bɔ tasuma, fura ɲuman tɛ, walima kuran ye.",
+    "icon": "flame",
+    "tone": "amber",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "stopper",
+        "fr": "Éloignez la source de chaleur sans vous mettre en danger. Pour l'électricité, coupez d'abord le courant.",
+        "bm": "Tasuma bɔ a la i ma yɛrɛ don haminaw la. Ni kuran ye, fɔlɔ a kunko tigɛ.",
+        "icon": "octagon-x",
+        "durationSeconds": 10
+      },
+      {
+        "id": "retirer",
+        "fr": "Retirez bijoux et vêtements non collés près de la brûlure.",
+        "bm": "Nɛgɛnw ni fɛnw bɔ minnu ma dɛbɛ jene kɛrɛ fɛ.",
+        "icon": "shirt",
+        "durationSeconds": 10
+      },
+      {
+        "id": "refroidir",
+        "fr": "Refroidissez sous une eau propre et fraîche pendant 20 minutes. N'utilisez ni glace, ni beurre, ni pommade.",
+        "bm": "A sumaya ni ji jɛman ye miniti 20. Yɔrɔkɛnɛ, tulu, pomadi kana baara kɛ a la.",
+        "icon": "waves",
+        "durationSeconds": 20
+      },
+      {
+        "id": "couvrir",
+        "fr": "Couvrez sans serrer avec une compresse propre non adhérente. Appelez le 122 si la brûlure est grande, profonde ou touche le visage, les mains ou les organes génitaux.",
+        "bm": "A dugun ni fini jɛman ye nka a kana gɛlɛya. 122 wele ni jene ka bon, a duguma, walima a bɛ ɲɛ, tɛgɛw, walima cɛya/musoya yɔrɔw kan.",
+        "icon": "bandage",
+        "durationSeconds": 20
+      }
+    ]
+  },
+  {
+    "id": "etouffement",
+    "title": "Étouffement adulte",
+    "bambaraTitle": "Fiɲɛsira datugulen (mɔgɔ bɛɛ)",
+    "summary": "La personne ne peut plus parler, tousser ou respirer.",
+    "summaryBm": "Mɔgɔ tɛ se ka kuma, ka nɔsiran, walima ka fiɲɛ sɔrɔ.",
+    "icon": "person-standing",
+    "tone": "alert",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "toux",
+        "fr": "Si la personne tousse efficacement, encouragez-la à continuer. Ne frappez pas dans son dos.",
+        "bm": "Ni a bɛ nɔsiran ɲuman na, a lasigi ka a to ka taa. A kɔ kana gosi.",
+        "icon": "message-circle",
+        "durationSeconds": 10
+      },
+      {
+        "id": "claques",
+        "fr": "Si elle ne peut plus respirer, penchez-la vers l'avant et donnez jusqu'à 5 claques fermes entre les omoplates.",
+        "bm": "Ni a tɛ se ka fiɲɛ sɔrɔ, a ɲɛsin ɲɛ fɛ, ka a kɔ gosi gɛlɛya la fo 5 siɲɛ, kɔkilaw cɛ.",
+        "icon": "hand",
+        "durationSeconds": 15
+      },
+      {
+        "id": "compressions",
+        "fr": "Si l'objet ne sort pas, faites jusqu'à 5 compressions abdominales, poing au-dessus du nombril, vers l'intérieur et le haut.",
+        "bm": "Ni fɛn ma bɔ, kɔnɔ digi kɛ fo 5 siɲɛ: tɛgɛsigi bila kɔnɔtugun san fɛ, ka digi kɔnɔ ni san fɛ.",
+        "icon": "move-up",
+        "durationSeconds": 15
+      },
+      {
+        "id": "alterner",
+        "fr": "Alternez 5 claques et 5 compressions. Appelez le 122.",
+        "bm": "Kɔ gosi 5 ni kɔnɔ digi 5 ɲɔgɔn kɔ. 122 wele.",
+        "icon": "repeat",
+        "durationSeconds": 15
+      },
+      {
+        "id": "inconscient",
+        "fr": "Si la personne devient inconsciente, allongez-la et commencez la RCP.",
+        "bm": "Ni a hakili bɔra, a bila a kɔ kan ka jusigi sɔrɔli daminɛ.",
+        "icon": "heart-pulse",
+        "durationSeconds": 10
+      }
+    ]
+  },
+  {
+    "id": "serpent",
+    "title": "Morsure de serpent",
+    "bambaraTitle": "Sa cigeli",
+    "summary": "Toute morsure suspecte nécessite un transport médical urgent.",
+    "summaryBm": "Sa cigeli bɛɛ ka kan ka taa so dɔgɔtɔrɔso la teliya la.",
+    "icon": "move-right",
+    "tone": "amber",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "eloigner",
+        "fr": "Éloignez-vous du serpent. Ne tentez pas de le capturer. Prenez une photo seulement si c'est sans danger.",
+        "bm": "I jɛn sa ma. Kana a ɲini ka a minɛ. Foto ta dɔrɔn ni a tɛ haminaw ye.",
+        "icon": "shield-alert",
+        "durationSeconds": 10
+      },
+      {
+        "id": "calmer",
+        "fr": "Rassurez la personne et gardez-la complètement immobile. Retirez bagues, bracelets ou chaussures serrées.",
+        "bm": "Mɔgɔ in lasɔn, a to ka jɔ kosɛbɛ. Nɛgɛnw, bolonɛgɛnw, samaraw minnu gɛlɛya bɔ.",
+        "icon": "pause",
+        "durationSeconds": 15
+      },
+      {
+        "id": "immobiliser",
+        "fr": "Immobilisez le membre mordu avec une attelle. Transportez la personne sans la faire marcher.",
+        "bm": "Bolow/sen min cira jɔ ni fɛn ye. Mɔgɔ in taa nka a kana taama.",
+        "icon": "move-horizontal",
+        "durationSeconds": 15
+      },
+      {
+        "id": "interdits",
+        "fr": "Ne posez pas de garrot, ne coupez pas la plaie, ne sucez pas le venin et n'appliquez aucun remède traditionnel.",
+        "bm": "Garo kana bila, farilankolo kana tigɛ, dɔgɔ kana mi, fura kɔrɔ fɛn si kana bila a la.",
+        "icon": "ban",
+        "durationSeconds": 15
+      },
+      {
+        "id": "secours",
+        "fr": "Appelez le 122 et rejoignez un centre de santé sans délai. Surveillez la respiration.",
+        "bm": "122 wele ka taa kɛnɛyaso la teliya la. Fiɲɛsɔrɔli lajɛ.",
+        "icon": "phone-call",
+        "durationSeconds": 15
+      }
+    ]
+  },
+  {
+    "id": "malaise-cardiaque",
+    "title": "Malaise cardiaque",
+    "bambaraTitle": "Jusigi dimi / nɔgɔya tɛ",
+    "summary": "Douleur thoracique, sueurs, nausée ou gêne respiratoire.",
+    "summaryBm": "Sisan dimi, jijiginen, fɔɔrɔ, walima fiɲɛ gɛlɛya.",
+    "icon": "heart-crack",
+    "tone": "alert",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "repos",
+        "fr": "Arrêtez l'effort. Installez la personne assise ou semi-assise dans une position confortable.",
+        "bm": "Baara gɛlɛn jɔ. Mɔgɔ in sigi, walima a sigi dɔɔnin kɔrɔta la, yɔrɔ nɔgɔn na.",
+        "icon": "armchair",
+        "durationSeconds": 10
+      },
+      {
+        "id": "appel",
+        "fr": "Appelez immédiatement le 122. Décrivez les symptômes et suivez les consignes.",
+        "bm": "122 wele sisan. A ko fɔ minnu bɛ a la, ka bakundamaaw ta.",
+        "icon": "phone-call",
+        "durationSeconds": 10
+      },
+      {
+        "id": "surveiller",
+        "fr": "Desserrez les vêtements et surveillez la conscience et la respiration. Ne donnez ni nourriture ni boisson.",
+        "bm": "A fɛnw nɔgɔya. A hakili ni a fiɲɛsɔrɔli lajɛ. Dumuni ni minnɛn kana di a ma.",
+        "icon": "eye",
+        "durationSeconds": 15
+      },
+      {
+        "id": "rcp",
+        "fr": "Si la personne devient inconsciente et ne respire pas normalement, commencez la RCP.",
+        "bm": "Ni a hakili bɔra ani a tɛ fiɲɛ sɔrɔ ɲuman na, jusigi sɔrɔli daminɛ.",
+        "icon": "heart-pulse",
+        "durationSeconds": 10
+      }
+    ]
+  },
+  {
+    "id": "noyade",
+    "title": "Noyade",
+    "bambaraTitle": "Ji kɔnɔ sa",
+    "summary": "Sortez la personne de l'eau uniquement sans vous mettre en danger.",
+    "summaryBm": "Mɔgɔ bɔ ji kɔnɔ nka i yɛrɛ kana don haminaw la.",
+    "icon": "waves",
+    "tone": "blue",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "securite",
+        "fr": "Ne vous mettez pas en danger. Tendez un objet ou lancez un flotteur. N'entrez dans l'eau que si vous êtes formé.",
+        "bm": "I yɛrɛ kana don haminaw la. Fɛn dɔ digi a ma, walima fɛn min bɛ ji san fɛ ci a ma. Ji kɔnɔ don dɔrɔn ni i ye kalan sɔrɔ.",
+        "icon": "life-buoy",
+        "durationSeconds": 15
+      },
+      {
+        "id": "appel",
+        "fr": "Faites appeler le 122 dès que possible.",
+        "bm": "122 wele ka teli kosɛbɛ.",
+        "icon": "phone-call",
+        "durationSeconds": 8
+      },
+      {
+        "id": "respiration",
+        "fr": "Une fois hors de l'eau, vérifiez la respiration pendant 10 secondes maximum.",
+        "bm": "Ni a bɔra ji kɔnɔ, a fiɲɛsɔrɔli lajɛ segonda 10 kɔnɔ.",
+        "icon": "wind",
+        "durationSeconds": 10
+      },
+      {
+        "id": "rcp",
+        "fr": "Si la personne ne respire pas normalement, donnez 5 insufflations initiales si vous êtes formé, puis commencez la RCP. Utilisez un défibrillateur dès qu'il est disponible.",
+        "bm": "Ni a tɛ fiɲɛ sɔrɔ ɲuman na, fiɲɛ 5 di fɔlɔ ni i ye kalan sɔrɔ, o kɔfɛ jusigi sɔrɔli daminɛ. Defibrilater baara kɛ ni a sɔrɔla.",
+        "icon": "heart-pulse",
+        "durationSeconds": 20
+      },
+      {
+        "id": "chaud",
+        "fr": "Si elle respire, placez-la sur le côté, retirez les vêtements mouillés et gardez-la au chaud.",
+        "bm": "Ni a bɛ fiɲɛ sɔrɔ, a bila a kɛrɛ fɛ, a fɛn jiw bɔ, a to ka sumaya sɔrɔ.",
+        "icon": "thermometer-sun",
+        "durationSeconds": 15
+      }
+    ]
+  },
+  {
+    "id": "electrocution",
+    "title": "Accident électrique",
+    "bambaraTitle": "Kuran haminaw",
+    "summary": "Le courant peut provoquer des lésions internes invisibles.",
+    "summaryBm": "Kuran bɛ se ka kɔnɔ dimi kɛ minnu tɛ ye.",
+    "icon": "zap",
+    "tone": "amber",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "couper",
+        "fr": "Ne touchez pas la personne avant d'avoir coupé le courant à la source.",
+        "bm": "Mɔgɔ in kana ta fo i ye kuran tigɛ a yɔrɔ fɔlɔ la.",
+        "icon": "power",
+        "durationSeconds": 10
+      },
+      {
+        "id": "appel",
+        "fr": "Appelez le 122. Toute électrisation sérieuse doit être évaluée médicalement.",
+        "bm": "122 wele. Kuran haminaw bɛɛ ka kan ka dɔgɔtɔrɔ lajɛ.",
+        "icon": "phone-call",
+        "durationSeconds": 10
+      },
+      {
+        "id": "respiration",
+        "fr": "Vérifiez la conscience et la respiration. Commencez la RCP si nécessaire.",
+        "bm": "A hakili ni a fiɲɛsɔrɔli lajɛ. Jusigi sɔrɔli daminɛ ni a ka kan.",
+        "icon": "heart-pulse",
+        "durationSeconds": 10
+      },
+      {
+        "id": "brulures",
+        "fr": "Refroidissez les brûlures visibles avec de l'eau propre et fraîche, puis couvrez sans serrer.",
+        "bm": "Jene minnu bɛ ye sumaya ni ji jɛman ye, o kɔfɛ a dugun nɔgɔya la.",
+        "icon": "waves",
+        "durationSeconds": 15
+      }
+    ]
+  },
+  {
+    "id": "fracture",
+    "title": "Fracture suspectée",
+    "bambaraTitle": "Kolo tigɛli miri",
+    "summary": "Douleur, gonflement, déformation ou impossibilité de bouger.",
+    "summaryBm": "Dimi, funun, yɛlɛma, walima se tɛ ka yɛlɛma.",
+    "icon": "bone",
+    "tone": "green",
+    "emergencyNumber": "122",
+    "bambaraReviewStatus": "pending_clinical_validation",
+    "steps": [
+      {
+        "id": "immobile",
+        "fr": "Demandez à la personne de ne pas bouger. Ne tentez pas de redresser le membre.",
+        "bm": "A fɔ mɔgɔ ma ko a kana yɛlɛma. Bolow/sen kana tila ka ɲɛsin.",
+        "icon": "pause",
+        "durationSeconds": 10
+      },
+      {
+        "id": "saignement",
+        "fr": "S'il y a une plaie, couvrez-la avec une compresse propre sans appuyer sur un os visible.",
+        "bm": "Ni farilankolo bɛ yen, a dugun ni fini jɛman ye, nka digi kana kɛ kolo min bɛ ye kan.",
+        "icon": "bandage",
+        "durationSeconds": 12
+      },
+      {
+        "id": "soutenir",
+        "fr": "Soutenez le membre dans la position trouvée avec des vêtements roulés ou une attelle si vous êtes formé.",
+        "bm": "Bolow/sen dɛmɛ a yɔrɔ min na a sɔrɔra, ni fini ye walima atteli ye ni i ye kalan sɔrɔ.",
+        "icon": "move-horizontal",
+        "durationSeconds": 15
+      },
+      {
+        "id": "froid",
+        "fr": "Pour une blessure fermée, appliquez du froid enveloppé dans un tissu pendant 20 minutes maximum.",
+        "bm": "Ni farilankolo tɛ yɛlɛlen, sumaya bila fini kɔnɔ miniti 20 kɔnɔ.",
+        "icon": "snowflake",
+        "durationSeconds": 15
+      },
+      {
+        "id": "secours",
+        "fr": "Appelez le 122 pour une fracture ouverte, une forte déformation ou une atteinte de la tête, du cou, du dos ou du bassin.",
+        "bm": "122 wele ni kolo bɛ ye, yɛlɛma gɛlɛn bɛ, walima ku, kan, kɔ, walima jɔnɔ dimina.",
+        "icon": "phone-call",
+        "durationSeconds": 15
+      }
+    ]
+  }
+]

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SOS Sécurité Mali — Aperçu UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --void:#15120F;
+    --surface:#1E1A16;
+    --surface-raised:#26211C;
+    --hairline:#3A332B;
+    --sand:#F5EFE6;
+    --sand-dim:#A79C8C;
+    --alert:#FF4B26;
+    --alert-dim:#5C2115;
+    --amber:#F5A729;
+    --amber-dim:#4A3612;
+    --green:#3FA66B;
+    --green-dim:#173B27;
+    --blue:#4C8DFF;
+    --radius-lg:28px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--void);
+    color:var(--sand);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .display{ font-family:'Space Grotesk', sans-serif; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width:920px;
+    margin:0 auto;
+    padding:72px 28px 48px;
+    text-align:center;
+  }
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(34px, 6vw, 58px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 span{ color:var(--alert); }
+  .hero p{
+    max-width:560px;
+    margin:22px auto 0;
+    color:var(--sand-dim);
+    font-size:16px;
+    line-height:1.6;
+  }
+  .badges{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:32px;
+  }
+  .badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--hairline);
+    color:var(--sand-dim);
+    background:var(--surface);
+  }
+  .badge b{ color:var(--sand); font-weight:500; }
+
+  /* ---------- GALLERY ---------- */
+  .gallery-wrap{
+    position:relative;
+    max-width:1180px;
+    margin:0 auto;
+    padding:20px 28px 40px;
+  }
+  .mesh-lines{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:0;
+    opacity:.55;
+  }
+  .mesh-lines path{
+    fill:none;
+    stroke:var(--amber);
+    stroke-width:1.4;
+    stroke-dasharray:2 10;
+    stroke-linecap:round;
+    animation:flow 3.5s linear infinite;
+  }
+  @keyframes flow{ to{ stroke-dashoffset:-120; } }
+
+  .gallery{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:44px 32px;
+  }
+  @media (max-width:920px){ .gallery{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:620px){ .gallery{ grid-template-columns:1fr; } }
+
+  .cell{ display:flex; flex-direction:column; align-items:center; }
+  .cell .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--sand-dim);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .cell .label .n{ color:var(--amber); }
+  .cell .label .live{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(63,166,107,.6);
+    animation:ping 2s ease-out infinite;
+  }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(63,166,107,.55); }
+    70%{ box-shadow:0 0 0 8px rgba(63,166,107,0); }
+    100%{ box-shadow:0 0 0 0 rgba(63,166,107,0); }
+  }
+
+  /* ---------- PHONE FRAME ---------- */
+  .phone{
+    width:270px;
+    height:568px;
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    border:1px solid var(--hairline);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px 6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--sand-dim);
+  }
+  .statusbar .offline{
+    color:var(--amber);
+    border:1px solid var(--amber-dim);
+    background:rgba(245,167,41,.08);
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:10px;
+  }
+  .screen{
+    flex:1;
+    padding:14px 18px 18px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .screen h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:19px;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .screen .sub{
+    font-size:12px;
+    color:var(--sand-dim);
+    margin-top:-8px;
+  }
+  .navbar{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding:10px 6px 16px;
+    border-top:1px solid var(--hairline);
+    font-size:10px;
+    color:var(--sand-dim);
+  }
+  .navbar .item{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .navbar .item.active{ color:var(--alert); }
+  .navbar .dot{ font-size:16px; line-height:1; }
+
+  /* ---------- shared bits ---------- */
+  .card{
+    background:var(--surface-raised);
+    border:1px solid var(--hairline);
+    border-radius:var(--radius-md);
+    padding:12px 14px;
+  }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .pill{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .pill.high{ background:var(--alert-dim); color:#FF8B71; }
+  .pill.mid{ background:var(--amber-dim); color:#FFC978; }
+  .pill.ok{ background:var(--green-dim); color:#79D9A4; }
+  .btn{
+    display:flex; align-items:center; justify-content:center;
+    gap:8px;
+    border-radius:var(--radius-sm);
+    padding:12px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    border:none;
+  }
+  .btn.primary{ background:var(--alert); color:#1a0d08; }
+  .btn.outline{ background:transparent; border:1px solid var(--hairline); color:var(--sand); }
+  .btn.amber{ background:var(--amber); color:#251804; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--hairline);
+    color:var(--sand-dim);
+  }
+  .chip.on{ background:rgba(255,75,38,.12); border-color:var(--alert); color:#FF9A80; }
+
+  /* ---------- SCREEN 1 — ACCUEIL ---------- */
+  .weather-chip{
+    align-self:flex-start;
+    display:flex; align-items:center; gap:6px;
+    font-size:11px; color:var(--sand-dim);
+    background:var(--surface-raised);
+    padding:5px 10px; border-radius:999px;
+    border:1px solid var(--hairline);
+  }
+  .sos-wrap{
+    flex:1;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:14px;
+  }
+  .sos-btn{
+    width:150px; height:150px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #FF6A45, var(--alert) 70%);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:22px; letter-spacing:.02em;
+    color:#1a0d08;
+    position:relative;
+    box-shadow:0 0 0 0 rgba(255,75,38,.5);
+    animation:pulse-sos 2.2s ease-out infinite;
+  }
+  @keyframes pulse-sos{
+    0%{ box-shadow:0 0 0 0 rgba(255,75,38,.45); }
+    70%{ box-shadow:0 0 0 26px rgba(255,75,38,0); }
+    100%{ box-shadow:0 0 0 0 rgba(255,75,38,0); }
+  }
+  .sos-hint{ font-size:12px; color:var(--sand-dim); letter-spacing:.04em; }
+  .quick-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  }
+  .quick-grid .q{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-size:10px; color:var(--sand-dim);
+    background:var(--surface-raised);
+    border:1px solid var(--hairline);
+    border-radius:var(--radius-sm);
+    padding:10px 4px;
+  }
+  .quick-grid .q .ic{ font-size:18px; }
+
+  /* ---------- SCREEN 2 — TYPE URGENCE ---------- */
+  .type-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .type-item{
+    background:var(--surface-raised);
+    border:1px solid var(--hairline);
+    border-radius:var(--radius-sm);
+    padding:14px 8px;
+    text-align:center;
+    font-size:12px;
+  }
+  .type-item.sel{ border-color:var(--alert); background:rgba(255,75,38,.1); }
+  .type-item .ic{ font-size:20px; display:block; margin-bottom:6px; }
+  .gps-card{ display:flex; flex-direction:column; gap:4px; }
+  .gps-card .coords{ font-size:12px; color:var(--green); }
+  .stack{ display:flex; flex-direction:column; gap:8px; margin-top:auto; }
+
+  /* ---------- SCREEN 3 — DOSSIER MEDICAL ---------- */
+  .id-row{ display:flex; align-items:center; gap:10px; }
+  .avatar{
+    width:42px; height:42px; border-radius:50%;
+    background:var(--amber-dim); color:var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700;
+  }
+  .field{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--hairline); font-size:13px; }
+  .field:last-child{ border-bottom:none; }
+  .field .k{ color:var(--sand-dim); }
+  .toggle{
+    width:38px; height:22px; border-radius:999px; background:var(--green);
+    position:relative;
+  }
+  .toggle::after{
+    content:''; position:absolute; width:16px; height:16px; border-radius:50%;
+    background:#fff; top:3px; right:3px;
+  }
+
+  /* ---------- SCREEN 4 — GUIDES LISTE ---------- */
+  .guide-list{ display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+  .guide-item{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface-raised);
+    border:1px solid var(--hairline);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+  }
+  .guide-item .ic{ font-size:18px; }
+  .guide-item .meta{ font-size:11px; color:var(--sand-dim); }
+  .guide-item .name{ font-size:13px; font-weight:500; }
+
+  /* ---------- SCREEN 5 — GUIDE DETAIL ---------- */
+  .progress-dots{ display:flex; gap:5px; }
+  .progress-dots span{ width:16px; height:4px; border-radius:2px; background:var(--hairline); }
+  .progress-dots span.on{ background:var(--alert); }
+  .illus{
+    height:110px; border-radius:var(--radius-md);
+    background:linear-gradient(135deg, var(--surface-raised), #2E2721);
+    display:flex; align-items:center; justify-content:center;
+    font-size:36px;
+    border:1px solid var(--hairline);
+  }
+  .step-text{ font-size:14px; line-height:1.55; color:var(--sand); }
+  .lang-row{ display:flex; gap:8px; align-items:center; }
+  .audio-live{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--green); }
+  .audio-bars{ display:flex; gap:2px; align-items:flex-end; height:12px; }
+  .audio-bars span{ width:2px; background:var(--green); animation:eq 900ms ease-in-out infinite; }
+  .audio-bars span:nth-child(1){ height:6px; animation-delay:0s; }
+  .audio-bars span:nth-child(2){ height:12px; animation-delay:.15s; }
+  .audio-bars span:nth-child(3){ height:8px; animation-delay:.3s; }
+  .audio-bars span:nth-child(4){ height:11px; animation-delay:.1s; }
+  @keyframes eq{ 0%,100%{ transform:scaleY(.5);} 50%{ transform:scaleY(1);} }
+
+  /* ---------- SCREEN 6 — METRONOME ---------- */
+  .metro-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+  .metro-ring{
+    width:150px; height:150px; border-radius:50%;
+    border:2px solid var(--alert);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    animation:beat 545ms ease-in-out infinite;
+  }
+  @keyframes beat{ 0%,100%{ transform:scale(1); } 20%{ transform:scale(1.06); } }
+  .metro-ring .bpm{ font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:500; }
+  .metro-ring .lbl{ font-size:10px; color:var(--sand-dim); letter-spacing:.1em; }
+  .metro-stats{ display:flex; gap:24px; }
+  .metro-stats .s{ text-align:center; }
+  .metro-stats .s .v{ font-family:'IBM Plex Mono',monospace; font-size:18px; }
+  .metro-stats .s .l{ font-size:10px; color:var(--sand-dim); }
+
+  /* ---------- SCREEN 7 — MESH ---------- */
+  .radar{
+    height:140px; border-radius:var(--radius-md);
+    background:radial-gradient(circle at center, rgba(63,166,107,.12), transparent 65%), var(--surface-raised);
+    border:1px solid var(--hairline);
+    position:relative;
+    overflow:hidden;
+  }
+  .radar .ring{
+    position:absolute; border:1px solid var(--hairline); border-radius:50%;
+    left:50%; top:50%; transform:translate(-50%,-50%);
+  }
+  .radar .ring.r1{ width:60px; height:60px; }
+  .radar .ring.r2{ width:100px; height:100px; }
+  .radar .ring.r3{ width:140px; height:140px; }
+  .radar .me{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:10px; height:10px; border-radius:50%; background:var(--alert);
+  }
+  .radar .node{
+    position:absolute; width:8px; height:8px; border-radius:50%; background:var(--green);
+    box-shadow:0 0 0 0 rgba(63,166,107,.6);
+    animation:ping 2.4s ease-out infinite;
+  }
+  .mesh-alert{
+    background:var(--surface-raised); border:1px solid var(--hairline); border-radius:var(--radius-sm);
+    padding:10px 12px; font-size:12px; display:flex; flex-direction:column; gap:4px;
+  }
+  .mesh-alert .top{ display:flex; justify-content:space-between; align-items:center; }
+  .bridge{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--blue); }
+
+  /* ---------- SCREEN 8 — CARTE ---------- */
+  .filters{ display:flex; gap:6px; overflow:hidden; }
+  .map-block{
+    flex:1; border-radius:var(--radius-md); overflow:hidden; position:relative;
+    background:
+      linear-gradient(var(--hairline) 1px, transparent 1px) 0 0/34px 34px,
+      linear-gradient(90deg, var(--hairline) 1px, transparent 1px) 0 0/34px 34px,
+      var(--surface-raised);
+    border:1px solid var(--hairline);
+    min-height:170px;
+  }
+  .pin{
+    position:absolute; width:20px; height:20px; border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:#111;
+  }
+  .pin span{ transform:rotate(45deg); }
+  .pin.hosp{ background:#FF6A5C; top:24%; left:30%; }
+  .pin.pharma{ background:var(--green); top:52%; left:60%; }
+  .pin.police{ background:var(--blue); top:70%; left:24%; }
+
+  /* ---------- SCREEN 9 — ANNUAIRE ---------- */
+  .num-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 0; border-bottom:1px solid var(--hairline);
+  }
+  .num-row:last-child{ border-bottom:none; }
+  .num-row .l{ display:flex; flex-direction:column; }
+  .num-row .l .n{ font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--amber); }
+  .num-row .l .d{ font-size:11px; color:var(--sand-dim); }
+  .call-btn{
+    width:34px; height:34px; border-radius:50%;
+    background:var(--green); color:#0d1f16;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+
+  footer{
+    text-align:center;
+    padding:50px 20px 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--sand-dim);
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Aperçu d'interface — non fonctionnel</div>
+  <h1 class="display">SOS Sécurité <span>Mali</span></h1>
+  <p>Premiers secours, alerte d'urgence et relais SOS — pensés pour fonctionner
+     là où le réseau ne va pas. Neuf écrans clés pour se projeter avant le
+     développement.</p>
+  <div class="badges">
+    <div class="badge"><b>Offline-first</b></div>
+    <div class="badge"><b>Sans compte</b> · id. par téléphone</div>
+    <div class="badge"><b>Relais mesh</b> multi-hop</div>
+    <div class="badge"><b>FR + Bambara</b></div>
+  </div>
+</header>
+
+<div class="gallery-wrap">
+  <svg class="mesh-lines" viewbox="0 0 1180 1400" preserveAspectRatio="none">
+    <path d="M 195 260 C 400 220, 500 220, 590 260" />
+    <path d="M 590 260 C 700 220, 800 220, 985 260" />
+    <path d="M 195 900 C 400 860, 500 860, 590 900" />
+    <path d="M 590 900 C 700 860, 800 860, 985 900" />
+  </svg>
+
+  <div class="gallery">
+
+    <!-- 1. ACCUEIL -->
+    <div class="cell">
+      <div class="label"><span class="n">01</span> Accueil · <span class="live"></span> en veille</div>
+      <div class="phone">
+        <div class="statusbar">
+          <span>09:41</span>
+          <span class="offline">● hors ligne</span>
+        </div>
+        <div class="screen">
+          <div class="weather-chip">🌦 28°C · Bamako · maj il y a 2h</div>
+          <div class="sos-wrap">
+            <div class="sos-btn display">SOS</div>
+            <div class="sos-hint mono">MAINTENIR 3 SECONDES</div>
+          </div>
+          <div class="quick-grid">
+            <div class="q"><span class="ic">🩺</span>Dossier</div>
+            <div class="q"><span class="ic">📖</span>Guides</div>
+            <div class="q"><span class="ic">🗺️</span>Carte</div>
+            <div class="q"><span class="ic">📡</span>Mesh</div>
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="item active"><span class="dot">●</span>Accueil</div>
+          <div class="item"><span class="dot">○</span>Guides</div>
+          <div class="item"><span class="dot">○</span>Carte</div>
+          <div class="item"><span class="dot">○</span>Mesh</div>
+          <div class="item"><span class="dot">○</span>Profil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TYPE D'URGENCE -->
+    <div class="cell">
+      <div class="label"><span class="n">02</span> Déclenchement SOS</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2>Quel type d'urgence ?</h2>
+          <div class="type-grid">
+            <div class="type-item sel"><span class="ic">🚑</span>Médical</div>
+            <div class="type-item"><span class="ic">🚗</span>Accident</div>
+            <div class="type-item"><span class="ic">⚠️</span>Agression</div>
+            <div class="type-item"><span class="ic">🔥</span>Incendie</div>
+            <div class="type-item"><span class="ic">🌊</span>Noyade</div>
+            <div class="type-item"><span class="ic">➕</span>Autre</div>
+          </div>
+          <div class="card gps-card">
+            <span class="sub" style="margin:0;">Position verrouillée</span>
+            <span class="coords mono">12.6392° N, 8.0029° O</span>
+          </div>
+          <div class="stack">
+            <button class="btn amber">📞 Appeler le 122</button>
+            <button class="btn outline">💬 Envoyer ma position par SMS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. DOSSIER MEDICAL -->
+    <div class="cell">
+      <div class="label"><span class="n">03</span> Dossier médical</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <div class="id-row">
+            <div class="avatar">AN</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;">Abdoulaye N.</div>
+              <div class="sub" style="margin:0;">+223 xx xx xx xx</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="field"><span class="k">Groupe sanguin</span><span>O+</span></div>
+            <div class="field"><span class="k">Allergies</span><span>Pénicilline</span></div>
+            <div class="field"><span class="k">Contact 1</span><span>Assan Sylla</span></div>
+            <div class="field"><span class="k">Contact 2</span><span>Mathieu K.</span></div>
+          </div>
+          <div class="card row">
+            <span style="font-size:12px;">Inclure dans mes alertes SOS</span>
+            <div class="toggle"></div>
+          </div>
+          <div class="stack">
+            <button class="btn outline">◻ Partager en QR code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. GUIDES LISTE -->
+    <div class="cell">
+      <div class="label"><span class="n">04</span> Guides premiers secours</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2>Guides</h2>
+          <div class="sub">10 gestes essentiels, disponibles hors-ligne</div>
+          <div class="guide-list">
+            <div class="guide-item"><span class="ic">🫁</span><div><div class="name">RCP</div><div class="meta">7 étapes · audio</div></div></div>
+            <div class="guide-item"><span class="ic">🩸</span><div><div class="name">Hémorragie</div><div class="meta">5 étapes · audio</div></div></div>
+            <div class="guide-item"><span class="ic">🛌</span><div><div class="name">Position latérale (PLS)</div><div class="meta">4 étapes · audio</div></div></div>
+            <div class="guide-item"><span class="ic">🔥</span><div><div class="name">Brûlure</div><div class="meta">4 étapes · audio</div></div></div>
+            <div class="guide-item"><span class="ic">🫄</span><div><div class="name">Étouffement</div><div class="meta">5 étapes · audio</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. GUIDE DETAIL -->
+    <div class="cell">
+      <div class="label"><span class="n">05</span> Guide · lecture guidée</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <div class="row">
+            <h2 style="font-size:16px;">RCP — Étape 3/7</h2>
+            <div class="lang-row">
+              <span class="chip on">FR</span><span class="chip">BM</span>
+            </div>
+          </div>
+          <div class="progress-dots">
+            <span class="on"></span><span class="on"></span><span class="on"></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="illus">🫀</div>
+          <div class="step-text">Placez le talon de votre main au centre de la
+            poitrine, entre les mamelons. Entrelacez les doigts et gardez les
+            bras tendus.</div>
+          <div class="audio-live">
+            <div class="audio-bars"><span></span><span></span><span></span><span></span></div>
+            lecture audio en cours
+          </div>
+          <button class="btn primary">Étape suivante ▸</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. METRONOME -->
+    <div class="cell">
+      <div class="label"><span class="n">06</span> Métronome RCP</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2>Métronome RCP</h2>
+          <div class="metro-wrap">
+            <div class="metro-ring">
+              <div class="bpm mono">110</div>
+              <div class="lbl">BPM</div>
+            </div>
+            <div class="metro-stats">
+              <div class="s"><div class="v mono">02:14</div><div class="l">DURÉE</div></div>
+              <div class="s"><div class="v mono">214</div><div class="l">COMPRESSIONS</div></div>
+            </div>
+          </div>
+          <button class="btn primary">⏸ Arrêter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. MESH -->
+    <div class="cell">
+      <div class="label"><span class="n">07</span> Relais SOS · Mesh</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2 style="font-size:16px;">Relais SOS — mesh</h2>
+          <div class="radar">
+            <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+            <div class="me"></div>
+            <div class="node" style="left:28%;top:32%;"></div>
+            <div class="node" style="left:70%;top:38%;animation-delay:.6s;"></div>
+            <div class="node" style="left:60%;top:68%;animation-delay:1.1s;"></div>
+          </div>
+          <div class="mesh-alert">
+            <div class="top">
+              <span>Médical · reçue à 2 sauts</span>
+              <span class="pill high">critique</span>
+            </div>
+            <div class="bridge">🛰 pont SMS actif — réseau retrouvé</div>
+          </div>
+          <div class="card row">
+            <span style="font-size:12px;">Secouriste disponible</span>
+            <div class="toggle"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. CARTE -->
+    <div class="cell">
+      <div class="label"><span class="n">08</span> Carte locale</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2 style="font-size:16px;">Autour de moi</h2>
+          <div class="filters">
+            <span class="chip on">Tout</span><span class="chip">Hôpitaux</span>
+            <span class="chip">Pharmacies</span><span class="chip">Police</span>
+          </div>
+          <div class="map-block">
+            <div class="pin hosp"><span>+</span></div>
+            <div class="pin pharma"><span>℞</span></div>
+            <div class="pin police"><span>◆</span></div>
+          </div>
+          <div class="card row">
+            <div>
+              <div style="font-size:12px;font-weight:500;">Pharmacie de garde</div>
+              <div class="sub" style="margin:0;">à 850 m · ouverte</div>
+            </div>
+            <div class="call-btn">📞</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. ANNUAIRE -->
+    <div class="cell">
+      <div class="label"><span class="n">09</span> Annuaire d'urgence</div>
+      <div class="phone">
+        <div class="statusbar"><span>09:41</span><span class="offline">● hors ligne</span></div>
+        <div class="screen">
+          <h2>Numéros d'urgence</h2>
+          <div class="card" style="padding:2px 14px;">
+            <div class="num-row"><div class="l"><span class="n">101</span><span class="d">Police nationale</span></div><div class="call-btn">📞</div></div>
+            <div class="num-row"><div class="l"><span class="n">111</span><span class="d">Gendarmerie</span></div><div class="call-btn">📞</div></div>
+            <div class="num-row"><div class="l"><span class="n">122</span><span class="d">Protection civile</span></div><div class="call-btn">📞</div></div>
+            <div class="num-row"><div class="l"><span class="n">144</span><span class="d">Gestion de crise</span></div><div class="call-btn">📞</div></div>
+            <div class="num-row"><div class="l"><span class="n">145</span><span class="d">Garde nationale</span></div><div class="call-btn">📞</div></div>
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="item"><span class="dot">○</span>Accueil</div>
+          <div class="item"><span class="dot">○</span>Guides</div>
+          <div class="item"><span class="dot">○</span>Carte</div>
+          <div class="item"><span class="dot">○</span>Mesh</div>
+          <div class="item active"><span class="dot">●</span>Profil</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>SOS SÉCURITÉ MALI — MAQUETTE STATIQUE · AUCUNE DONNÉE N'EST COLLECTÉE</footer>
+
+</body>
+</html>

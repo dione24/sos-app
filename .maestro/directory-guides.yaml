@@ -1,0 +1,15 @@
+appId: ml.sossecurite.app
+name: Annuaire et guides hors ligne
+---
+- launchApp
+- tapOn: "Numéros"
+- assertVisible: "Numéros d'urgence"
+- assertVisible: "122"
+- assertVisible: "Protection Civile"
+- back
+- tapOn: "Guides"
+- assertVisible: "Gestes qui sauvent"
+- assertVisible: "validation locale requise"
+- tapOn: "Réanimation cardio-pulmonaire, 7 étapes"
+- assertVisible: "Étape 1 sur 7"
+- assertVisible: "Lire cette étape à voix haute"

@@ -1,0 +1,14 @@
+appId: ml.sossecurite.app
+name: Consentements carte et confidentialité
+---
+- launchApp
+- tapOn: "Carte, Autour de moi"
+- assertVisible: "Trier les lieux depuis ma position"
+- assertVisible: "Continuer avec Bamako"
+- tapOn: "Continuer avec Bamako"
+- assertVisible: "CHU Gabriel Touré"
+- tapOn: "Accueil"
+- tapOn: "Ouvrir les paramètres"
+- tapOn: "Confidentialité et données"
+- assertVisible: "Vos données médicales restent sur ce téléphone"
+- assertVisible: "Effacer toutes mes données"
