@@ -1,5 +1,22 @@
 # Artefacts Android — 6 novembre 2026
 
+## Passage en production — 6 novembre 2026
+
+Le propriétaire a expressément demandé le passage en production et la fusion de la
+PR après le test interne. La version **1.0.0 (5)**, identique au bundle testé, a été
+ajoutée au canal de production `4697930975691391093`, pour **le Mali**.
+Les dix modifications (release, pays, fiche française et déclarations) ont été
+envoyées : Play affiche « Modifications en cours d’examen », avec les vérifications
+automatiques préalables encore en cours. La publication gérée est désactivée : le
+déploiement complet est prévu après approbation Google. Cette soumission ne signifie
+pas que l’app est déjà disponible publiquement.
+
+La relecture médicale locale reste **non documentée**, et les limites de QA restent
+celles de `QA_MATRIX.md`. Aucune signature clinique ni réussite de test non exécuté
+n’est ajoutée. La demande actuelle remplace la consigne antérieure limitant cette
+intervention au test interne et interdisant la fusion.
+
+
 Version **1.0.0**, `versionCode` **5**, package `ml.sossecurite.app`.
 Compte Play autorisé : **MHM Digital Agency**. Éditeur : SahelPay Technologies.
 Distribution prévue : **test interne uniquement** avant validation clinique et QA.

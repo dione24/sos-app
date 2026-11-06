@@ -1,5 +1,22 @@
 # Checklist publication — SOS Sécurité Mali 1.0.0
 
+## Passage en production — 6 novembre 2026
+
+Le propriétaire a expressément demandé le passage en production et la fusion de la
+PR après le test interne. La version **1.0.0 (5)**, identique au bundle testé, a été
+ajoutée au canal de production `4697930975691391093`, pour **le Mali**.
+Les dix modifications (release, pays, fiche française et déclarations) ont été
+envoyées : Play affiche « Modifications en cours d’examen », avec les vérifications
+automatiques préalables encore en cours. La publication gérée est désactivée : le
+déploiement complet est prévu après approbation Google. Cette soumission ne signifie
+pas que l’app est déjà disponible publiquement.
+
+La relecture médicale locale reste **non documentée**, et les limites de QA restent
+celles de `QA_MATRIX.md`. Aucune signature clinique ni réussite de test non exécuté
+n’est ajoutée. La demande actuelle remplace la consigne antérieure limitant cette
+intervention au test interne et interdisant la fusion.
+
+
 Éditeur : **SahelPay Technologies** · Abdoulaye NIANGALY  
 App **gratuite** · Publication Android en cours le 6 novembre 2026 ; iOS hors de cette demande.
 
@@ -65,7 +82,7 @@ App **gratuite** · Publication Android en cours le 6 novembre 2026 ; iOS hors d
 - [x] fiche `PLAY_STORE_LISTING.md` saisie, 7 captures natives code 5, nouveau visuel et icône conservée ;
 - [x] Data safety + Health declaration ; classification IARC et cible adultes enregistrées ;
 - [x] URL privacy live ;
-- [x] piste interne **active**, version 1.0.0 (5), non examinée ; **production réservée au propriétaire après QA et relecture médicale**.
+- [x] piste interne **active**, version 1.0.0 (5), non examinée ; **production soumise sur demande du propriétaire**, approbation Google en attente.
 
 ### App Store
 

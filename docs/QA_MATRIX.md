@@ -84,7 +84,7 @@ dossier vide et alertes fictives créées par les essais.
 - Trois Android pour vérifier le transfert et les sauts BLE ; ne pas promettre un
   multi-hop garanti. Un seul téléphone et un émulateur ne constituent pas cette preuve.
 - iOS hors de la demande de publication Android ; aucun essai iPhone effectué ici.
-- Relecture clinique locale signée avant toute promotion publique.
+- Relecture clinique locale signée toujours non documentée ; publication de production demandée par le propriétaire le 6 novembre 2026, sans validation clinique ajoutée au registre.
 
 ## Historique du 10 août 2026 (ancienne build)
 
