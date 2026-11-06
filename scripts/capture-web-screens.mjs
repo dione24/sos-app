@@ -18,6 +18,8 @@ import { extname, join, resolve } from 'node:path';
 const outDir = resolve(process.argv[2] ?? 'docs/design/screens/apres');
 const distDir = resolve(process.env.SOS_WEB_DIST ?? 'dist-web');
 const playwrightDir = process.env.SOS_PLAYWRIGHT_DIR;
+// SOS_ONLY=02-accueil,03-sos : ne garder que ces captures (le parcours reste identique).
+const only = process.env.SOS_ONLY ? new Set(process.env.SOS_ONLY.split(',')) : null;
 if (!playwrightDir) throw new Error('SOS_PLAYWRIGHT_DIR manquant (dossier node_modules contenant playwright)');
 const { chromium } = createRequire(join(playwrightDir, '/'))('playwright');
 
@@ -54,6 +56,7 @@ async function open(path) {
 }
 
 async function shot(name) {
+  if (only && !only.has(name)) return;
   const file = join(outDir, `${name}.png`);
   await page.screenshot({ path: file, type: 'png' });
   const kb = Math.round(statSync(file).size / 1024);
@@ -106,6 +109,7 @@ await field('Nom').first().fill('Moussa Traoré');
 await field('Téléphone').first().fill('+223 00 00 00 01');
 await tap('Enregistrer');
 await page.waitForTimeout(800);
+await open('/profile');
 await shot('12-dossier');
 
 await open('/');
