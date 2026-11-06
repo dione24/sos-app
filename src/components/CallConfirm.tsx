@@ -37,8 +37,8 @@ export function CallConfirm({ number, service, onCall, onClose }: CallConfirmPro
           <Text maxFontSizeMultiplier={1.3} style={s.label}>Appel d’urgence</Text>
           <Text maxFontSizeMultiplier={1.2} style={s.number}>{number}</Text>
           <Text maxFontSizeMultiplier={1.4} style={s.service}>{service} · réseau téléphonique</Text>
-          <View ref={callRef} style={s.actions}>
-            <Button label={`Appeler le ${number}`} onPress={onCall} variant="sos" icon={<PhoneCall size={22} color={colors.onColor} />} />
+          <View style={s.actions}>
+            <Button ref={callRef} label={`Appeler le ${number}`} onPress={onCall} variant="sos" icon={<PhoneCall size={22} color={colors.onColor} />} />
             <Button label="Retour sans appeler" onPress={onClose} variant="secondary" />
           </View>
         </View>

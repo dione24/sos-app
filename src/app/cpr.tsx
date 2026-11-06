@@ -173,6 +173,8 @@ export default function CprScreen() {
             size="md"
             variant="secondary"
             accessibilityLabel="Son du métronome"
+            accessibilityRole="switch"
+            checked={sound}
             onPress={() => setSound((value) => { soundRef.current = !value; return !value; })}
             icon={sound ? <Volume2 size={20} color={colors.primaryText} /> : <VolumeX size={20} color={colors.inkFaint} />}
             style={s.control}

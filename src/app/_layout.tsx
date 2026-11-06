@@ -5,7 +5,7 @@ import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
 import { getProfile, getSetting, migrateDatabase, setSetting } from '@/db/database';
@@ -96,11 +96,18 @@ function ThemedApp() {
       .catch(() => setSetupError("Impossible d'ouvrir le stockage chiffré de l'appareil."));
   }, []);
 
+  // Référence stable : un `onInit` recréé (ex. bascule clair/sombre) ferait
+  // rouvrir la base par SQLiteProvider et démonterait les écrans en cours.
+  const initDatabase = useCallback(
+    (db: Parameters<typeof migrateDatabase>[0]) => migrateDatabase(db, databaseKey ?? ''),
+    [databaseKey],
+  );
+
   if (fontError || setupError) return <BootStatus label={setupError ?? 'Les polices intégrées sont indisponibles.'} error />;
   if (!loaded || !databaseKey) return <BootStatus label="Préparation de SOS Mali…" />;
 
   return (
-    <SQLiteProvider databaseName="sos-securite-mali-secure-v2.db" onInit={(db) => migrateDatabase(db, databaseKey)}>
+    <SQLiteProvider databaseName="sos-securite-mali-secure-v2.db" onInit={initDatabase}>
       <StatusBar style={dark ? 'light' : 'dark'} />
       <BootstrapGate />
     </SQLiteProvider>

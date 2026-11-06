@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import type { ReactNode, Ref } from 'react';
+import { ActivityIndicator, Pressable, Text, View, type AccessibilityRole, type StyleProp, type ViewStyle } from 'react-native';
 
 import { makeStyles, useTheme } from '@/theme';
 
@@ -15,6 +15,10 @@ type ButtonProps = {
   loading?: boolean;
   accessibilityHint?: string;
   accessibilityLabel?: string;
+  /** `switch` pour un réglage à deux états (avec `checked`). */
+  accessibilityRole?: AccessibilityRole;
+  checked?: boolean;
+  ref?: Ref<View>;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -28,6 +32,9 @@ export function Button({
   loading,
   accessibilityHint,
   accessibilityLabel,
+  accessibilityRole = 'button',
+  checked,
+  ref,
   style,
 }: ButtonProps) {
   const s = useStyles();
@@ -37,10 +44,11 @@ export function Button({
 
   return (
     <Pressable
-      accessibilityRole="button"
+      ref={ref}
+      accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled: Boolean(inactive), busy: Boolean(loading) }}
+      accessibilityState={{ disabled: Boolean(inactive), busy: Boolean(loading), ...(checked === undefined ? {} : { checked }) }}
       disabled={inactive}
       onPress={onPress}
       style={({ pressed }) => [
