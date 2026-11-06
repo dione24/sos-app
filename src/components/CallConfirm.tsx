@@ -1,15 +1,9 @@
+import { PhoneCall } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
-import {
-  AccessibilityInfo,
-  findNodeHandle,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { AccessibilityInfo, findNodeHandle, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, font, radius, spacing, type } from '@/constants/theme';
+import { Button } from '@/components/ui/Button';
+import { makeStyles, useTheme } from '@/theme';
 
 type CallConfirmProps = {
   number: string;
@@ -19,9 +13,12 @@ type CallConfirmProps = {
 };
 
 export function CallConfirm({ number, service, onCall, onClose }: CallConfirmProps) {
+  const s = useStyles();
+  const { colors } = useTheme();
   const callRef = useRef<View>(null);
 
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     const timer = setTimeout(() => {
       const node = findNodeHandle(callRef.current);
       if (node) AccessibilityInfo.setAccessibilityFocus(node);
@@ -30,80 +27,40 @@ export function CallConfirm({ number, service, onCall, onClose }: CallConfirmPro
   }, []);
 
   return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onClose}
-      presentationStyle="overFullScreen"
-      statusBarTranslucent
-      transparent
-      visible
-    >
-      <View accessibilityViewIsModal accessibilityLabel="Confirmation de l’appel" style={styles.overlay}>
+    <Modal animationType="fade" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible>
+      <View accessibilityViewIsModal accessibilityLabel="Confirmation de l’appel" style={s.overlay}>
         <Pressable accessibilityLabel="Fermer la confirmation" onPress={onClose} style={StyleSheet.absoluteFill} />
-        <View style={styles.panel}>
-          <Text maxFontSizeMultiplier={1.35} style={styles.eyebrow}>APPEL D’URGENCE</Text>
-          <Text maxFontSizeMultiplier={1.2} style={styles.number}>{number}</Text>
-          <Text maxFontSizeMultiplier={1.5} style={styles.service}>{service} · réseau téléphonique</Text>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Appeler le ${number}`}
-            ref={callRef}
-            onPress={onCall}
-            style={({ pressed }) => [styles.call, pressed && styles.pressed]}
-          >
-            <Text maxFontSizeMultiplier={1.35} style={styles.callText}>Appeler</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Retour sans appeler"
-            onPress={onClose}
-            style={({ pressed }) => [styles.back, pressed && styles.pressed]}
-          >
-            <Text maxFontSizeMultiplier={1.35} style={styles.backText}>Retour</Text>
-          </Pressable>
+        <View style={s.panel}>
+          <View style={s.badge}>
+            <PhoneCall size={26} color={colors.dangerText} strokeWidth={2.2} />
+          </View>
+          <Text maxFontSizeMultiplier={1.3} style={s.label}>Appel d’urgence</Text>
+          <Text maxFontSizeMultiplier={1.2} style={s.number}>{number}</Text>
+          <Text maxFontSizeMultiplier={1.4} style={s.service}>{service} · réseau téléphonique</Text>
+          <View style={s.actions}>
+            <Button ref={callRef} label={`Appeler le ${number}`} onPress={onCall} variant="sos" icon={<PhoneCall size={22} color={colors.onColor} />} />
+            <Button label="Retour sans appeler" onPress={onClose} variant="secondary" />
+          </View>
         </View>
       </View>
     </Modal>
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: spacing.lg,
-    backgroundColor: `${colors.void}EB`,
-  },
+const useStyles = makeStyles((t) => ({
+  overlay: { flex: 1, justifyContent: 'center', padding: t.spacing.lg, backgroundColor: t.colors.overlay },
   panel: {
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  eyebrow: { ...type.eyebrow, color: colors.amber, textAlign: 'center' },
-  number: { fontFamily: font.display, fontSize: 36, lineHeight: 42, color: colors.sand, textAlign: 'center' },
-  service: { fontFamily: font.bodyMedium, fontSize: 16, lineHeight: 22, color: colors.sandMuted, textAlign: 'center' },
-  call: {
-    minHeight: 56,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.sm,
-    backgroundColor: colors.amber,
+    gap: t.spacing.xs,
+    padding: t.spacing.xl,
+    borderRadius: t.radius.lg,
+    backgroundColor: t.colors.surface,
     borderWidth: 1,
-    borderColor: colors.amber,
+    borderColor: t.colors.border,
   },
-  callText: { fontFamily: font.displayMedium, fontSize: 18, color: colors.black },
-  back: {
-    minHeight: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  backText: { fontFamily: font.displayMedium, fontSize: 16, color: colors.sand },
-  pressed: { opacity: 0.75, transform: [{ scale: 0.985 }] },
-});
+  badge: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: t.colors.dangerBg, marginBottom: t.spacing.xs },
+  label: { ...t.text.overline, color: t.colors.dangerText },
+  number: { fontFamily: 'DMSans_700Bold', fontSize: 44, lineHeight: 50, letterSpacing: -0.5, color: t.colors.ink },
+  service: { ...t.text.body, color: t.colors.inkMuted, textAlign: 'center' },
+  actions: { alignSelf: 'stretch', gap: t.spacing.sm, marginTop: t.spacing.md },
+}));

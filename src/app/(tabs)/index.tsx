@@ -1,25 +1,21 @@
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import {
-  HeartPulse,
-  PhoneCall,
-  Settings2,
-  ShieldAlert,
-  UserRound,
-} from 'lucide-react-native';
+import { HeartPulse, PhoneCall, Settings2, ShieldAlert, UserRoundPlus, WifiOff } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
-import { Card } from '@/components/ui';
-import { colors, font, radius, shadows, spacing, type } from '@/constants/theme';
+import { IconButton, IconTile, ListRow } from '@/components/ui';
 import { getProfile } from '@/db/database';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useI18n } from '@/i18n/use-i18n';
+import { makeStyles, useTheme } from '@/theme';
 
 export default function HomeScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const router = useRouter();
   const db = useSQLiteContext();
   const reducedMotion = useReducedMotion();
@@ -37,8 +33,8 @@ export default function HomeScreen() {
     }
     const animation = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 1500, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 1600, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: 1000, useNativeDriver: true }),
       ]),
     );
     animation.start();
@@ -49,35 +45,21 @@ export default function HomeScreen() {
     void getProfile(db).then((profile) => setProfileName(profile?.name ?? ''));
   }, [db]);
 
-  const pulseScale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.16] });
-  const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] });
+  const pulseScale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
+  const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] });
 
   return (
     <Screen>
       <AppHeader
-        title={
-          profileName
-            ? `Bonjour, ${profileName.split(' ')[0]}`
-            : 'SOS Sécurité Mali'
-        }
-        eyebrow={t('home_ready')}
-        action={
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('settings_title')}
-            onPress={() => router.push('/settings')}
-            hitSlop={12}
-            style={styles.settings}
-          >
-            <Settings2 size={21} color={colors.sandMuted} />
-          </Pressable>
-        }
+        title={profileName ? `Bonjour, ${profileName.split(' ')[0]}` : 'SOS Sécurité Mali'}
+        subtitle={t('home_ready')}
+        action={<IconButton accessibilityLabel={t('settings_title')} icon={<Settings2 size={22} color={colors.inkMuted} />} onPress={() => router.push('/settings')} />}
       />
 
-      <View style={[styles.sosZone, largeText && styles.sosZoneLarge]}>
+      <View style={s.sosZone}>
         <Animated.View
           pointerEvents="none"
-          style={[styles.pulse, { opacity: reducedMotion ? 0.18 : pulseOpacity, transform: [{ scale: reducedMotion ? 1 : pulseScale }] }]}
+          style={[s.pulse, { opacity: reducedMotion ? 0 : pulseOpacity, transform: [{ scale: reducedMotion ? 1 : pulseScale }] }]}
         />
         <Pressable
           accessibilityRole="button"
@@ -87,104 +69,94 @@ export default function HomeScreen() {
             void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
             router.push('/sos');
           }}
-          style={({ pressed }) => [styles.sos, pressed && styles.sosPressed]}
+          style={({ pressed }) => [s.sos, pressed && s.sosPressed]}
         >
-          <ShieldAlert size={36} color={colors.black} strokeWidth={2.7} />
-          <Text maxFontSizeMultiplier={1.15} style={styles.sosText}>SOS</Text>
-          <Text maxFontSizeMultiplier={1.35} style={styles.sosSub}>{t('home_touch')}</Text>
+          <ShieldAlert size={40} color={colors.onColor} strokeWidth={2.2} />
+          <Text maxFontSizeMultiplier={1.1} style={s.sosText}>SOS</Text>
+          <Text maxFontSizeMultiplier={1.25} style={s.sosSub}>{t('home_touch')}</Text>
         </Pressable>
-        <Text maxFontSizeMultiplier={1.15} style={styles.sosHint}>{t('home_sos_hint')}</Text>
+        <Text maxFontSizeMultiplier={1.3} style={s.sosHint}>{t('home_sos_hint')}</Text>
       </View>
 
-      <View style={[styles.directRow, largeText && styles.wrapRow]}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('home_cpr')} onPress={() => router.push('/cpr')} style={[styles.direct, largeText && styles.directLarge]}>
-          <HeartPulse size={20} color={colors.alert} />
-          <View style={styles.directCopy}>
-            <Text maxFontSizeMultiplier={1.5} style={styles.directTitle}>{t('home_cpr')}</Text>
-            <Text maxFontSizeMultiplier={1.5} style={styles.directSub}>{t('home_cpr_sub')}</Text>
+      <View style={[s.quickRow, largeText && s.quickColumn]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`${t('home_cpr')}, ${t('home_cpr_sub')}`} onPress={() => router.push('/cpr')} style={({ pressed }) => [s.quick, pressed && s.quickPressed]}>
+          <IconTile tone="danger"><HeartPulse size={24} color={colors.dangerText} /></IconTile>
+          <View style={s.quickCopy}>
+            <Text maxFontSizeMultiplier={1.4} style={s.quickTitle}>{t('home_cpr')}</Text>
+            <Text maxFontSizeMultiplier={1.4} style={s.quickSub}>{t('home_cpr_sub')}</Text>
           </View>
         </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('home_numbers')} onPress={() => router.push('/directory')} style={[styles.direct, largeText && styles.directLarge]}>
-          <PhoneCall size={20} color={colors.green} />
-          <View style={styles.directCopy}>
-            <Text maxFontSizeMultiplier={1.5} style={styles.directTitle}>{t('home_numbers')}</Text>
-            <Text maxFontSizeMultiplier={1.5} style={styles.directSub}>{t('home_numbers_sub')}</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={`${t('home_numbers')}, ${t('home_numbers_sub')}`} onPress={() => router.push('/directory')} style={({ pressed }) => [s.quick, pressed && s.quickPressed]}>
+          <IconTile tone="primary"><PhoneCall size={24} color={colors.primaryText} /></IconTile>
+          <View style={s.quickCopy}>
+            <Text maxFontSizeMultiplier={1.4} style={s.quickTitle}>{t('home_numbers')}</Text>
+            <Text maxFontSizeMultiplier={1.4} style={s.quickSub}>{t('home_numbers_sub')}</Text>
           </View>
         </Pressable>
       </View>
 
       {!profileName ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={t('home_complete_profile')} onPress={() => router.push('/profile')}>
-          <Card style={styles.profileBanner}>
-            <UserRound size={22} color={colors.amber} />
-            <View style={styles.profileCopy}>
-              <Text maxFontSizeMultiplier={1.5} style={styles.profileTitle}>{t('home_complete_profile')}</Text>
-              <Text maxFontSizeMultiplier={1.5} style={styles.profileSub}>{t('home_complete_profile_sub')}</Text>
-            </View>
-          </Card>
-        </Pressable>
+        <ListRow
+          title={t('home_complete_profile')}
+          subtitle={t('home_complete_profile_sub')}
+          leading={<IconTile tone="warning"><UserRoundPlus size={22} color={colors.warningText} /></IconTile>}
+          chevron
+          onPress={() => router.push('/profile')}
+        />
       ) : null}
+
+      <View style={s.offline}>
+        <WifiOff size={18} color={colors.inkFaint} />
+        <Text maxFontSizeMultiplier={1.5} style={s.offlineText}>{t('home_local')} · {t('home_offline')}</Text>
+      </View>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  settings: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.hairline,
-    backgroundColor: colors.raised,
-  },
-  sosZone: { minHeight: 200, alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
-  sosZoneLarge: { minHeight: 200 },
+const SOS_SIZE = 220;
+
+const useStyles = makeStyles((t) => ({
+  sosZone: { minHeight: 280, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, paddingVertical: t.spacing.md },
   pulse: {
     position: 'absolute',
-    width: 190,
-    height: 190,
-    borderRadius: 95,
-    borderWidth: 2,
-    borderColor: colors.alert,
-    backgroundColor: colors.alertDark,
+    width: SOS_SIZE + 24,
+    height: SOS_SIZE + 24,
+    borderRadius: (SOS_SIZE + 24) / 2,
+    backgroundColor: t.colors.sos,
   },
   sos: {
-    width: 172,
-    height: 172,
-    borderRadius: 86,
+    width: SOS_SIZE,
+    height: SOS_SIZE,
+    borderRadius: SOS_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.alert,
-    borderWidth: 5,
-    borderColor: '#FFB09F',
-    ...shadows.soft,
+    gap: 2,
+    backgroundColor: t.colors.sos,
+    borderWidth: 6,
+    borderColor: t.colors.sosRing,
+    ...t.shadows.floating,
   },
-  sosPressed: { transform: [{ scale: 0.96 }], backgroundColor: '#E43D1C' },
-  sosText: { fontFamily: font.display, fontSize: 44, lineHeight: 49, color: colors.black, letterSpacing: 1 },
-  sosSub: { fontFamily: font.bodyBold, fontSize: 12, color: colors.black, letterSpacing: 0.2 },
-  sosHint: { ...type.eyebrow, color: colors.sandMuted, letterSpacing: 0.7 },
-  wrapRow: { flexWrap: 'wrap' },
-  directRow: { flexDirection: 'row', gap: spacing.sm },
-  direct: {
+  sosPressed: { backgroundColor: t.colors.sosPressed, transform: [{ scale: 0.97 }] },
+  sosText: { fontFamily: 'DMSans_700Bold', fontSize: 52, lineHeight: 58, letterSpacing: 2, color: t.colors.onColor },
+  sosSub: { fontFamily: 'DMSans_600SemiBold', fontSize: 13, lineHeight: 18, color: t.colors.onColor, textAlign: 'center', paddingHorizontal: t.spacing.lg, opacity: 0.95 },
+  sosHint: { ...t.text.caption, textAlign: 'center' },
+  quickRow: { flexDirection: 'row', gap: t.spacing.sm },
+  quickColumn: { flexDirection: 'column' },
+  quick: {
     flex: 1,
-    minHeight: 88,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    minHeight: 120,
+    gap: t.spacing.sm,
+    padding: t.spacing.md,
+    borderRadius: t.radius.md,
+    backgroundColor: t.colors.surface,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: t.colors.border,
+    ...t.shadows.card,
   },
-  directCopy: { flex: 1 },
-  directLarge: { flexBasis: '100%' },
-  directTitle: { fontFamily: font.bodyBold, fontSize: 15, color: colors.sand },
-  directSub: { fontFamily: font.body, fontSize: 12, color: colors.sandFaint, marginTop: 2 },
-  profileBanner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  profileCopy: { flex: 1 },
-  profileTitle: { ...type.small, color: colors.sand, fontFamily: font.bodyBold },
-  profileSub: { ...type.small, fontSize: 11, marginTop: 2 },
-});
+  quickPressed: { backgroundColor: t.colors.surfaceAlt },
+  quickCopy: { gap: 2 },
+  quickTitle: { ...t.text.bodyStrong, fontSize: 15, lineHeight: 20 },
+  quickSub: { ...t.text.caption, fontSize: 13, lineHeight: 18 },
+  offline: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.xs },
+  offlineText: { ...t.text.caption, color: t.colors.inkFaint },
+}));

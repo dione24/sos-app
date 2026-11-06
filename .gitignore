@@ -26,3 +26,4 @@ credentials.json
 
 expo-env.d.ts
 # @end expo-cli
+dist-web/

@@ -1,23 +1,25 @@
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ChevronLeft, ChevronRight, Pause, PhoneCall, Play, Volume2 } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Pause, PhoneCall, Play, Volume2, VolumeX } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { GuideIcon } from '@/components/GuideIcon';
 import { Screen } from '@/components/Screen';
-import { Badge, Button, Card } from '@/components/ui';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
+import { Button, Card, IconButton, StepProgress } from '@/components/ui';
 import { getGuide } from '@/data';
 import { useI18n } from '@/i18n/use-i18n';
 import { resolveGuideAudio } from '@/lib/guide-audio';
 import { confirmCall } from '@/services/phone';
+import { makeStyles, useTheme } from '@/theme';
 
 const GUIDE_AWAKE_TAG = 'first-aid-guidance';
 
 export default function GuideDetailScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t } = useI18n();
@@ -29,14 +31,14 @@ export default function GuideDetailScreen() {
   const contentLanguage = 'fr' as const;
   const stepText = step?.fr ?? '';
   const title = guide?.title ?? '';
-  // Memoised: an unstable reference here would restart playback on every render.
+  // Mémoïsé : une référence instable relancerait la lecture à chaque rendu.
   const audio = useMemo(
     () => (guide && step ? resolveGuideAudio(contentLanguage, guide.id, step.id) : null),
     [contentLanguage, guide, step],
   );
-  // `null` keeps the player mounted with no media until a narration file is registered.
+  // `null` garde le lecteur monté sans média tant qu'aucun fichier n'est enregistré.
   const player = useAudioPlayer(audio?.source ?? null);
-  // Playback position is read through a ref so status updates never re-render the screen.
+  // La position de lecture passe par une ref pour ne jamais re-rendre l'écran.
   const finishedRef = useRef(false);
 
   useEffect(() => {
@@ -56,14 +58,14 @@ export default function GuideDetailScreen() {
   useEffect(() => {
     if (!guided) return;
     void activateKeepAwakeAsync(GUIDE_AWAKE_TAG);
-    // Rewind only after a completed step; play() alone keeps start latency minimal.
+    // Rembobiner seulement après une étape terminée ; play() seul garde la latence minimale.
     if (finishedRef.current) {
       finishedRef.current = false;
       void player.seekTo(0).catch(() => undefined);
     }
     try {
-      // Typed void, but the native call rejects asynchronously when the player was
-      // released mid-navigation. Swallow it so the UI never claims to be playing.
+      // Typé void, mais l'appel natif rejette de façon asynchrone si le lecteur a été
+      // libéré pendant une navigation. On l'avale pour ne jamais afficher « en lecture » à tort.
       const started: unknown = player.play();
       if (started instanceof Promise) started.catch(() => setGuided(false));
     } catch {
@@ -73,7 +75,7 @@ export default function GuideDetailScreen() {
       try {
         player.pause();
       } catch {
-        // Player may already be released when the screen unmounts.
+        // Le lecteur peut déjà être libéré au démontage de l'écran.
       }
       void deactivateKeepAwake(GUIDE_AWAKE_TAG);
     };
@@ -83,7 +85,7 @@ export default function GuideDetailScreen() {
     return (
       <Screen>
         <AppHeader title={t('guide_missing')} back />
-        <Button label={t('guide_back')} onPress={() => router.replace('/guides')} variant="outline" />
+        <Button label={t('guide_back')} onPress={() => router.replace('/guides')} variant="secondary" />
       </Screen>
     );
   }
@@ -107,57 +109,35 @@ export default function GuideDetailScreen() {
   return (
     <Screen
       footer={
-        <View style={styles.footer}>
-          <View style={styles.navRow}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('guide_prev')}
-              disabled={index === 0}
-              onPress={() => setIndex((value) => Math.max(0, value - 1))}
-              style={[styles.previous, index === 0 && styles.disabled]}
-            >
-              <ChevronLeft size={25} color={colors.sand} />
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={isLast ? t('guide_done') : t('guide_next')}
-              onPress={next}
-              style={styles.next}
-            >
-              <Text maxFontSizeMultiplier={1.3} style={styles.nextText}>
-                {isLast ? t('guide_done') : t('guide_next')}
-              </Text>
-              <ChevronRight size={23} color={colors.black} />
-            </Pressable>
-          </View>
+        <View style={s.navRow}>
+          <IconButton
+            accessibilityLabel={t('guide_prev')}
+            disabled={index === 0}
+            icon={<ChevronLeft size={26} color={colors.ink} />}
+            onPress={() => setIndex((value) => Math.max(0, value - 1))}
+            style={s.previous}
+          />
+          <Button
+            label={isLast ? t('guide_done') : t('guide_next')}
+            onPress={next}
+            icon={isLast ? undefined : <ChevronRight size={22} color={colors.onPrimary} />}
+            style={s.next}
+          />
         </View>
       }
     >
-      <AppHeader
-        title={title}
-        eyebrow={`${t('guide_step')} ${index + 1} ${t('guide_of')} ${guide.steps.length}`}
-        back
-      />
+      <AppHeader title={title} subtitle={`${t('guide_step')} ${index + 1} ${t('guide_of')} ${guide.steps.length}`} back />
+      <StepProgress count={guide.steps.length} current={index} label={`${t('guide_step')} ${index + 1} ${t('guide_of')} ${guide.steps.length}`} />
 
-      <View style={styles.progress}>
-        {guide.steps.map((item, itemIndex) => (
-          <View key={item.id} style={[styles.progressSegment, itemIndex <= index && styles.progressDone]} />
-        ))}
-      </View>
-
-      <View style={styles.audioBadge}>
-        <Badge label={audio ? t('guide_voice_ready') : t('guide_voice_pending')} tone={audio ? 'green' : 'amber'} dot />
-      </View>
-
-      <View style={styles.visual}>
-        <View style={styles.visualHalo} />
-        <GuideIcon id={guide.id} color={colors.alertLight} size={66} />
-        <Text maxFontSizeMultiplier={1.2} style={styles.stepNumber}>{String(index + 1).padStart(2, '0')}</Text>
-      </View>
-
-      <Card style={styles.instruction}>
-        <Text maxFontSizeMultiplier={1.45} style={styles.instructionLabel}>{t('guide_do_now')}</Text>
-        <Text maxFontSizeMultiplier={1.55} style={styles.instructionText}>{stepText}</Text>
+      <Card style={s.instruction}>
+        <View style={s.instructionTop}>
+          <View style={s.stepBadge}>
+            <GuideIcon id={guide.id} color={colors.primaryText} size={24} />
+          </View>
+          <Text maxFontSizeMultiplier={1.3} style={s.instructionLabel}>{t('guide_do_now')}</Text>
+          <Text maxFontSizeMultiplier={1.2} style={s.stepNumber}>{index + 1}/{guide.steps.length}</Text>
+        </View>
+        <Text maxFontSizeMultiplier={1.5} style={s.instructionText}>{stepText}</Text>
       </Card>
 
       <Pressable
@@ -166,100 +146,61 @@ export default function GuideDetailScreen() {
         accessibilityLabel={guided ? t('guide_playing') : t('guide_play')}
         disabled={!audio}
         onPress={toggleGuided}
-        style={[styles.audio, guided && styles.audioOn, !audio && styles.audioMissing]}
+        style={({ pressed }) => [s.audio, guided && s.audioOn, !audio && s.audioMissing, pressed && audio && s.audioPressed]}
       >
-        {guided ? <Pause size={22} color={colors.black} /> : <Play size={22} color={audio ? colors.green : colors.sandFaint} />}
-        <View style={styles.audioCopy}>
-          <Text maxFontSizeMultiplier={1.4} style={[styles.audioTitle, guided && styles.audioTitleOn, !audio && styles.audioTitleMissing]}>
+        <View style={[s.audioIcon, guided && s.audioIconOn]}>
+          {guided ? <Pause size={24} color={colors.onPrimary} fill={colors.onPrimary} /> : audio ? <Play size={24} color={colors.onPrimary} fill={colors.onPrimary} /> : <VolumeX size={24} color={colors.inkFaint} />}
+        </View>
+        <View style={s.audioCopy}>
+          <Text maxFontSizeMultiplier={1.4} style={[s.audioTitle, !audio && s.audioTitleMissing]}>
             {audio ? (guided ? t('guide_playing') : t('guide_play')) : t('guide_audio_missing')}
           </Text>
-          <Text maxFontSizeMultiplier={1.5} style={[styles.audioSub, guided && styles.audioSubOn]}>
-            {audio ? (guided ? t('guide_pause') : t('guide_audio_human')) : t('guide_dual')}
-          </Text>
+          <Text maxFontSizeMultiplier={1.5} style={s.audioSub}>{audio ? (guided ? t('guide_pause') : t('guide_audio_human')) : t('guide_dual')}</Text>
         </View>
-        <Volume2 size={19} color={guided ? colors.black : colors.sandMuted} />
+        {audio ? <Volume2 size={22} color={guided ? colors.primaryText : colors.inkFaint} /> : null}
       </Pressable>
 
       {guide.emergencyNumber ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`${t('guide_call')} ${guide.emergencyNumber}`}
+        <Button
+          label={`${t('guide_call')} ${guide.emergencyNumber}`}
           onPress={() => confirmCall(guide.emergencyNumber!, 'Protection Civile')}
-          style={styles.call}
-        >
-          <PhoneCall size={18} color={colors.amber} />
-          <Text maxFontSizeMultiplier={1.4} style={styles.callText}>
-            {t('guide_call')} {guide.emergencyNumber}
-          </Text>
-        </Pressable>
+          variant="secondary"
+          icon={<PhoneCall size={22} color={colors.dangerText} />}
+        />
       ) : null}
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  progress: { flexDirection: 'row', gap: 5 },
-  progressSegment: { flex: 1, height: 5, borderRadius: 3, backgroundColor: colors.hairline },
-  progressDone: { backgroundColor: colors.alert },
-  audioBadge: { alignItems: 'flex-start' },
-  visual: {
-    minHeight: 158,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  visualHalo: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: colors.alertDark, opacity: 0.5 },
-  stepNumber: { position: 'absolute', right: spacing.md, bottom: spacing.sm, fontFamily: font.display, fontSize: 34, color: colors.hairline },
-  instruction: { gap: spacing.sm },
-  instructionLabel: { ...type.eyebrow, color: colors.alertLight },
-  instructionText: { fontFamily: font.bodyMedium, fontSize: 20, lineHeight: 29, color: colors.sand },
+const useStyles = makeStyles((t) => ({
+  instruction: { gap: t.spacing.md, padding: t.spacing.lg },
+  instructionTop: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  stepBadge: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: t.colors.primaryBg },
+  instructionLabel: { ...t.text.overline, flex: 1, color: t.colors.primaryText },
+  stepNumber: { ...t.text.captionStrong, color: t.colors.inkFaint },
+  instructionText: { fontFamily: 'DMSans_500Medium', fontSize: 22, lineHeight: 32, color: t.colors.ink },
   audio: {
-    minHeight: 66,
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
+    gap: t.spacing.sm,
+    padding: t.spacing.sm,
+    paddingRight: t.spacing.md,
+    borderRadius: t.radius.md,
     borderWidth: 1,
-    borderColor: colors.hairline,
-    backgroundColor: colors.raised,
+    borderColor: t.colors.border,
+    backgroundColor: t.colors.surface,
   },
-  audioOn: { backgroundColor: colors.green, borderColor: colors.green },
-  audioMissing: { opacity: 0.92, borderColor: colors.amberDark },
-  audioCopy: { flex: 1 },
-  audioTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  audioTitleOn: { color: colors.black },
-  audioTitleMissing: { color: colors.amberLight },
-  audioSub: { ...type.small, fontSize: 11 },
-  audioSubOn: { color: colors.greenLight },
-  call: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, minHeight: 42 },
-  callText: { fontFamily: font.bodyBold, color: colors.amber, fontSize: 13 },
-  footer: { gap: spacing.sm },
-  navRow: { flexDirection: 'row', gap: spacing.sm },
-  previous: {
-    width: 58,
-    minHeight: 56,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.raised,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  next: {
-    flex: 1,
-    minHeight: 56,
-    borderRadius: radius.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.alert,
-  },
-  nextText: { fontFamily: font.displayMedium, fontSize: 17, color: colors.black },
-  disabled: { opacity: 0.35 },
-});
+  audioOn: { borderColor: t.colors.primaryBorder, backgroundColor: t.colors.primaryBg },
+  audioMissing: { backgroundColor: t.colors.surfaceAlt },
+  audioPressed: { opacity: 0.8 },
+  audioIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: t.colors.primary },
+  audioIconOn: { backgroundColor: t.colors.primaryPressed },
+  audioCopy: { flex: 1, gap: 2 },
+  audioTitle: { ...t.text.bodyStrong },
+  audioTitleMissing: { color: t.colors.inkMuted },
+  audioSub: { ...t.text.caption },
+  navRow: { flexDirection: 'row', gap: t.spacing.sm },
+  previous: { width: t.hit.action, height: t.hit.action },
+  next: { flex: 1 },
+}));

@@ -1,21 +1,23 @@
 import { OfflineManager } from '@maplibre/maplibre-react-native';
 import { useRouter } from 'expo-router';
-import { Check, ChevronRight, CloudSun, Download, FileLock2, Languages, MapPinned, ShieldCheck } from 'lucide-react-native';
+import { Check, CloudSun, Download, FileLock2, Languages, MapPinned, ShieldCheck } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
-import { Badge, Button, Card, SectionTitle } from '@/components/ui';
+import { Button, Card, IconTile, ListRow, Notice, SectionHeader, Tag } from '@/components/ui';
 import { MAP_PROVIDER_READY, MAP_STYLE_URL } from '@/constants/map';
 import { PUBLISHER } from '@/constants/publisher';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
 import { getSetting, setSetting } from '@/db/database';
 import { useI18n } from '@/i18n/use-i18n';
+import { makeStyles, useTheme } from '@/theme';
 import type { Language } from '@/types/models';
 
 export default function SettingsScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const db = useSQLiteContext();
   const router = useRouter();
   const { language, setLanguage, t } = useI18n();
@@ -70,117 +72,110 @@ export default function SettingsScreen() {
 
   return (
     <Screen>
-      <AppHeader title={t('settings_title')} eyebrow={t('settings_eyebrow')} back />
+      <AppHeader title={t('settings_title')} subtitle={t('settings_eyebrow')} back />
 
-      <SectionTitle title={t('settings_language')} />
-      <Card style={styles.languageCard}>
-        <View style={styles.languageTop}>
-          <View style={styles.settingIcon}><Languages size={22} color={colors.amber} /></View>
-          <View style={styles.settingCopy}>
-            <Text maxFontSizeMultiplier={1.4} style={styles.settingTitle}>{t('settings_language')}</Text>
-            <Text maxFontSizeMultiplier={1.6} style={styles.settingSub}>{t('settings_language_sub')}</Text>
-          </View>
+      <SectionHeader title={t('settings_language')} />
+      <Card style={s.languageCard}>
+        <View style={s.cardTop}>
+          <IconTile tone="primary"><Languages size={22} color={colors.primaryText} /></IconTile>
+          <Text maxFontSizeMultiplier={1.5} style={s.cardText}>{t('settings_language_sub')}</Text>
         </View>
-        <View style={styles.langRow}>
+        <View style={s.langRow}>
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ selected: language === 'fr' }}
             onPress={() => void chooseLanguage('fr')}
-            style={[styles.langBtn, language === 'fr' && styles.langBtnOn]}
+            style={[s.langBtn, language === 'fr' && s.langBtnOn]}
           >
-            <Text maxFontSizeMultiplier={1.3} style={[styles.langBtnText, language === 'fr' && styles.langBtnTextOn]}>{t('settings_fr')}</Text>
+            {language === 'fr' ? <Check size={18} color={colors.primaryText} strokeWidth={2.6} /> : null}
+            <Text maxFontSizeMultiplier={1.3} style={[s.langBtnText, language === 'fr' && s.langBtnTextOn]}>{t('settings_fr')}</Text>
           </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: true, selected: false }}
-            disabled
-            style={[styles.langBtn, styles.langBtnDisabled]}
-          >
-            <Text maxFontSizeMultiplier={1.3} style={styles.langBtnText}>{t('settings_bm')}</Text>
+          <Pressable accessibilityRole="button" accessibilityState={{ disabled: true, selected: false }} disabled style={[s.langBtn, s.langBtnDisabled]}>
+            <Text maxFontSizeMultiplier={1.3} style={s.langBtnText}>{t('settings_bm')}</Text>
+            <Text maxFontSizeMultiplier={1.3} style={s.langBtnSoon}>bientôt</Text>
           </Pressable>
         </View>
       </Card>
 
-      <SectionTitle title={t('settings_map')} aside="≈ 85 Mo" />
-      <Card style={styles.mapCard}>
-        <View style={styles.mapTop}>
-          <View style={[styles.settingIcon, mapReady && styles.readyIcon]}>{mapReady ? <Check size={22} color={colors.green} /> : <MapPinned size={22} color={colors.blue} />}</View>
-          <View style={styles.settingCopy}>
-            <Text style={styles.settingTitle}>{mapReady ? 'Carte de Bamako prête' : MAP_PROVIDER_READY ? 'Ajouter la carte de Bamako' : 'Liste des lieux prête'}</Text>
-            <Text style={styles.settingSub}>{mapReady ? 'Vous pouvez maintenant afficher les lieux sur la carte.' : MAP_PROVIDER_READY ? 'Téléchargez-la une fois avec une connexion Wi-Fi.' : 'Hôpitaux, pharmacies et commissariats restent consultables.'}</Text>
+      <SectionHeader title={t('settings_map')} aside="≈ 85 Mo" />
+      <Card style={s.mapCard}>
+        <View style={s.cardTop}>
+          <IconTile tone={mapReady ? 'primary' : 'info'}>{mapReady ? <Check size={22} color={colors.primaryText} /> : <MapPinned size={22} color={colors.infoText} />}</IconTile>
+          <View style={s.cardCopy}>
+            <Text maxFontSizeMultiplier={1.4} style={s.cardTitle}>{mapReady ? 'Carte de Bamako prête' : MAP_PROVIDER_READY ? 'Ajouter la carte de Bamako' : 'Liste des lieux prête'}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={s.cardText}>{mapReady ? 'Vous pouvez maintenant afficher les lieux sur la carte.' : MAP_PROVIDER_READY ? 'Téléchargez-la une fois avec une connexion Wi-Fi.' : 'Hôpitaux, pharmacies et commissariats restent consultables.'}</Text>
           </View>
-          <Badge label={mapReady ? 'prête' : MAP_PROVIDER_READY ? 'à télécharger' : 'indisponible'} tone={mapReady ? 'green' : 'amber'} />
+          <Tag label={mapReady ? 'Prête' : MAP_PROVIDER_READY ? 'À télécharger' : 'Indisponible'} tone={mapReady ? 'primary' : MAP_PROVIDER_READY ? 'info' : 'neutral'} />
         </View>
         {downloading ? (
-          <View style={styles.progressWrap}><View style={styles.progressTrack}><View style={[styles.progressBar, { width: `${progress}%` }]} /></View><Text style={styles.progressText}>{progress}%</Text></View>
+          <View style={s.progressWrap}>
+            <View style={s.progressTrack}><View style={[s.progressBar, { width: `${progress}%` }]} /></View>
+            <Text maxFontSizeMultiplier={1.3} style={s.progressText}>{progress}%</Text>
+          </View>
         ) : null}
-        {!mapReady && MAP_PROVIDER_READY ? <Button label={downloading ? `Téléchargement ${progress}%` : 'Télécharger maintenant'} onPress={() => void downloadMap()} variant="outline" disabled={downloading} icon={<Download size={19} color={colors.sand} />} /> : mapReady ? <Button label="Ouvrir la carte" onPress={() => router.replace('/map')} variant="soft" /> : null}
+        {!mapReady && MAP_PROVIDER_READY ? (
+          <Button label={downloading ? `Téléchargement ${progress}%` : 'Télécharger maintenant'} onPress={() => void downloadMap()} variant="secondary" disabled={downloading} icon={<Download size={20} color={colors.ink} />} />
+        ) : mapReady ? (
+          <Button label="Ouvrir la carte" onPress={() => router.replace('/map')} variant="secondary" />
+        ) : null}
       </Card>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('settings_weather')}
+      <ListRow
+        title={t('settings_weather')}
+        subtitle={t('settings_weather_sub')}
+        leading={<IconTile tone="info"><CloudSun size={22} color={colors.infoText} /></IconTile>}
+        chevron
         onPress={() => router.push('/weather')}
-        style={styles.privacyLink}
-      >
-        <View style={styles.settingIcon}><CloudSun size={22} color={colors.amber} /></View>
-        <View style={styles.settingCopy}>
-          <Text maxFontSizeMultiplier={1.4} style={styles.settingTitle}>{t('settings_weather')}</Text>
-          <Text maxFontSizeMultiplier={1.6} style={styles.settingSub}>{t('settings_weather_sub')}</Text>
-        </View>
-        <ChevronRight size={20} color={colors.sandFaint} />
-      </Pressable>
+      />
 
-      <SectionTitle title={t('settings_privacy')} />
-      <Card style={styles.privacyCard}>
-        <ShieldCheck size={24} color={colors.green} />
-        <View style={styles.settingCopy}><Text style={styles.settingTitle}>Vos informations restent privées</Text><Text style={styles.settingSub}>Elles sont protégées sur votre téléphone. Aucun compte n'est nécessaire.</Text></View>
-      </Card>
-      <Pressable accessibilityRole="button" accessibilityLabel="Ouvrir confidentialité et contrôle des données" onPress={() => router.push('/privacy')} style={styles.privacyLink}>
-        <View style={styles.settingIcon}><FileLock2 size={22} color={colors.blue} /></View>
-        <View style={styles.settingCopy}><Text style={styles.settingTitle}>Confidentialité et données</Text><Text style={styles.settingSub}>Autorisations, partage de données et suppression.</Text></View>
-        <ChevronRight size={20} color={colors.sandFaint} />
-      </Pressable>
+      <SectionHeader title={t('settings_privacy')} />
+      <Notice icon={<ShieldCheck size={20} color={colors.primaryText} />} tone="primary" title="Vos informations restent privées" text="Elles sont protégées sur votre téléphone. Aucun compte n'est nécessaire." />
+      <ListRow
+        title="Confidentialité et données"
+        subtitle="Autorisations, partage de données et suppression."
+        leading={<IconTile tone="neutral"><FileLock2 size={22} color={colors.inkMuted} /></IconTile>}
+        chevron
+        accessibilityLabel="Ouvrir confidentialité et contrôle des données"
+        onPress={() => router.push('/privacy')}
+      />
 
-      <Text style={styles.version}>
-        {PUBLISHER.appName.toUpperCase()} · V{PUBLISHER.version} · {PUBLISHER.legalName.toUpperCase()} · GRATUITE
+      <Text maxFontSizeMultiplier={1.4} style={s.version}>
+        {PUBLISHER.appName} · v{PUBLISHER.version} · {PUBLISHER.legalName} · gratuite
       </Text>
-      <Text style={styles.support}>{PUBLISHER.supportEmail} · {PUBLISHER.website}</Text>
+      <Text maxFontSizeMultiplier={1.4} style={s.support}>{PUBLISHER.supportEmail} · {PUBLISHER.website}</Text>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  settingIcon: { width: 44, height: 44, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.amberDark },
-  readyIcon: { backgroundColor: colors.greenDark },
-  settingCopy: { flex: 1 },
-  settingTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  settingSub: { ...type.small, fontSize: 11, lineHeight: 15, marginTop: 2 },
-  languageCard: { gap: spacing.md },
-  languageTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  langRow: { flexDirection: 'row', gap: spacing.sm },
+const useStyles = makeStyles((t) => ({
+  languageCard: { gap: t.spacing.md },
+  mapCard: { gap: t.spacing.md },
+  cardTop: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  cardCopy: { flex: 1, gap: 2 },
+  cardTitle: { ...t.text.bodyStrong },
+  cardText: { ...t.text.caption, flex: 1 },
+  langRow: { flexDirection: 'row', gap: t.spacing.sm },
   langBtn: {
     flex: 1,
-    minHeight: 48,
-    borderRadius: radius.sm,
+    minHeight: t.hit.action,
+    flexDirection: 'row',
+    gap: t.spacing.xs,
+    borderRadius: t.radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: colors.hairline,
-    backgroundColor: colors.surface,
+    borderColor: t.colors.borderStrong,
+    backgroundColor: t.colors.surface,
   },
-  langBtnOn: { borderColor: colors.alert, backgroundColor: colors.alertDark },
-  langBtnDisabled: { opacity: 0.42 },
-  langBtnText: { fontFamily: font.bodyBold, fontSize: 14, color: colors.sandMuted },
-  langBtnTextOn: { color: colors.alertLight },
-  mapCard: { gap: spacing.md },
-  mapTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  progressWrap: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  progressTrack: { flex: 1, height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: colors.hairline },
-  progressBar: { height: 8, borderRadius: 4, backgroundColor: colors.green },
-  progressText: { fontFamily: font.mono, fontSize: 11, color: colors.greenLight },
-  privacyCard: { flexDirection: 'row', gap: spacing.sm },
-  privacyLink: { minHeight: 74, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm, borderRadius: radius.md, backgroundColor: colors.raised, borderWidth: 1, borderColor: colors.hairline },
-  version: { ...type.eyebrow, textAlign: 'center', color: colors.sandFaint, marginTop: spacing.lg },
-  support: { ...type.small, textAlign: 'center', color: colors.sandFaint, fontSize: 11 },
-});
+  langBtnOn: { borderColor: t.colors.primary, borderWidth: 2, backgroundColor: t.colors.primaryBg },
+  langBtnDisabled: { opacity: 0.55 },
+  langBtnText: { ...t.text.bodyStrong, color: t.colors.inkMuted },
+  langBtnTextOn: { color: t.colors.primaryText },
+  langBtnSoon: { ...t.text.caption, fontSize: 13, lineHeight: 18, color: t.colors.inkFaint },
+  progressWrap: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  progressTrack: { flex: 1, height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: t.colors.border },
+  progressBar: { height: 8, borderRadius: 4, backgroundColor: t.colors.primary },
+  progressText: { ...t.text.captionStrong, color: t.colors.primaryText },
+  version: { ...t.text.caption, color: t.colors.inkFaint, textAlign: 'center', marginTop: t.spacing.md },
+  support: { ...t.text.caption, color: t.colors.inkFaint, textAlign: 'center' },
+}));

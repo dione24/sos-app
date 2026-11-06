@@ -34,6 +34,23 @@ La V1 comprend :
   audio voix humaine à brancher fichier par fichier ;
 - opt-in « secouriste disponible ».
 
+## Design
+
+Système de design (couleurs clair/sombre, typographie, composants) : `docs/design/DESIGN.md`.
+Constat de la refonte de novembre 2026 : `docs/design/AUDIT-2026-11.md` ; captures avant/après :
+`docs/design/screens/comparatif.html`.
+
+### Aperçu web pour les revues visuelles
+
+L'interface peut être rendue dans un navigateur pour relire les écrans (pas pour un usage réel) :
+`metro.config.js` remplace, **sur la plateforme web uniquement**, SQLCipher, SecureStore, le Bluetooth
+et MapLibre par des shims de `src/web-shims/`. Android et iOS n'y touchent jamais.
+
+```bash
+npx expo export --platform web --output-dir dist-web
+SOS_PLAYWRIGHT_DIR=/chemin/vers/node_modules node scripts/capture-web-screens.mjs docs/design/screens/apres
+```
+
 ## Important : ce projet ne fonctionne pas dans Expo Go
 
 `react-native-ble-plx` et MapLibre contiennent du code natif. Il faut un **development

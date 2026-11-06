@@ -1,46 +1,29 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-  type ScrollViewProps,
-  type ViewStyle,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, type ScrollViewProps, type ViewStyle } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EMERGENCY_FAB_SCROLL_CLEARANCE } from '@/components/EmergencyFab';
-import { colors, spacing } from '@/constants/theme';
+import { makeStyles, spacing } from '@/theme';
 
 type ScreenProps = PropsWithChildren<{
   scroll?: boolean | undefined;
   footer?: ReactNode | undefined;
-  /** Extra bottom inset for screens under the floating SOS FAB (tab flows). */
+  /** Dégagement supplémentaire pour le bouton SOS flottant (onglets). */
   clearFab?: boolean | undefined;
   contentStyle?: ViewStyle | undefined;
   scrollProps?: ScrollViewProps | undefined;
 }>;
 
-export function Screen({
-  children,
-  scroll = true,
-  footer,
-  clearFab = false,
-  contentStyle,
-  scrollProps,
-}: ScreenProps) {
+export function Screen({ children, scroll = true, footer, clearFab = false, contentStyle, scrollProps }: ScreenProps) {
+  const s = useStyles();
   const insets = useSafeAreaInsets();
-  // Keep room for the emergency FAB / tab bar, and never sit under the home indicator.
   const fabPad = clearFab ? EMERGENCY_FAB_SCROLL_CLEARANCE : 0;
-  const contentBottomPad = footer
-    ? spacing.xl + insets.bottom
-    : 100 + Math.max(insets.bottom, 12) + fabPad;
+  const contentBottomPad = footer ? spacing.lg : spacing.xxl + Math.max(insets.bottom, spacing.sm) + fabPad;
   const footerBottomPad = spacing.sm + Math.max(insets.bottom, spacing.md);
 
   const content = scroll ? (
     <ScrollView
-      contentContainerStyle={[styles.content, { paddingBottom: contentBottomPad }, contentStyle]}
+      contentContainerStyle={[s.content, { paddingBottom: contentBottomPad }, contentStyle]}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
       showsVerticalScrollIndicator={false}
@@ -49,36 +32,28 @@ export function Screen({
       {children}
     </ScrollView>
   ) : (
-    <View style={[styles.content, styles.flex, { paddingBottom: contentBottomPad }, contentStyle]}>
-      {children}
-    </View>
+    <View style={[s.content, s.flex, { paddingBottom: contentBottomPad }, contentStyle]}>{children}</View>
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.flex}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
-      >
+    <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={s.flex} keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}>
         {content}
-        {footer ? <View style={[styles.footer, { paddingBottom: footerBottomPad }]}>{footer}</View> : null}
+        {footer ? <View style={[s.footer, { paddingBottom: footerBottomPad }]}>{footer}</View> : null}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.void },
+const useStyles = makeStyles((t) => ({
+  safe: { flex: 1, backgroundColor: t.colors.bg },
   flex: { flex: 1 },
-  content: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    gap: spacing.md,
-  },
+  content: { paddingHorizontal: t.spacing.md, paddingTop: t.spacing.xs, gap: t.spacing.md },
   footer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    backgroundColor: colors.void,
+    paddingHorizontal: t.spacing.md,
+    paddingTop: t.spacing.sm,
+    backgroundColor: t.colors.bg,
+    borderTopWidth: 1,
+    borderTopColor: t.colors.border,
   },
-});
+}));

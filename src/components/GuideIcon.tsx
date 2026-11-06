@@ -26,5 +26,5 @@ const icons = {
 
 export function GuideIcon({ id, color, size = 24 }: { id: string; color: string; size?: number }) {
   const Icon = icons[id as keyof typeof icons] ?? ShieldAlert;
-  return <Icon size={size} color={color} strokeWidth={2.3} />;
+  return <Icon size={size} color={color} strokeWidth={2} />;
 }

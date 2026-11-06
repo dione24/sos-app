@@ -1,18 +1,18 @@
 import { useAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { Hand, HeartPulse, Pause, PhoneCall, Play, RotateCcw, Volume2 } from 'lucide-react-native';
+import { Hand, HeartPulse, Pause, PhoneCall, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { CallConfirm } from '@/components/CallConfirm';
 import { Screen } from '@/components/Screen';
-import { Button, Card } from '@/components/ui';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
+import { Button, IconTile, Notice } from '@/components/ui';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { calculateNextBeatAt, canRestartCpr, CPR_BPM, CPR_RESTART_GUARD_MS } from '@/lib/cpr';
 import { openPhoneDialer } from '@/services/phone';
+import { makeStyles, useTheme } from '@/theme';
 
 const CPR_AWAKE_TAG = 'cpr-metronome';
 const BEEP_DATA_URI =
@@ -25,6 +25,8 @@ function formatDuration(milliseconds: number) {
 }
 
 export default function CprScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const reducedMotion = useReducedMotion();
   const player = useAudioPlayer(BEEP_DATA_URI, { keepAudioSessionActive: true });
   const scale = useRef(new Animated.Value(1)).current;
@@ -46,12 +48,10 @@ export default function CprScreen() {
 
     function beat() {
       const now = performance.now();
-      // Sound first: the beat is what the rescuer compresses to, so nothing that
-      // can block the JS thread should be queued ahead of it.
+      // Le son d'abord : c'est le repère de compression, rien ne doit le précéder.
       if (soundRef.current) {
-        // Both calls queue on the native main thread in order, so the rewind is
-        // applied before play() runs. Awaiting the seek instead would add a JS
-        // round-trip to every beat and make the tempo drift under load.
+        // Les deux appels s'enchaînent sur le thread natif : le rembobinage précède play().
+        // Attendre le seek ajouterait un aller-retour JS à chaque battement (dérive sous charge).
         void player.seekTo(0).catch(() => undefined);
         player.play();
       }
@@ -65,10 +65,9 @@ export default function CprScreen() {
         ]).start();
       }
 
-      // Scheduling against the absolute target prevents setTimeout drift over long sessions.
+      // Planifier sur la cible absolue évite la dérive de setTimeout sur une longue session.
       nextBeatRef.current = calculateNextBeatAt(nextBeatRef.current, now);
-      // Re-read the clock: measuring the delay from `now` would add this beat's
-      // own processing time to the interval, and that time varies per beat.
+      // Relire l'horloge : mesurer depuis `now` ajouterait le temps de traitement du battement.
       const delay = Math.max(0, nextBeatRef.current - performance.now());
       timeoutRef.current = setTimeout(beat, delay);
     }
@@ -85,9 +84,8 @@ export default function CprScreen() {
   }, [player, reducedMotion, running, scale]);
 
   function start() {
-    // The stop control is replaced by the start control while the finger is
-    // still lifting after a long press. Ignore that trailing release so the
-    // metronome cannot restart accidentally.
+    // Le contrôle d'arrêt est remplacé par celui de départ pendant que le doigt se relève
+    // après un appui long : on ignore ce relâchement pour éviter un redémarrage accidentel.
     if (!canRestartCpr(performance.now(), restartAvailableAtRef.current)) return;
     setElapsed(0);
     setCompressions(0);
@@ -107,143 +105,144 @@ export default function CprScreen() {
   }
 
   const primaryControl = !running ? (
-    <Pressable accessibilityRole="button" accessibilityLabel="Démarrer le métronome RCP" onPress={start} style={styles.start}>
-      <Play size={25} fill={colors.black} color={colors.black} />
-      <Text maxFontSizeMultiplier={1.3} style={styles.startText}>Démarrer les compressions</Text>
-    </Pressable>
+    <Button label="Démarrer les compressions" onPress={start} variant="sos" accessibilityLabel="Démarrer le métronome RCP" icon={<Play size={24} color={colors.onColor} fill={colors.onColor} />} />
   ) : (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Maintenir pour arrêter le métronome"
       delayLongPress={900}
       onLongPress={stop}
-      style={styles.stop}
+      style={({ pressed }) => [s.stop, pressed && s.stopPressed]}
     >
-      <Pause size={24} color={colors.sand} />
+      <Pause size={24} color={colors.ink} />
       <View>
-        <Text maxFontSizeMultiplier={1.3} style={styles.stopText}>Maintenir pour arrêter</Text>
-        <Text maxFontSizeMultiplier={1.4} style={styles.stopSub}>Évite un arrêt accidentel</Text>
+        <Text maxFontSizeMultiplier={1.3} style={s.stopText}>Maintenir pour arrêter</Text>
+        <Text maxFontSizeMultiplier={1.4} style={s.stopSub}>Évite un arrêt accidentel</Text>
       </View>
     </Pressable>
   );
 
   return (
     <>
-    <Screen scroll contentStyle={styles.scrollScreen} footer={primaryControl}>
-      <AppHeader title="Métronome RCP" eyebrow="Adulte · 110 BPM" back />
+      <Screen scroll footer={primaryControl}>
+        <AppHeader title="Métronome RCP" subtitle="Adulte · 110 battements par minute" back />
 
-      <Card style={styles.safety}>
-        <HeartPulse size={20} color={colors.alert} />
-        <Text maxFontSizeMultiplier={1.35} style={styles.safetyText}>
-          Personne inconsciente et qui ne respire pas normalement : appelez le 122 puis commencez les compressions.
-        </Text>
-      </Card>
-      <Button
-        label="Appeler le 122"
-        onPress={() => setShowCallConfirm(true)}
-        variant="amber"
-        icon={<PhoneCall size={20} color={colors.black} />}
-        accessibilityHint="Une confirmation sera demandée avant l'appel"
-      />
+        <Notice
+          icon={<HeartPulse size={20} color={colors.dangerText} />}
+          tone="danger"
+          text="Personne inconsciente et qui ne respire pas normalement : appelez le 122 puis commencez les compressions."
+        >
+          <Button label="Appeler le 122" size="md" variant="secondary" onPress={() => setShowCallConfirm(true)} icon={<PhoneCall size={20} color={colors.dangerText} />} accessibilityHint="Une confirmation sera demandée avant l'appel" />
+        </Notice>
 
-      <View style={styles.center}>
-        <Animated.View style={[styles.ringOuter, { transform: [{ scale }] }]}>
-          <View style={[styles.ring, running && styles.ringActive]}>
-            <Text maxFontSizeMultiplier={1} style={styles.bpm}>{CPR_BPM}</Text>
-            <Text maxFontSizeMultiplier={1.25} style={styles.bpmLabel}>BATTEMENTS / MIN</Text>
-            <View style={styles.stateRow}>
-              <View style={[styles.stateDot, running && styles.stateDotOn]} />
-              <Text maxFontSizeMultiplier={1.25} style={styles.state}>{running ? 'EN COURS' : 'PRÊT'}</Text>
+        <View style={s.center}>
+          <Animated.View style={[s.ringOuter, running && s.ringOuterActive, { transform: [{ scale }] }]}>
+            <View style={[s.ring, running && s.ringActive]}>
+              <Text maxFontSizeMultiplier={1} style={s.bpm}>{CPR_BPM}</Text>
+              <Text maxFontSizeMultiplier={1.2} style={s.bpmLabel}>battements / min</Text>
+              <View style={[s.state, running && s.stateOn]}>
+                <Text maxFontSizeMultiplier={1.2} style={[s.stateText, running && s.stateTextOn]}>{running ? 'En cours' : 'Prêt'}</Text>
+              </View>
+            </View>
+          </Animated.View>
+
+          <View style={s.stats}>
+            <View style={s.stat}>
+              <Text maxFontSizeMultiplier={1.2} style={s.statValue}>{formatDuration(elapsed)}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={s.statLabel}>Durée</Text>
+            </View>
+            <View style={s.statDivider} />
+            <View style={s.stat}>
+              <Text maxFontSizeMultiplier={1.2} style={s.statValue}>{compressions}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={s.statLabel}>Compressions</Text>
             </View>
           </View>
-        </Animated.View>
+        </View>
 
-        <View style={styles.stats}>
-          <View style={styles.stat}>
-            <Text maxFontSizeMultiplier={1.2} style={styles.statValue}>{formatDuration(elapsed)}</Text>
-            <Text maxFontSizeMultiplier={1.25} style={styles.statLabel}>DURÉE</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.stat}>
-            <Text maxFontSizeMultiplier={1.2} style={styles.statValue}>{compressions}</Text>
-            <Text maxFontSizeMultiplier={1.25} style={styles.statLabel}>COMPRESSIONS</Text>
+        <View style={s.technique}>
+          <IconTile tone="primary"><Hand size={24} color={colors.primaryText} /></IconTile>
+          <View style={s.techCopy}>
+            <Text maxFontSizeMultiplier={1.3} style={s.techTitle}>Deux mains · centre de la poitrine</Text>
+            <Text maxFontSizeMultiplier={1.4} style={s.techSub}>Bras tendus · profondeur 5 à 6 cm · laisser remonter</Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.technique}>
-        <View style={styles.techIcon}><Hand size={23} color={colors.amber} /></View>
-        <View style={styles.techCopy}>
-          <Text maxFontSizeMultiplier={1.25} style={styles.techTitle}>Deux mains · centre de la poitrine</Text>
-          <Text maxFontSizeMultiplier={1.3} style={styles.techSub}>Bras tendus · profondeur 5 à 6 cm · laisser remonter</Text>
+        <View style={s.controls}>
+          <Button
+            label={sound ? 'Son actif' : 'Son coupé'}
+            size="md"
+            variant="secondary"
+            accessibilityLabel="Son du métronome"
+            accessibilityRole="switch"
+            checked={sound}
+            onPress={() => setSound((value) => { soundRef.current = !value; return !value; })}
+            icon={sound ? <Volume2 size={20} color={colors.primaryText} /> : <VolumeX size={20} color={colors.inkFaint} />}
+            style={s.control}
+          />
+          <Button label="Remettre à zéro" size="md" variant="secondary" accessibilityLabel="Remettre le métronome à zéro" onPress={reset} icon={<RotateCcw size={20} color={colors.ink} />} style={s.control} />
         </View>
-      </View>
-
-      <View style={styles.controls}>
-        <Pressable accessibilityRole="switch" accessibilityLabel="Son du métronome" accessibilityState={{ checked: sound }} onPress={() => setSound((value) => { soundRef.current = !value; return !value; })} style={styles.smallControl}>
-          <Volume2 size={21} color={sound ? colors.green : colors.sandFaint} />
-          <Text maxFontSizeMultiplier={1.35} style={styles.smallLabel}>{sound ? 'Son actif' : 'Son coupé'}</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel="Remettre le métronome à zéro" onPress={reset} style={styles.smallControl}>
-          <RotateCcw size={20} color={colors.sandMuted} />
-          <Text maxFontSizeMultiplier={1.35} style={styles.smallLabel}>Remettre à zéro</Text>
-        </Pressable>
-      </View>
-
-    </Screen>
-    {showCallConfirm ? (
-      <CallConfirm
-        number="122"
-        service="Protection Civile"
-        onClose={() => setShowCallConfirm(false)}
-        onCall={() => {
-          setShowCallConfirm(false);
-          void openPhoneDialer('122');
-        }}
-      />
-    ) : null}
+      </Screen>
+      {showCallConfirm ? (
+        <CallConfirm
+          number="122"
+          service="Protection Civile"
+          onClose={() => setShowCallConfirm(false)}
+          onCall={() => {
+            setShowCallConfirm(false);
+            void openPhoneDialer('122');
+          }}
+        />
+      ) : null}
     </>
   );
 }
 
-const styles = StyleSheet.create({
-  scrollScreen: { paddingBottom: spacing.xxl },
-  safety: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm },
-  safetyText: { ...type.small, flex: 1, color: colors.sand, fontSize: 12, lineHeight: 17 },
-  center: { alignItems: 'center', justifyContent: 'center', gap: spacing.md },
-  ringOuter: { width: 180, height: 180, borderRadius: 90, padding: 8, borderWidth: 1, borderColor: colors.alertDark },
+const RING = 200;
+
+const useStyles = makeStyles((t) => ({
+  center: { alignItems: 'center', justifyContent: 'center', gap: t.spacing.lg, paddingVertical: t.spacing.sm },
+  ringOuter: { width: RING, height: RING, borderRadius: RING / 2, padding: 8, backgroundColor: t.colors.surfaceAlt },
+  ringOuterActive: { backgroundColor: t.colors.dangerBg },
   ring: {
     flex: 1,
-    borderRadius: 100,
+    borderRadius: RING / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderWidth: 3,
-    borderColor: colors.hairline,
+    gap: 2,
+    backgroundColor: t.colors.surface,
+    borderWidth: 4,
+    borderColor: t.colors.borderStrong,
   },
-  ringActive: { borderColor: colors.alert, backgroundColor: colors.alertDark },
-  bpm: { fontFamily: font.display, fontSize: 64, lineHeight: 68, color: colors.sand },
-  bpmLabel: { ...type.eyebrow, fontSize: 11 },
-  stateRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: spacing.sm },
-  stateDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.sandFaint },
-  stateDotOn: { backgroundColor: colors.green },
-  state: { ...type.eyebrow, fontSize: 11, color: colors.sand },
+  ringActive: { borderColor: t.colors.sos },
+  bpm: { fontFamily: 'DMSans_700Bold', fontSize: 64, lineHeight: 70, letterSpacing: -1, color: t.colors.ink },
+  bpmLabel: { ...t.text.caption, color: t.colors.inkMuted },
+  state: { marginTop: t.spacing.xs, paddingHorizontal: t.spacing.sm, paddingVertical: 4, borderRadius: t.radius.full, backgroundColor: t.colors.surfaceAlt, borderWidth: 1, borderColor: t.colors.border },
+  stateOn: { backgroundColor: t.colors.dangerBg, borderColor: t.colors.dangerBorder },
+  stateText: { ...t.text.captionStrong, color: t.colors.inkMuted },
+  stateTextOn: { color: t.colors.dangerText },
   stats: { flexDirection: 'row', alignItems: 'center' },
-  stat: { width: 130, alignItems: 'center' },
-  statDivider: { width: 1, height: 42, backgroundColor: colors.hairline },
-  statValue: { fontFamily: font.displayMedium, fontSize: 26, color: colors.sand },
-  statLabel: { ...type.eyebrow, fontSize: 11, marginTop: 3 },
-  technique: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm },
-  techIcon: { width: 44, height: 44, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.amberDark },
-  techCopy: { flex: 1 },
-  techTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  techSub: { ...type.small, fontSize: 11, marginTop: 2 },
-  controls: { flexDirection: 'row', gap: spacing.sm },
-  smallControl: { flex: 1, minHeight: 48, flexDirection: 'row', gap: spacing.xs, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm, borderWidth: 1, borderColor: colors.hairline },
-  smallLabel: { fontFamily: font.bodyMedium, fontSize: 11, color: colors.sandMuted },
-  start: { minHeight: 60, borderRadius: radius.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, backgroundColor: colors.alert },
-  startText: { fontFamily: font.displayMedium, fontSize: 17, color: colors.black },
-  stop: { minHeight: 60, borderRadius: radius.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, backgroundColor: colors.raised, borderWidth: 1, borderColor: colors.alert },
-  stopText: { fontFamily: font.displayMedium, fontSize: 15, color: colors.sand },
-  stopSub: { ...type.small, fontSize: 11, textAlign: 'center' },
-});
+  stat: { width: 140, alignItems: 'center', gap: 2 },
+  statDivider: { width: 1, height: 44, backgroundColor: t.colors.border },
+  statValue: { fontFamily: 'DMSans_700Bold', fontSize: 30, lineHeight: 36, color: t.colors.ink },
+  statLabel: { ...t.text.caption },
+  technique: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm, padding: t.spacing.md, borderRadius: t.radius.md, borderWidth: 1, borderColor: t.colors.border, backgroundColor: t.colors.surface },
+  techCopy: { flex: 1, gap: 2 },
+  techTitle: { ...t.text.bodyStrong },
+  techSub: { ...t.text.caption },
+  controls: { flexDirection: 'row', gap: t.spacing.sm },
+  control: { flex: 1 },
+  stop: {
+    minHeight: 64,
+    borderRadius: t.radius.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: t.spacing.sm,
+    backgroundColor: t.colors.surface,
+    borderWidth: 2,
+    borderColor: t.colors.sos,
+  },
+  stopPressed: { backgroundColor: t.colors.dangerBg },
+  stopText: { ...t.text.bodyStrong },
+  stopSub: { ...t.text.caption },
+}));
