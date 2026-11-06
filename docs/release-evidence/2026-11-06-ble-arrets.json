@@ -1,0 +1,37 @@
+{
+  "device": "TECNO KN4",
+  "android": 16,
+  "versionCode": 5,
+  "nativeForegroundServiceType": "connectedDevice",
+  "events": [
+    {
+      "t": 1793963848.9868128,
+      "event": "Attente du d\u00e9verrouillage"
+    },
+    {
+      "t": 1793963930.5677829,
+      "event": "Arr\u00eat dans application r\u00e9ussi"
+    },
+    {
+      "t": 1793963936.258832,
+      "event": "Repartage explicite r\u00e9ussi"
+    },
+    {
+      "t": 1793963954.0266712,
+      "event": "Arr\u00eat dans notification r\u00e9ussi"
+    },
+    {
+      "t": 1793963971.6841128,
+      "event": "\u00c9tat synchronis\u00e9, pause/reprise sans rediffusion"
+    }
+  ],
+  "settingsRestored": {
+    "resolution": "720x1576",
+    "density": 280,
+    "screenOffTimeout": 30000,
+    "animations": 0.5,
+    "demoMode": false
+  },
+  "notificationsStillSnoozed": 0,
+  "foregroundRelayStillActive": false
+}

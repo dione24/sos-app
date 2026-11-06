@@ -2,6 +2,15 @@
 
 Statut au 10 août 2026 : **revue documentaire effectuée, validation clinique locale requise avant publication publique**.
 
+## Décision de publication du 6 novembre 2026
+
+Après la publication en test interne, le propriétaire a expressément demandé la
+fusion de la PR et la mise en production. Interrogé sur la relecture médicale locale,
+il indique ne pas disposer de cette information. **Aucun relecteur, organisme ou
+visa clinique n’est donc enregistré ; le registre de signature reste en attente.**
+La demande de publication ne vaut pas validation médicale du contenu. Les limites
+QA sont conservées dans `QA_MATRIX.md` et ne sont pas cochées comme réalisées.
+
 ## Référentiels utilisés
 
 - IFRC, *International First Aid, Resuscitation and Education Guidelines 2025* (18 mars 2026) :

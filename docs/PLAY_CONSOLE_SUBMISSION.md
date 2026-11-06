@@ -1,5 +1,22 @@
 # Saisie Play Console — SOS Sécurité Mali 1.0.0
 
+## Passage en production — 6 novembre 2026
+
+Le propriétaire a expressément demandé le passage en production et la fusion de la
+PR après le test interne. La version **1.0.0 (5)**, identique au bundle testé, a été
+ajoutée au canal de production `4697930975691391093`, pour **le Mali**.
+Les dix modifications (release, pays, fiche française et déclarations) ont été
+envoyées : Play affiche « Modifications en cours d’examen », avec les vérifications
+automatiques préalables encore en cours. La publication gérée est désactivée : le
+déploiement complet est prévu après approbation Google. Cette soumission ne signifie
+pas que l’app est déjà disponible publiquement.
+
+La relecture médicale locale reste **non documentée**, et les limites de QA restent
+celles de `QA_MATRIX.md`. Aucune signature clinique ni réussite de test non exécuté
+n’est ajoutée. La demande actuelle remplace la consigne antérieure limitant cette
+intervention au test interne et interdisant la fusion.
+
+
 Éditeur : **SahelPay Technologies** · Abdoulaye NIANGALY  
 Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 
@@ -18,7 +35,7 @@ Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 | Pays initial | Mali (étendre ensuite) |
 | Adresse e-mail | **support@sahelpay.ml** |
 | Site web | **https://sahelpay.ml** |
-| URL confidentialité | **https://sahelpay.ml/apps/sos-securite-mali/privacy** |
+| URL confidentialité | **https://www.sahelpay.ml/apps/sos-securite-mali/privacy** |
 | Package | `ml.sossecurite.app` |
 
 La description courte, la description complète et les notes de version prêtes à
@@ -33,8 +50,8 @@ destinataire explicitement choisi. Cette réponse évite de sous-déclarer un fl
 
 | Type | Collectée | Partagée | Finalité | Facultative | Traitement |
 | --- | --- | --- | --- | --- | --- |
-| Localisation précise | Oui | Oui si l'exception fournisseur de service n'est pas contractuellement démontrée | Fonctionnalité de l'app | Oui | HTTPS ; ne pas cocher éphémère pour Open-Meteo |
-| Identifiant d'appareil ou autre (adresse IP, déclaration conservatrice) | Oui | Même règle fournisseur de service | Fonctionnalité de l'app, sécurité/prévention des abus | Non pour la météo Bamako actualisée automatiquement | HTTPS ; journaux gérés par les fournisseurs |
+| Localisation approximative et précise | Oui | Oui si l'exception fournisseur de service n'est pas contractuellement démontrée | Fonctionnalité de l'app | Oui | HTTPS ; ne pas cocher éphémère pour Open-Meteo |
+| Identifiant d'appareil ou autre (adresse IP, déclaration conservatrice) | Oui | Même règle fournisseur de service | Fonctionnalité de l'app | Non pour la météo Bamako actualisée automatiquement | HTTPS ; journaux gérés par les fournisseurs |
 
 - Ne pas déclarer comme collectés par SahelPay le nom, le téléphone, la photo, les
   contacts ou le dossier médical : ils restent dans SQLCipher sur l'appareil.
@@ -87,8 +104,38 @@ dans `store-assets/video/` après un test GATT réussi.
 ## Checklist technique avant envoi
 
 1. Héberger `store-assets/privacy-policy.html` à l'URL ci-dessus.
-2. Injecter `EXPO_PUBLIC_MAPTILER_KEY` (restreinte package Android + iOS bundle).
+2. Injecter `EXPO_PUBLIC_MAPTILER_KEY` (visibilité EAS sensitive ; User-Agent contenant `ml.sossecurite.app`).
 3. `eas build --platform android --profile production`
 4. `npm run verify:android-release -- <aab>`
 5. `npm run verify:play-submission`
-6. Piste interne → testeurs → production.
+6. Piste interne ; promotion publique réservée au propriétaire après QA et validation clinique.
+
+## État au 6 novembre 2026
+
+Compte choisi explicitement par le propriétaire : **MHM Digital Agency**.
+Application Play créée : ID `4975629932621694392`.
+Canal de test interne : `4700776084224063532`.
+Classification IARC enregistrée avec accord du propriétaire : PEGI 3,
+ESRB Everyone, USK 12 ; présence d’interactions utilisateurs et partage de position.
+La cible commerciale reste exclusivement **18 ans et plus**.
+La fiche complète est enregistrée avec les textes, l’icône d’origine, le nouveau
+visuel et les sept captures natives code 5 ordonnées. La release **1.0.0 (5)** est
+**active et accessible aux testeurs internes** depuis le 6 novembre 2026, 11 h 25 UTC.
+Elle est **non examinée**, sous le nom temporaire `ml.sossecurite.app (unreviewed)`.
+Deux comptes propriétaires sont sélectionnés dans une liste SOS dédiée ; leurs
+adresses restent dans la console, hors Git.
+
+Lien d’inscription activé :
+https://play.google.com/apps/internaltest/4700776084224063532
+
+Les dix déclarations initiales sont traitées, y compris l’absence d’identifiant
+publicitaire. Le formulaire FGS est apparu après ce premier déploiement :
+« Transfert de données continu vers un appareil externe » et lien vidéo public
+renseignés et enregistrés. Le préflight final indique 0 échec et 0 garde bloquante.
+Aucune promotion publique ; la validation clinique et la QA physique restent
+requises pour cette décision du propriétaire.
+
+La fiche et les déclarations sont enregistrées mais pas encore examinées :
+« Envoyer l’appli pour examen » reste désactivé tant que le parcours de publication
+complet n’est pas engagé. Aucune release de production n’est créée pour contourner
+cette étape ; le test interne est déjà actif et indépendant.

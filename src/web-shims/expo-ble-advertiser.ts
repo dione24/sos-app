@@ -15,6 +15,9 @@ export default {
   async getStatusAsync(): Promise<AdvertiserStatus> {
     return { advertising: false, bytes: 0 };
   },
+  addListener() {
+    return { remove() {} };
+  },
   async signPayloadAsync(_payload: string) {
     return { publicKey: '', signature: '' };
   },

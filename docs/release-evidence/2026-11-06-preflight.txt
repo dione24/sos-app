@@ -1,0 +1,90 @@
+
+> sos-securite-mali@1.0.0 preflight:monday
+> bash scripts/preflight-monday.sh <artefacts>/sos-securite-mali-1.0.0-5.aab
+
+
+[TypeScript]
+
+> sos-securite-mali@1.0.0 typecheck
+> tsc --noEmit
+
+OK : TypeScript
+
+[Tests unitaires]
+
+> sos-securite-mali@1.0.0 test
+> vitest run
+
+
+ RUN  v4.1.10 <depot>
+
+
+ Test Files  10 passed (10)
+      Tests  42 passed (42)
+   Start at  11:24:35
+   Duration  288ms (transform 492ms, setup 0ms, import 840ms, tests 76ms, environment 1ms)
+
+OK : Tests unitaires
+
+[Compatibilité Expo]
+env: load .env.local
+env: export EXPO_PUBLIC_MAPTILER_KEY
+Dependencies are up to date
+OK : Compatibilité Expo
+
+[Expo Doctor]
+Running 21 checks on your project...
+21/21 checks passed. No issues detected!
+OK : Expo Doctor
+
+[Manifeste Android]
+
+> sos-securite-mali@1.0.0 verify:android-manifest
+> bash scripts/verify-android-manifest.sh
+
+Manifeste Android validé : API 36, permissions minimales, Bluetooth sans usage de localisation et FGS BLE isolé.
+OK : Manifeste Android
+
+[Configuration iOS minimale]
+
+> sos-securite-mali@1.0.0 verify:ios-config
+> bash scripts/verify-ios-config.sh
+
+Configuration iOS validée : permissions au premier plan, sans Face ID ni modes arrière-plan.
+OK : Configuration iOS minimale
+
+[Intégrité des assets Play]
+icon-512.png: OK
+feature-graphic-1024x500.png: OK
+screenshots/01-home.png: OK
+screenshots/02-sos-medical.png: OK
+screenshots/03-guides.png: OK
+screenshots/04-cpr.png: OK
+screenshots/05-map-list.png: OK
+screenshots/06-relay-consent.png: OK
+screenshots/07-voice-guide.png: OK
+video/foreground-service-connected-device.mp4: OK
+OK : Intégrité des assets Play
+
+[Dossier Play]
+
+> sos-securite-mali@1.0.0 verify:play-submission
+> bash scripts/verify-play-submission.sh
+
+Vidéo FGS validée : 107.3 s, 720×1666, 1.9 Mio.
+Assets Play prêts : 7 captures, icône, visuel, politique finale et vidéo FGS.
+OK : Dossier Play
+
+[Signature AAB]
+
+> sos-securite-mali@1.0.0 verify:android-release
+> bash scripts/verify-android-release.sh <artefacts>/sos-securite-mali-1.0.0-5.aab
+
+Signature AAB de production acceptée : CN=, OU=, O=, L=, ST=, C=US
+091ee6475392079e3b7523e3e83e427721b76548fd9debc269e1da858457f325  <artefacts>/sos-securite-mali-1.0.0-5.aab
+OK : Signature AAB
+
+Résumé préflight
+- échecs techniques : 0
+- gardes publication encore bloquantes : 0
+Préflight complet : dossier prêt pour la piste interne Google Play.

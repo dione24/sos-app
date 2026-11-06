@@ -11,11 +11,18 @@ App **gratuite**.
 EXPO_PUBLIC_MAPTILER_KEY=votre_cle_maptiler
 ```
 
-Dans MapTiler Cloud, restreindre la clé au minimum à :
+Projet EAS lié : `dione24/sos-securite-mali`, ID
+`bdcf21f2-861a-460b-9036-c862ce4e4313`.
 
-- Android package : `ml.sossecurite.app`
-- iOS bundle : `ml.sossecurite.app`
-- (optionnel) domaines web si prévisualisation)
+La clé est configurée dans EAS **production** et **preview**, avec visibilité
+**sensitive**. Expo refuse la visibilité secret pour une variable `EXPO_PUBLIC_`,
+car sa valeur sera accessible dans le client compilé.
+
+MapTiler Cloud autorise les requêtes dont le **User-Agent contient
+`ml.sossecurite.app`**. Il s’agit d’une restriction de requête, pas d’une attestation
+cryptographique du package Android. Le client MapLibre ajoute ce User-Agent avant
+tout chargement de carte ou pack hors ligne. Vérification : attendu 200 / autre 403.
+Ne jamais committer la clé réelle, le keystore ni `credentials.json`.
 
 ## 1. Compte EAS
 
@@ -67,7 +74,7 @@ les assets Play et la signature. Refuser toute signature `CN=Android Debug`.
 
 | Plateforme | Étape |
 | --- | --- |
-| Google Play | Piste **Test interne** → testeurs → production |
+| Google Play | Piste **Test interne** ; production après validation clinique et QA |
 | Apple | **TestFlight** → review App Store |
 
 Soumission assistée :
@@ -79,10 +86,10 @@ npx eas-cli@latest submit --platform ios --profile production
 
 ## 7. Politique de confidentialité
 
-Héberger avant toute soumission store :
+Politique spécifique publiée et vérifiée le 6 novembre 2026 :
 
 - Fichier local : `store-assets/privacy-policy.html`
-- URL : https://sahelpay.ml/apps/sos-securite-mali/privacy
+- URL : https://www.sahelpay.ml/apps/sos-securite-mali/privacy
 
 ## 8. Après build
 

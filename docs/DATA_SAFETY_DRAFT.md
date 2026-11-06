@@ -1,4 +1,4 @@
-# Google Play — Data safety (brouillon conservateur)
+# Google Play — Data safety (déclaration du 6 novembre 2026)
 
 Éditeur : **SahelPay Technologies** · support@sahelpay.ml · application **gratuite**.  
 À reporter dans Play Console après vérification de l’AAB final et des SDK réellement
@@ -63,3 +63,21 @@ Références fournisseurs vérifiées le 10 août 2026 :
 - https://open-meteo.com/en/terms
 - https://www.maptiler.com/privacy-policy
 - https://docs.maptiler.com/guides/maps-apis/maps-platform/personal-data-in-maptiler-cloud/
+
+## Réponses enregistrées dans Play Console le 6 novembre 2026
+
+- Position **approximative et exacte** : collectée et partagée, facultative,
+  finalité fonctionnement de l’app, traitement non éphémère. La position peut être
+  approximative selon le choix Android ; la zone des tuiles révèle une zone consultée.
+- ID de l’appareil ou autres ID (adresse IP, déclaration conservatrice) : collectés
+  et partagés, requis lors des requêtes réseau météo automatiques, fonctionnement
+  de l’app, traitement non éphémère. Aucun identifiant publicitaire ajouté.
+- Aucun compte ni connexion ; aucune publicité ni analytics.
+- Chiffrement en transit pour les données collectées par les fournisseurs HTTPS.
+- Lien de demande de suppression : politique publique, sections effacement local
+  et contact support. Les transferts SMS / BLE / export sont déclenchés par
+  l’utilisateur et décrits séparément dans la politique.
+
+Cette déclaration conservatrice ne présume pas d’une exception contractuelle
+« fournisseur de service » pour Open-Meteo ou MapTiler. Les données médicales
+restent uniquement locales tant que l’utilisateur n’initie pas un partage.

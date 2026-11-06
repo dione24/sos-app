@@ -2,6 +2,12 @@
 import type { ReactNode } from 'react';
 import { View, type ViewStyle } from 'react-native';
 
+export const TransformRequestManager = {
+  addHeader(_options: unknown) {
+    return 'sos-maptiler-user-agent';
+  },
+};
+
 export function Map({ children, style }: { children?: ReactNode; style?: ViewStyle; mapStyle?: string }) {
   return <View style={style}>{children}</View>;
 }

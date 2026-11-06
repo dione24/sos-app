@@ -1,9 +1,15 @@
 # Vidéo de déclaration Foreground Service
 
-Le fichier final attendu est `foreground-service-connected-device.mp4`.
+`foreground-service-connected-device.mp4` : preuve réelle du 6 novembre 2026,
+APK signé version 1.0.0 (5), TECNO KN4 / Android 16. 107,3 s, 720 × 1666,
+H.264, sans audio, deux séquences assemblées avec bandeau et masquage des autres
+notifications. SOS fictif sans position, aucun appel ni SMS envoyé.
 
-Il doit provenir du build de production ou d'un build fonctionnel identique, ne
-contenir aucune donnée personnelle et suivre le parcours décrit dans
-`docs/FOREGROUND_SERVICE_DECLARATION.md`. Ne pas soumettre une vidéo où la diffusion
-Bluetooth échoue : la notification du service actif et son action d'arrêt doivent
-être visibles.
+Démarrage GATT et FGS réels, refus/réouverture du consentement, arrêts dans
+l’application et depuis la notification, état synchronisé après arrêt.
+Les trois sauts BLE ne sont pas validés avec un seul appareil.
+
+Lien sans connexion :
+https://www.sahelpay.ml/apps/sos-securite-mali/foreground-service-connected-device.mp4
+
+Contrôle : `npm run verify:fgs-video`. Empreinte dans `../CHECKSUMS.sha256`.

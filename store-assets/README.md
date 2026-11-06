@@ -7,12 +7,12 @@ App **gratuite** · Android + iOS · `ml.sossecurite.app`
 
 - `icon-512.png` : icône 512 × 512
 - `feature-graphic-1024x500.png` : visuel 1024 × 500
-- `screenshots/` : sept captures Android 1080 × 1920, dont la voix IA française en lecture
-- `privacy-policy.html` : **prête à héberger** (coordonnées SahelPay intégrées)
+- `screenshots/` : sept captures natives de l’APK signé code 5, Android 12L, PNG RGB 1080 × 1920, dont la narration française en lecture
+- `privacy-policy.html` : **publiée et vérifiée le 6 novembre 2026** (coordonnées SahelPay intégrées)
 
-URL publique à publier sur le site :
+URL publique de la politique :
 
-`https://sahelpay.ml/apps/sos-securite-mali/privacy`
+`https://www.sahelpay.ml/apps/sos-securite-mali/privacy`
 
 Contrôle :
 
@@ -42,3 +42,7 @@ Obligatoire pour le service BLE `connectedDevice` :
 - support@sahelpay.ml
 - privacy@sahelpay.ml
 - https://sahelpay.ml
+
+État du 6 novembre 2026 : fiche Play complète, release 1.0.0 (5) active en test
+interne, vidéo native validée et déclaration FGS enregistrée. `verify:play-submission`
+et le préflight final passent. La promotion publique reste réservée au propriétaire.

@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "versionCode": 5,
+  "certificateSha256": "35:44:B2:DD:ED:F5:91:B9:76:24:9A:CE:D8:5B:9A:50:BE:31:F4:EF:EB:56:03:BD:DA:1E:83:72:FF:C0:5D:E1",
+  "artifacts": [
+    {
+      "file": "sos-securite-mali-1.0.0-5.apk",
+      "buildId": "d29ad26e-5768-4fe8-9979-384bc6bf82ec",
+      "profile": "preview",
+      "bytes": 183377042,
+      "sha256": "4f43a7734669a3734d6160f3b19b018092771ca23732ad3784ffc19a10bbaab5"
+    },
+    {
+      "file": "sos-securite-mali-1.0.0-5.aab",
+      "buildId": "0dc0d008-34f5-4271-adb8-3aa3b204f724",
+      "profile": "production",
+      "bytes": 120441703,
+      "sha256": "091ee6475392079e3b7523e3e83e427721b76548fd9debc269e1da858457f325"
+    }
+  ],
+  "elf64LibrariesChecked": 52,
+  "elf16kFailures": 0
+}

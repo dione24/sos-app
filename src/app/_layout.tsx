@@ -1,4 +1,5 @@
 import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
+import { TransformRequestManager } from '@maplibre/maplibre-react-native';
 import * as Crypto from 'expo-crypto';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname, useRouter } from 'expo-router';
@@ -9,11 +10,20 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
 import { getProfile, getSetting, migrateDatabase, setSetting } from '@/db/database';
+import { MAP_REQUEST_USER_AGENT } from '@/constants/map';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useAppStore } from '@/store/app-store';
 import { ThemeProvider, makeStyles, useTheme } from '@/theme';
 
 const DATABASE_KEY_NAME = 'sos_mali_database_key_v1';
+
+// Appliqué aussi aux ressources du pack hors ligne, avant le premier écran carte.
+TransformRequestManager.addHeader({
+  id: 'sos-maptiler-user-agent',
+  match: '^https://api\\.maptiler\\.com/',
+  name: 'User-Agent',
+  value: MAP_REQUEST_USER_AGENT,
+});
 
 async function getOrCreateDatabaseKey() {
   const saved = await SecureStore.getItemAsync(DATABASE_KEY_NAME);
