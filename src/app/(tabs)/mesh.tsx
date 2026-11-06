@@ -11,7 +11,7 @@ import { Screen } from '@/components/Screen';
 import { Button, Card, EmptyState, IconTile, Notice, SectionHeader, Tag, ToggleRow } from '@/components/ui';
 import { getContacts, getProfile, getSetting, setSetting } from '@/db/database';
 import { contactRecipients, EMERGENCY_LABELS, formatCoordinates } from '@/lib/sos';
-import { readPacketFromDevice, startBleAdvertising, startBleMeshScan, stopBleAdvertising, type BleScanUpdate } from '@/services/ble-mesh';
+import { getBleAdvertisingStatus, observeBleAdvertising, readPacketFromDevice, startBleAdvertising, startBleMeshScan, stopBleAdvertising, type BleScanUpdate } from '@/services/ble-mesh';
 import { getRecentMeshMessages, markMessageRelayed, processIncomingMessage, purgeSeenMessages } from '@/services/mesh-repository';
 import { makeStyles, useTheme } from '@/theme';
 import type { MeshMessage } from '@/types/models';
@@ -59,34 +59,49 @@ export default function MeshScreen() {
   const [bleConsent, setBleConsent] = useState<boolean | null>(null);
   const [showBleDisclosure, setShowBleDisclosure] = useState(true);
   const [broadcast, setBroadcast] = useState<'idle' | 'active' | 'error'>('idle');
+  const [broadcastBusy, setBroadcastBusy] = useState(false);
   const [history, setHistory] = useState<Awaited<ReturnType<typeof getRecentMeshMessages>>>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [smsBusy, setSmsBusy] = useState(false);
   const readingDevices = useRef(new Set<string>());
 
   useEffect(() => {
+    let mounted = true;
+    void getSetting(db, 'ble_disclosure_accepted').then((consent) => {
+      if (mounted) setBleConsent(consent === '1');
+    });
+    return () => { mounted = false; };
+  }, [db]);
+
+  useEffect(() => {
+    let mounted = true;
+    const subscription = observeBleAdvertising((active) => {
+      if (mounted) setBroadcast(active ? 'active' : 'idle');
+    });
+    void getBleAdvertisingStatus().then((active) => {
+      if (mounted) setBroadcast(active ? 'active' : 'idle');
+    }).catch(() => {
+      if (mounted) setBroadcast('error');
+    });
+    return () => { mounted = false; subscription.remove(); };
+  }, []);
+
+  useEffect(() => {
+    if (bleConsent === null) return;
     let stop: (() => void) | undefined;
     let mounted = true;
     async function start() {
       await purgeSeenMessages(db);
-      const [network, saved, rescuerRow, consent] = await Promise.all([
+      const [network, saved, rescuerRow] = await Promise.all([
         Network.getNetworkStateAsync(),
         getRecentMeshMessages(db),
         db.getFirstAsync<{ enabled: number }>('SELECT enabled FROM rescuer_opt_in WHERE id = 1'),
-        getSetting(db, 'ble_disclosure_accepted'),
       ]);
       if (!mounted) return;
       setBridgeOnline(Boolean(network.isConnected && network.isInternetReachable !== false));
       setHistory(saved);
       setRescuer(rescuerRow?.enabled === 1);
-      const allowed = consent === '1' || bleConsent === true;
-      setBleConsent(allowed);
-      if (!allowed) return;
-      const packetToBroadcast = saved.find(({ message }) => message.hopsRemaining > 0)?.message;
-      if (packetToBroadcast && canBroadcastBle) {
-        const result = await startBleAdvertising(packetToBroadcast);
-        if (mounted) setBroadcast(result.state === 'active' ? 'active' : 'error');
-      }
+      if (!bleConsent) return;
       if (running) {
         stop = await startBleMeshScan((update) => {
           if (!mounted) return;
@@ -125,6 +140,20 @@ export default function MeshScreen() {
   async function stopBroadcast() {
     await stopBleAdvertising();
     setBroadcast('idle');
+  }
+
+  async function shareLatestAlert() {
+    if (broadcastBusy) return;
+    const packet = history.find(({ message }) => message.hopsRemaining > 0)?.message;
+    if (!packet) return;
+    setBroadcastBusy(true);
+    try {
+      const result = await startBleAdvertising(packet);
+      setBroadcast(result.state === 'active' ? 'active' : 'error');
+      if (result.state !== 'active') Alert.alert('Alerte non partagée', result.message);
+    } finally {
+      setBroadcastBusy(false);
+    }
   }
 
   function retryScan() {
@@ -291,6 +320,8 @@ export default function MeshScreen() {
 
       {broadcast === 'active' ? (
         <Button label="Arrêter de partager mon alerte" onPress={() => void stopBroadcast()} variant="secondary" icon={<CircleAlert size={20} color={colors.dangerText} />} />
+      ) : canBroadcastBle && bleConsent === true && history.length > 0 ? (
+        <Button label="Partager la dernière alerte" onPress={() => void shareLatestAlert()} disabled={broadcastBusy} loading={broadcastBusy} variant="secondary" icon={<RadioTower size={20} color={colors.ink} />} />
       ) : null}
 
       <Notice

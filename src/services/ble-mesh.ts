@@ -191,3 +191,13 @@ export async function startBleAdvertising(message: MeshMessage) {
 export async function stopBleAdvertising() {
   if (Platform.OS === 'android') await ExpoBleAdvertiser.stopAdvertisingAsync();
 }
+
+export async function getBleAdvertisingStatus() {
+  if (Platform.OS !== 'android') return false;
+  return (await ExpoBleAdvertiser.getStatusAsync()).advertising;
+}
+
+export function observeBleAdvertising(listener: (active: boolean) => void) {
+  if (Platform.OS !== 'android') return { remove() {} };
+  return ExpoBleAdvertiser.addListener('onAdvertisingStateChanged', (status) => listener(status.advertising));
+}
