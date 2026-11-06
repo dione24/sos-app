@@ -1,14 +1,13 @@
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { HeartPulse, PhoneCall, Settings2, ShieldAlert, UserRoundPlus, WifiOff } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Animated, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
 import { IconButton, IconTile, ListRow } from '@/components/ui';
-import { getProfile } from '@/db/database';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useI18n } from '@/i18n/use-i18n';
 import { makeStyles, useTheme } from '@/theme';
@@ -26,24 +25,35 @@ export default function HomeScreen() {
   const pulse = useRef(new Animated.Value(0)).current;
   const [profileName, setProfileName] = useState('');
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     if (reducedMotion) {
       pulse.setValue(0);
       return;
     }
     const animation = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 1600, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: 1000, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 1600, useNativeDriver: true, isInteraction: false }),
+        Animated.timing(pulse, { toValue: 0, duration: 1000, useNativeDriver: true, isInteraction: false }),
       ]),
     );
     animation.start();
-    return () => animation.stop();
-  }, [pulse, reducedMotion]);
+    return () => {
+      animation.stop();
+      pulse.setValue(0);
+    };
+  }, [pulse, reducedMotion]));
 
-  useEffect(() => {
-    void getProfile(db).then((profile) => setProfileName(profile?.name ?? ''));
-  }, [db]);
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    void db.getFirstAsync<{ name: string }>('SELECT name FROM user_profile ORDER BY updated_at DESC LIMIT 1')
+      .then((profile) => {
+        if (active) setProfileName(profile?.name ?? '');
+      })
+      .catch(() => {
+        if (active) setProfileName('');
+      });
+    return () => { active = false; };
+  }, [db]));
 
   const pulseScale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
   const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] });

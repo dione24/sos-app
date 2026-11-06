@@ -1,8 +1,8 @@
-import { Camera, Map, Marker } from '@maplibre/maplibre-react-native';
-import { useRouter } from 'expo-router';
+import { Camera, Map, Marker, type MapProps } from '@maplibre/maplibre-react-native';
+import { useFocusEffect, useIsFocused, useRouter } from 'expo-router';
 import { Building2, Download, Hospital, List, MapIcon, Navigation, Pill, Shield } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Linking, Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
@@ -12,6 +12,7 @@ import { MAP_PROVIDER_READY, MAP_STYLE_URL } from '@/constants/map';
 import { FACILITIES } from '@/data';
 import { getSetting, setSetting } from '@/db/database';
 import { distanceKm, formatDistance } from '@/lib/distance';
+import { rememberMapViewport, type SavedMapViewport } from '@/lib/map-viewport';
 import { getEmergencyPosition } from '@/services/location';
 import { useAppStore } from '@/store/app-store';
 import { makeStyles, useTheme, type Palette } from '@/theme';
@@ -70,36 +71,57 @@ export default function MapScreen() {
   const largeText = fontScale >= 1.3;
   const db = useSQLiteContext();
   const router = useRouter();
-  const storedPosition = useAppStore((state) => state.lastPosition);
+  const isFocused = useIsFocused();
+  const focused = useRef(false);
+  const locationRequest = useRef<Promise<Coordinates | null> | null>(null);
+  const savedViewport = useRef<SavedMapViewport | null>(null);
+  const position = useAppStore((state) => state.lastPosition);
   const setStoredPosition = useAppStore((state) => state.setLastPosition);
-  const [position, setPosition] = useState<Coordinates | null>(storedPosition);
   const [locationConsent, setLocationConsent] = useState<'loading' | 'prompt' | 'accepted' | 'declined'>('loading');
   const [filter, setFilter] = useState<Filter>('tout');
   const [mapDownloaded, setMapDownloaded] = useState(false);
-  const [mode, setMode] = useState<'map' | 'list'>('list');
+  const [modeChoice, setModeChoice] = useState<'map' | 'list' | null>(null);
+  const mode = mapDownloaded ? modeChoice ?? 'map' : 'list';
 
-  useEffect(() => {
+  const saveViewport = useCallback<NonNullable<MapProps['onRegionDidChange']>>(({ nativeEvent }) => {
+    // Pas de setState : déplacer la carte ne déclenche aucun rendu React.
+    savedViewport.current = rememberMapViewport(savedViewport.current, nativeEvent);
+  }, []);
+
+  const locate = useCallback(async () => {
+    // Un retour rapide sur cet onglet réutilise la demande GPS déjà en cours.
+    locationRequest.current ??= getEmergencyPosition().catch(() => null).finally(() => {
+      locationRequest.current = null;
+    });
+    const next = await locationRequest.current;
+    if (focused.current) setStoredPosition(next);
+  }, [setStoredPosition]);
+
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    focused.current = true;
     void Promise.all([
       getSetting(db, 'map_offline_ready'),
       getSetting(db, 'map_location_disclosure_accepted'),
     ]).then(([mapValue, consentValue]) => {
+      if (!active) return;
       const ready = mapValue === '1' && MAP_PROVIDER_READY;
       setMapDownloaded(ready);
-      if (ready) setMode('map');
       const allowed = consentValue === '1';
-      setLocationConsent(allowed ? 'accepted' : 'prompt');
-      if (allowed && !position) void locate();
+      setLocationConsent((current) => allowed ? 'accepted' : current === 'declined' ? current : 'prompt');
+      if (allowed && !useAppStore.getState().lastPosition) void locate();
+    }).catch(() => {
+      if (active) setLocationConsent((current) => current === 'loading' ? 'prompt' : current);
     });
-  }, [db, position, setStoredPosition]);
-
-  async function locate() {
-    const next = await getEmergencyPosition();
-    setPosition(next);
-    setStoredPosition(next);
-  }
+    return () => {
+      active = false;
+      focused.current = false;
+    };
+  }, [db, locate]));
 
   async function acceptLocationDisclosure() {
     await setSetting(db, 'map_location_disclosure_accepted', '1');
+    if (!focused.current) return;
     setLocationConsent('accepted');
     await locate();
   }
@@ -120,10 +142,10 @@ export default function MapScreen() {
         subtitle="Hôpitaux, pharmacies et commissariats de Bamako"
         action={
           <View style={s.modeSwitch}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Afficher la carte" accessibilityState={{ disabled: !mapDownloaded, selected: mode === 'map' }} disabled={!mapDownloaded} onPress={() => setMode('map')} style={[s.mode, mode === 'map' && s.modeOn, !mapDownloaded && s.modeDisabled]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Afficher la carte" accessibilityState={{ disabled: !mapDownloaded, selected: mode === 'map' }} disabled={!mapDownloaded} onPress={() => setModeChoice('map')} style={[s.mode, mode === 'map' && s.modeOn, !mapDownloaded && s.modeDisabled]}>
               <MapIcon size={20} color={mode === 'map' ? colors.onPrimary : colors.inkMuted} />
             </Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel="Afficher la liste" accessibilityState={{ selected: mode === 'list' }} onPress={() => setMode('list')} style={[s.mode, mode === 'list' && s.modeOn]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Afficher la liste" accessibilityState={{ selected: mode === 'list' }} onPress={() => setModeChoice('list')} style={[s.mode, mode === 'list' && s.modeOn]}>
               <List size={20} color={mode === 'list' ? colors.onPrimary : colors.inkMuted} />
             </Pressable>
           </View>
@@ -172,16 +194,18 @@ export default function MapScreen() {
 
       {mode === 'map' && mapDownloaded ? (
         <View style={s.mapWrap}>
-          <Map mapStyle={MAP_STYLE_URL!} style={s.map}>
-            <Camera initialViewState={{ center: [origin.longitude, origin.latitude], zoom: 12 }} />
-            {visible.map(({ facility }) => (
-              <Marker key={facility.id} id={facility.id} lngLat={[facility.longitude, facility.latitude]} onPress={() => void openFacilityDirections(facility)}>
-                <View style={[s.pin, { backgroundColor: categoryColor(facility.category, colors) }]}>
-                  <CategoryIcon category={facility.category} color={colors.onColor} size={18} />
-                </View>
-              </Marker>
-            ))}
-          </Map>
+          {isFocused ? (
+            <Map mapStyle={MAP_STYLE_URL!} style={s.map} onRegionIsChanging={saveViewport} onRegionDidChange={saveViewport}>
+              <Camera initialViewState={savedViewport.current ?? { center: [origin.longitude, origin.latitude], zoom: 12 }} />
+              {visible.map(({ facility }) => (
+                <Marker key={facility.id} id={facility.id} lngLat={[facility.longitude, facility.latitude]} onPress={() => void openFacilityDirections(facility)}>
+                  <View style={[s.pin, { backgroundColor: categoryColor(facility.category, colors) }]}>
+                    <CategoryIcon category={facility.category} color={colors.onColor} size={18} />
+                  </View>
+                </Marker>
+              ))}
+            </Map>
+          ) : null}
         </View>
       ) : (
         <View style={s.listWrap}>
