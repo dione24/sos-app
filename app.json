@@ -2,7 +2,7 @@
   "expo": {
     "name": "SOS Sécurité Mali",
     "slug": "sos-securite-mali",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "sosmali",
@@ -37,7 +37,7 @@
         "android.permission.VIBRATE",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "versionCode": 5
+      "versionCode": 6
     },
     "ios": {
       "bundleIdentifier": "ml.sossecurite.app",

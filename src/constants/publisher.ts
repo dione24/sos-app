@@ -14,7 +14,7 @@ export const PUBLISHER = {
   appName: 'SOS Sécurité Mali',
   androidPackage: 'ml.sossecurite.app',
   iosBundleId: 'ml.sossecurite.app',
-  version: '1.0.0',
+  version: '1.0.1',
   price: 'free' as const,
   containsAds: false,
   requiresAccount: false,
