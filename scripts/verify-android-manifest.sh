@@ -67,6 +67,10 @@ for permission in \
 done
 
 [[ "$xmltree" == *'allowBackup(0x01010280)=false'* ]] || fail "allowBackup doit rester à false"
+for permission in android.permission.ACCESS_COARSE_LOCATION android.permission.ACCESS_FINE_LOCATION; do
+  count="$(awk -v name="\"$permission\"" 'index($0, name) { n++ } END { print n+0 }' <<< "$xmltree")"
+  [[ "$count" == 1 ]] || fail "$permission doit avoir une seule déclaration (trouvé : $count)"
+done
 for permission in android.permission.BLUETOOTH android.permission.BLUETOOTH_ADMIN; do
   block="$(awk -v name="$permission" 'index($0, name) { print; getline; print; exit }' <<< "$xmltree")"
   [[ "$block" == *'maxSdkVersion(0x01010271)=30'* ]] || fail "$permission doit être limité à Android 11 et inférieur"
