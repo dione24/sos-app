@@ -29,12 +29,13 @@ if [[ -z "$aapt2" ]]; then
   exit 1
 fi
 
+expected_version="$(node -p 'require("./app.json").expo.version')"
 badging="$("$aapt2" dump badging "$apk_path")"
 permissions="$("$aapt2" dump permissions "$apk_path")"
 xmltree="$("$aapt2" dump xmltree "$apk_path" --file AndroidManifest.xml)"
 
 [[ "$badging" == *"package: name='ml.sossecurite.app'"* ]] || fail "package Android inattendu"
-[[ "$badging" == *"versionName='1.0.0'"* ]] || fail "versionName inattendue"
+[[ "$badging" == *"versionName='$expected_version'"* ]] || fail "versionName inattendue (attendu : $expected_version)"
 [[ "$badging" == *"targetSdkVersion:'36'"* ]] || fail "targetSdk 36 requis"
 
 for feature in \
