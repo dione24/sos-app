@@ -1,5 +1,8 @@
 const mapTilerKey = process.env.EXPO_PUBLIC_MAPTILER_KEY?.trim();
 
+/** Identifie les requêtes natives pour la restriction de la clé MapTiler. */
+export const MAP_REQUEST_USER_AGENT = 'ml.sossecurite.app/1.0.0';
+
 /**
  * MapLibre's demo tiles are explicitly development-only. A public MapTiler key
  * is injected at build time for production and is never persisted in user data.

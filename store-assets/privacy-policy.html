@@ -3,25 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
   <title>Politique de confidentialité — SOS Sécurité Mali</title>
   <style>
-    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin: 0; background: #15120f; color: #f4eee5; line-height: 1.65; }
-    main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 80px; }
-    h1, h2 { line-height: 1.2; }
-    h1 { font-size: clamp(2rem, 7vw, 3.4rem); margin: 0 0 12px; }
-    h2 { margin-top: 40px; color: #ffad25; }
-    p, li { color: #d7cbbd; }
-    a { color: #7ee1a6; }
-    .meta { color: #ffad25; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-    .card { padding: 18px; border: 1px solid #3a3128; border-radius: 14px; background: #1e1a16; margin: 20px 0; }
-    strong { color: #fff9f1; }
+    @font-face { font-family: 'DM Sans'; src: url('./fonts/dm-sans.woff2') format('woff2'); font-weight: 100 1000; font-display: swap; }
+    @font-face { font-family: Manrope; src: url('./fonts/manrope.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+    :root { color-scheme: light dark; --bg: #f8f7f2; --surface: #ffffff; --ink: #153c32; --muted: #475467; --line: #d8e1d6; --link: #5b7731; font-family: 'DM Sans', sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.75; }
+    main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 72px; }
+    h1, h2 { font-family: Manrope, sans-serif; line-height: 1.25; overflow-wrap: anywhere; }
+    h1 { font-size: clamp(2rem, 7vw, 3.4rem); margin: 0 0 20px; }
+    h2 { margin-top: 36px; font-size: 1.5rem; }
+    p, li { color: var(--muted); }
+    a { color: var(--link); text-underline-offset: 3px; overflow-wrap: anywhere; }
+    a:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
+    .meta { color: var(--link); font-weight: 600; font-size: .875rem; }
+    .card { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); margin: 24px 0; }
+    strong { color: var(--ink); }
+    code { overflow-wrap: anywhere; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0f1613; --surface: #153c32; --ink: #f8f7f2; --muted: #d5ddd7; --line: #3c5e50; --link: #a9d472; } }
   </style>
 </head>
 <body>
 <main>
-  <p class="meta">Version 1.0 — applicable le 17 août 2026</p>
+  <p class="meta">Version 1.0 — mise à jour le 6 novembre 2026</p>
   <h1>Politique de confidentialité</h1>
   <p><strong>SOS Sécurité Mali</strong> est une application d'urgence et de premiers secours, <strong>gratuite</strong>, sans compte, sans publicité et sans profilage publicitaire.</p>
 
