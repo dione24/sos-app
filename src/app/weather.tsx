@@ -1,6 +1,6 @@
 import { CloudLightning, CloudRain, CloudSun, MapPin, RefreshCw, Waves } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
@@ -8,15 +8,17 @@ import { Screen } from '@/components/Screen';
 import { Button, Card, Notice, Tag } from '@/components/ui';
 import { getSetting, setSetting } from '@/db/database';
 import { getEmergencyPosition } from '@/services/location';
-import { loadWeather } from '@/services/weather';
+import { getCachedWeather, getLastCachedWeather, loadWeather } from '@/services/weather';
 import { useAppStore } from '@/store/app-store';
 import { makeStyles, useTheme } from '@/theme';
 import type { WeatherSnapshot } from '@/types/models';
 
 function ageLabel(timestamp: number) {
   if (!timestamp) return 'aucune donnée enregistrée';
-  const hours = Math.floor((Date.now() - timestamp) / 3_600_000);
-  if (hours < 1) return 'il y a moins d’une heure';
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60_000));
+  if (minutes < 1) return 'à l’instant';
+  if (minutes < 60) return `il y a ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
   return `il y a ${hours} h`;
 }
 
@@ -26,32 +28,49 @@ export default function WeatherScreen() {
   const { fontScale } = useWindowDimensions();
   const largeText = fontScale >= 1.3;
   const db = useSQLiteContext();
-  const position = useAppStore((state) => state.lastPosition);
   const setLastPosition = useAppStore((state) => state.setLastPosition);
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [weatherLocationConsent, setWeatherLocationConsent] = useState<boolean | null>(null);
   const [locationUnavailable, setLocationUnavailable] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [unsavedLocationChoice, setUnsavedLocationChoice] = useState<boolean | null>(null);
 
-  async function refresh(usePreciseLocation = weatherLocationConsent === true) {
+  const requestId = useRef(0);
+
+  const refresh = useCallback(async (usePreciseLocation: boolean, forceRefresh = false) => {
+    const request = ++requestId.current;
+    const current = () => request === requestId.current;
     setLoading(true);
-    let nextPosition = usePreciseLocation ? position : null;
-    if (usePreciseLocation && !nextPosition) {
-      setLocating(true);
-      try {
-        nextPosition = await getEmergencyPosition();
-      } catch {
-        nextPosition = null;
-      } finally {
+    setLocating(false);
+    let nextPosition = usePreciseLocation ? useAppStore.getState().lastPosition : null;
+    try {
+      // Montrer la prévision enregistrée avec son lieu et sa date avant d'attendre
+      // un GPS ou le réseau. La dernière position n'est pas attribuée à Bamako.
+      const preview = usePreciseLocation && !nextPosition
+        ? await getLastCachedWeather(db)
+        : await getCachedWeather(db, nextPosition);
+      if (!current()) return;
+      setWeather(preview);
+      if (usePreciseLocation && !nextPosition) {
+        setLocating(true);
+        try { nextPosition = await getEmergencyPosition(); } catch { nextPosition = null; }
+        if (!current()) return;
         setLocating(false);
+        if (nextPosition) setLastPosition(nextPosition);
+        // Le cache affiché pendant le GPS pouvait appartenir à l'ancien lieu.
+        // Seule une prévision correspondant aux coordonnées obtenues est conservée.
+        const matching = await getCachedWeather(db, nextPosition);
+        if (!current()) return;
+        setWeather(matching);
       }
-      if (nextPosition) setLastPosition(nextPosition);
+      setLocationUnavailable(usePreciseLocation && !nextPosition);
+      const nextWeather = await loadWeather(db, nextPosition, { forceRefresh });
+      if (current()) setWeather(nextWeather);
+    } finally {
+      if (current()) { setLoading(false); setLocating(false); }
     }
-    setLocationUnavailable(usePreciseLocation && !nextPosition);
-    setWeather(await loadWeather(db, nextPosition));
-    setLoading(false);
-  }
+  }, [db, setLastPosition]);
 
   useEffect(() => {
     let mounted = true;
@@ -60,20 +79,33 @@ export default function WeatherScreen() {
       const allowed = value === '1';
       setWeatherLocationConsent(allowed);
       await refresh(allowed);
+    }).catch(() => {
+      if (!mounted) return;
+      setWeatherLocationConsent(false);
+      void refresh(false);
     });
-    return () => { mounted = false; };
-  }, []);
+    return () => { mounted = false; requestId.current += 1; };
+  }, [db, refresh]);
 
-  async function acceptWeatherLocation() {
-    await setSetting(db, 'weather_location_disclosure_accepted', '1');
-    setWeatherLocationConsent(true);
-    await refresh(true);
-  }
-
-  async function useBamakoWeather() {
-    await setSetting(db, 'weather_location_disclosure_accepted', '0');
-    setWeatherLocationConsent(false);
-    await refresh(false);
+  async function changeWeatherLocation(accepted: boolean) {
+    const request = ++requestId.current;
+    setLoading(true);
+    setLocating(false);
+    setUnsavedLocationChoice(null);
+    try {
+      await setSetting(db, 'weather_location_disclosure_accepted', accepted ? '1' : '0');
+    } catch {
+      if (request !== requestId.current) return;
+      // Une préférence qui n'a pas été enregistrée n'autorise pas une nouvelle
+      // recherche GPS. Bamako reste disponible, et le choix peut être réessayé.
+      setWeatherLocationConsent(false);
+      setUnsavedLocationChoice(accepted);
+      await refresh(false);
+      return;
+    }
+    if (request !== requestId.current) return;
+    setWeatherLocationConsent(accepted);
+    await refresh(accepted);
   }
 
   const rainRisk = weather?.precipitationProbability ?? 0;
@@ -99,6 +131,12 @@ export default function WeatherScreen() {
   return (
     <Screen>
       <AppHeader title="Météo" subtitle="Prévisions pour Bamako ou votre position" back action={<Tag label={sourceTag.label} tone={sourceTag.tone} dot />} />
+
+      {unsavedLocationChoice !== null ? (
+        <Notice tone="warning" title="Choix non enregistré" text="Réessayez pour conserver votre choix au prochain démarrage. La météo de Bamako reste disponible.">
+          <Button label="Réessayer d'enregistrer mon choix" variant="secondary" onPress={() => { if (unsavedLocationChoice !== null) void changeWeatherLocation(unsavedLocationChoice); }} loading={loading} />
+        </Notice>
+      ) : null}
 
       <Card style={[s.hero, largeText && s.heroLarge]} tone={severe ? 'warning' : 'neutral'}>
         <View style={[s.heroIcon, severe && s.heroIconSevere]}>
@@ -146,20 +184,20 @@ export default function WeatherScreen() {
           title="Météo à ma position"
           text="Votre position sert uniquement à afficher la météo près de vous. Vous pouvez aussi continuer avec Bamako."
         >
-          <Button label="Utiliser ma position" onPress={() => void acceptWeatherLocation()} icon={<MapPin size={20} color={colors.onPrimary} />} />
+          <Button label="Utiliser ma position" onPress={() => void changeWeatherLocation(true)} icon={<MapPin size={20} color={colors.onPrimary} />} />
         </Notice>
       ) : weatherLocationConsent === true ? (
         <Notice
           icon={<MapPin size={20} color={locationUnavailable ? colors.warningText : colors.primaryText} />}
           tone={locationUnavailable ? 'warning' : 'neutral'}
           title={locating ? 'Recherche de la position…' : locationUnavailable ? 'Position indisponible · Bamako affichée' : 'Prévision à ma position'}
-          text={locating ? 'La prévision de Bamako reste visible pendant la recherche.' : locationUnavailable ? 'Vous pouvez réessayer avec le bouton Actualiser.' : 'Votre position est utilisée uniquement pour cette prévision.'}
+          text={locating ? 'La dernière prévision enregistrée reste visible pendant la recherche.' : locationUnavailable ? 'Vous pouvez réessayer avec le bouton Actualiser.' : 'Votre position est utilisée uniquement pour cette prévision.'}
         >
-          <Button label="Revenir à Bamako" size="md" variant="ghost" accessibilityLabel="Revenir à la météo de Bamako" onPress={() => void useBamakoWeather()} />
+          <Button label="Revenir à Bamako" size="md" variant="ghost" accessibilityLabel="Revenir à la météo de Bamako" onPress={() => void changeWeatherLocation(false)} />
         </Notice>
       ) : null}
 
-      <Button label="Actualiser si le réseau est disponible" onPress={() => void refresh()} variant="secondary" loading={loading} icon={<RefreshCw size={20} color={colors.ink} />} />
+      <Button label="Actualiser si le réseau est disponible" onPress={() => void refresh(weatherLocationConsent === true, true)} variant="secondary" loading={loading} icon={<RefreshCw size={20} color={colors.ink} />} />
     </Screen>
   );
 }

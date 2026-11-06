@@ -6,12 +6,13 @@ import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
-import { getProfile, getSetting, migrateDatabase, setSetting } from '@/db/database';
+import { migrateDatabase } from '@/db/database';
 import { MAP_REQUEST_USER_AGENT } from '@/constants/map';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { createBootstrapSession, readBootstrapState } from '@/lib/bootstrap';
 import { useAppStore } from '@/store/app-store';
 import { ThemeProvider, makeStyles, useTheme } from '@/theme';
 
@@ -43,35 +44,35 @@ function BootstrapGate() {
   const { colors } = useTheme();
   const setLanguage = useAppStore((state) => state.setLanguage);
   const [checked, setChecked] = useState(false);
+  const [bootstrapError, setBootstrapError] = useState(false);
+  const bootstrap = useMemo(
+    () => createBootstrapSession(async () => {
+      const state = await readBootstrapState(db);
+      if (useAppStore.getState().language !== 'fr') setLanguage('fr');
+      return state;
+    }),
+    [db, setLanguage],
+  );
 
   useEffect(() => {
     let mounted = true;
-    async function bootstrap() {
-      const [profile, skipped, language] = await Promise.all([
-        getProfile(db),
-        getSetting(db, 'onboarding_skipped'),
-        getSetting(db, 'language'),
-      ]);
-      if (!mounted) return;
-      if (language === 'bm') {
-        setLanguage('fr');
-        await setSetting(db, 'language', 'fr');
-      } else if (language === 'fr') {
-        setLanguage('fr');
-      }
-      setChecked(true);
-      if (!profile && skipped !== '1' && pathname !== '/onboarding') {
-        router.replace('/onboarding');
-      }
-    }
-    void bootstrap();
+    void bootstrap(pathname)
+      .then((destination) => {
+        if (!mounted) return;
+        setChecked(true);
+        if (destination) router.replace(destination);
+      })
+      .catch(() => {
+        if (mounted) setBootstrapError(true);
+      });
     return () => {
       mounted = false;
     };
-  }, [db, pathname, router, setLanguage]);
+  }, [bootstrap, pathname, router]);
 
   const reducedMotion = useReducedMotion();
 
+  if (bootstrapError) return <BootStatus label="Impossible de lire les préférences de l'appareil." error />;
   if (!checked) return <BootStatus label="Ouverture sécurisée…" />;
   return (
     <Stack
