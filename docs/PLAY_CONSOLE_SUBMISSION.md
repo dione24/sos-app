@@ -101,18 +101,24 @@ Canal de test interne : `4700776084224063532`.
 Classification IARC enregistrée avec accord du propriétaire : PEGI 3,
 ESRB Everyone, USK 12 ; présence d’interactions utilisateurs et partage de position.
 La cible commerciale reste exclusivement **18 ans et plus**.
-La fiche complète est enregistrée avec ses textes, l’icône d’origine, le nouveau
-visuel et les sept captures natives code 5 ordonnées. Google l’indique prête pour
-examen. L’AAB 1.0.0 (5) est accepté dans le brouillon de la piste interne.
-Deux comptes propriétaires sont sélectionnés dans une liste SOS dédiée ; les
+La fiche complète est enregistrée avec les textes, l’icône d’origine, le nouveau
+visuel et les sept captures natives code 5 ordonnées. La release **1.0.0 (5)** est
+**active et accessible aux testeurs internes** depuis le 6 novembre 2026, 11 h 25 UTC.
+Elle est **non examinée**, sous le nom temporaire `ml.sossecurite.app (unreviewed)`.
+Deux comptes propriétaires sont sélectionnés dans une liste SOS dédiée ; leurs
 adresses restent dans la console, hors Git.
 
-Lien d’inscription prévu (inactif tant que la release n’est pas publiée) :
+Lien d’inscription activé :
 https://play.google.com/apps/internaltest/4700776084224063532
 
-Les dix déclarations proposées dans « Contenu de l’application » sont traitées,
-y compris l’absence d’identifiant publicitaire. Le formulaire FGS n’est pas encore
-proposé dans cette vue ; sa préparation attend la vidéo native réelle. Le préflight final indique
-0 échec technique et 1 garde de publication (vidéo manquante). Ne pas finaliser
-le déploiement interne avant le retest physique et la preuve FGS ; aucune
-publication publique n’est autorisée par ce dossier.
+Les dix déclarations initiales sont traitées, y compris l’absence d’identifiant
+publicitaire. Le formulaire FGS est apparu après ce premier déploiement :
+« Transfert de données continu vers un appareil externe » et lien vidéo public
+renseignés et enregistrés. Le préflight final indique 0 échec et 0 garde bloquante.
+Aucune promotion publique ; la validation clinique et la QA physique restent
+requises pour cette décision du propriétaire.
+
+La fiche et les déclarations sont enregistrées mais pas encore examinées :
+« Envoyer l’appli pour examen » reste désactivé tant que le parcours de publication
+complet n’est pas engagé. Aucune release de production n’est créée pour contourner
+cette étape ; le test interne est déjà actif et indépendant.

@@ -49,8 +49,8 @@ App **gratuite** · Publication Android en cours le 6 novembre 2026 ; iOS hors d
 - [ ] captures iPhone 6,9 pouces et iPad 13 pouces (`store-assets/ios/`) ;
 - [ ] TalkBack / VoiceOver ;
 - [ ] BLE multi-appareils (3 sauts) si multi-hop annoncé ;
-- [ ] vidéo FGS Bluetooth pour Play (Android).
-- [ ] validation MP4 automatique de la preuve FGS (`npm run verify:fgs-video`).
+- [x] vidéo FGS Bluetooth native code 5, hébergée publiquement, déclaration enregistrée dans Play.
+- [x] validation MP4 automatique de la preuve FGS (`npm run verify:fgs-video`).
 
 ## Contenu médical
 
@@ -65,7 +65,7 @@ App **gratuite** · Publication Android en cours le 6 novembre 2026 ; iOS hors d
 - [x] fiche `PLAY_STORE_LISTING.md` saisie, 7 captures natives code 5, nouveau visuel et icône conservée ;
 - [x] Data safety + Health declaration ; classification IARC et cible adultes enregistrées ;
 - [x] URL privacy live ;
-- [ ] piste interne ; **production réservée au propriétaire après QA et relecture médicale**.
+- [x] piste interne **active**, version 1.0.0 (5), non examinée ; **production réservée au propriétaire après QA et relecture médicale**.
 
 ### App Store
 
@@ -89,10 +89,11 @@ pendant la fusion Gradle via `tools:node="remove"`, en conservant une seule pair
 GPS non limitée. Le manifeste fusionné Gradle et les deux artefacts finaux code 5
 passent la vérification. Le code 4 a été annulé ; ne pas distribuer les anciens builds.
 
-L’AAB **1.0.0 (5)** est accepté dans le brouillon interne Play. Les deux testeurs
-propriétaires sont sélectionnés dans une liste SOS dédiée. Le préflight final donne
-**0 échec technique, 1 garde de publication : vidéo FGS absente**. Le TECNO doit
-être reconnecté pour le retest physique de l’arrêt BLE et l’enregistrement réel.
-La fiche complète est prête pour examen, les déclarations de contenu sont
-renseignées. La déclaration FGS attend sa vidéo ; aucune diffusion interne ni
-promotion publique n’a été lancée.
+L’AAB **1.0.0 (5)** est diffusé dans la piste **interne active**, sans promotion
+publique. Les deux testeurs propriétaires sont sélectionnés dans une liste SOS
+dédiée. Le préflight final donne **0 échec technique, 0 garde de publication**.
+La vidéo native est validée et publique, la déclaration FGS est enregistrée.
+Le TECNO a exécuté les deux arrêts BLE et la vérification d’absence de rediffusion ;
+ses réglages temporaires sont restaurés et vérifiés. La QA physique complète,
+TalkBack, les essais sur trois appareils et la relecture clinique restent des
+conditions séparées de la promotion publique.

@@ -21,8 +21,8 @@ OK : TypeScript
 
  Test Files  10 passed (10)
       Tests  42 passed (42)
-   Start at  10:52:20
-   Duration  370ms (transform 721ms, setup 0ms, import 1.21s, tests 102ms, environment 1ms)
+   Start at  11:24:35
+   Duration  288ms (transform 492ms, setup 0ms, import 840ms, tests 76ms, environment 1ms)
 
 OK : Tests unitaires
 
@@ -63,6 +63,7 @@ screenshots/04-cpr.png: OK
 screenshots/05-map-list.png: OK
 screenshots/06-relay-consent.png: OK
 screenshots/07-voice-guide.png: OK
+video/foreground-service-connected-device.mp4: OK
 OK : Intégrité des assets Play
 
 [Dossier Play]
@@ -70,8 +71,9 @@ OK : Intégrité des assets Play
 > sos-securite-mali@1.0.0 verify:play-submission
 > bash scripts/verify-play-submission.sh
 
-ÉCHEC : vidéo Foreground Service manquante : store-assets/video/foreground-service-connected-device.mp4
-1 blocage(s) Play restant(s).
+Vidéo FGS validée : 107.3 s, 720×1666, 1.9 Mio.
+Assets Play prêts : 7 captures, icône, visuel, politique finale et vidéo FGS.
+OK : Dossier Play
 
 [Signature AAB]
 
@@ -84,5 +86,5 @@ OK : Signature AAB
 
 Résumé préflight
 - échecs techniques : 0
-- gardes publication encore bloquantes : 1
-Le code est contrôlé, mais la soumission reste volontairement interdite jusqu'à résolution des éléments éditeur/Play.
+- gardes publication encore bloquantes : 0
+Préflight complet : dossier prêt pour la piste interne Google Play.

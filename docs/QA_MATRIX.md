@@ -30,7 +30,7 @@ finales ainsi que leurs empreintes sont consignées dans `RELEASE_ARTIFACTS.md`.
 | Captures finales | Sept PNG RGB 1080 × 1920 relus puis importés en ordre dans Play |
 | Manifeste final | Permissions GPS uniques non limitées ; fusion Gradle réelle et APK/AAB contrôlés |
 | Compatibilité 16 Ko | zipalign réussi, 52 ELF arm64/x86_64 contrôlés sans échec |
-| Préflight final | 0 échec technique, 1 garde publication : vidéo FGS absente |
+| Préflight final | 0 échec technique, 0 garde publication ; MP4 FGS valide |
 
 Les trois scénarios Maestro passent sur le code 5. Les essais RCP longue durée
 ont été effectués sur le code 3 (même écran RCP) : **7 min 36 s, 837 impulsions**,
@@ -52,18 +52,33 @@ notifications, annonce GATT et service `BleRelayForegroundService` réellement a
 (`isForeground=true`, type connectedDevice, notification ID 122 avec action d’arrêt).
 Le défaut d’état du bouton d’arrêt a été corrigé dans le code 5 : observation de
 l’état natif, arrêt synchronisé, suppression des rediffusions automatiques de
-l’historique. **Retest physique du correctif et vidéo finale encore requis.**
+l’historique. **Retest physique final réussi**, voir ci-dessous.
 
-Le TECNO s’est déconnecté avant l’installation finale. Les changements temporaires
-d’affichage, d’animations, de veille et de mode démo doivent être restaurés à la
-reconnexion USB ; ne pas considérer cette restauration comme acquise avant lecture
-de confirmation. Aucun vrai SMS/appel, aucune donnée médicale réelle et aucune
-position personnelle n’ont été utilisés par la QA.
+Le code 5 a ensuite été installé et testé sur le **TECNO KN4 / Android 16** :
+
+| Parcours physique code 5 | Résultat |
+| --- | --- |
+| SOS fictif « Autre », sans position | Réussi ; aucune position personnelle |
+| Refus puis réouverture du consentement BLE | Réussi, avant l’autorisation Android |
+| GATT / FGS / notification | Démarrage natif réel, type connectedDevice, notification ID 122 |
+| Arrêt depuis l’application | Réussi ; FGS absent après l’action |
+| Repartage explicite | Réussi ; FGS actif après action volontaire |
+| Arrêt depuis notification | Réussi ; FGS absent, écran revenu sur le bouton de repartage |
+| Pause et nouvelle demande de recherche | Aucun redémarrage de l’ancienne alerte |
+| Vidéo | Deux séquences natives, MP4 final 107,3 s, 720 × 1666, validé |
+| Restauration du téléphone | Résolution 720 × 1576, densité 280, veille 30 s, animations 0,5, mode démo inactif ; tous vérifiés |
+| Notifications / service en fin de test | Aucune notification encore différée, aucun relais actif |
+
+L’APK preview de cette installation QA a été retiré du profil personnel après les
+essais, ainsi que les fichiers de démonstration, afin de laisser installer la version
+signée par Google Play. Aucun profil professionnel n’a été désinstallé.
+
+Aucun appel/SMS, aucune donnée médicale réelle et aucune position personnelle n’ont
+été utilisés. Les données réinitialisées étaient celles de cette installation QA :
+dossier vide et alertes fictives créées par les essais.
 
 ### Limites restant à lever
 
-- Retest du code 5 sur le TECNO et vidéo FGS réelle, avec arrêt depuis l’app et la
-  notification, puis vérification qu’une pause/reprise ne relance pas l’ancienne alerte.
 - Parcours complet physique, audio/haptique, GPS simulé accepté/timeout, composeur
   SMS avec destinataires fictifs, import invalide, TalkBack.
 - Trois Android pour vérifier le transfert et les sauts BLE ; ne pas promettre un

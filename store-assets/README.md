@@ -43,5 +43,6 @@ Obligatoire pour le service BLE `connectedDevice` :
 - privacy@sahelpay.ml
 - https://sahelpay.ml
 
-État du 6 novembre 2026 : fiche Play complète enregistrée ; vidéo FGS réelle
-encore absente, donc `verify:play-submission` retourne volontairement le code 2.
+État du 6 novembre 2026 : fiche Play complète, release 1.0.0 (5) active en test
+interne, vidéo native validée et déclaration FGS enregistrée. `verify:play-submission`
+et le préflight final passent. La promotion publique reste réservée au propriétaire.

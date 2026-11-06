@@ -20,23 +20,35 @@ Contrôles effectués : signature AAB et APK, validation bundletool 1.18.3,
 minSdk 24, targetSdk 36, `debuggable=false`, `allowBackup=false`.
 Le contrôle du manifeste APK confirme les permissions minimales, Bluetooth facultatif,
 absence de localisation en arrière-plan et service relais BLE isolé.
-APK final code 5 installé et testé sur émulateur Android 12L / API 32 isolé.
-Le TECNO KN4 / Android 16 a exécuté les anciens APK codes 2/3 ; la déconnexion
-USB empêche encore le retest physique du code 5 et la vidéo finale du service BLE.
-Voir `QA_MATRIX.md` pour les limites des preuves.
+APK final code 5 installé en natif sur émulateur Android 12L / API 32 isolé et
+sur **TECNO KN4 / Android 16**. Le relais réel démarre, s’arrête depuis l’application
+et depuis la notification ; l’état de l’écran se resynchronise et la reprise de
+recherche ne rediffuse pas l’ancienne alerte. Les réglages du téléphone ont été
+vérifiés restaurés : 720 × 1576, densité 280, veille 30 s, animations 0,5, mode démo
+inactif. Aucun relais ne reste actif ; aucune notification n’est encore différée.
+Voir `QA_MATRIX.md` pour les limites des autres parcours physiques.
 
 Contrôles supplémentaires du code 5 : `bundletool validate`, `zipalign -c -P 16 4`,
 alignement ELF 16 Ko de 52 bibliothèques arm64/x86_64, permissions GPS uniques
 sans limite API héritée. Le manifeste Gradle fusionné réel a aussi été contrôlé.
-Google Play accepte le bundle 5 (1.0.0), sans erreur bloquante ; avertissement
-uniquement pour l’absence de fichier de désobscurcissement.
 
-## Préflight final du 6 novembre 2026
+## Préflight final et distribution — 6 novembre 2026
 
-`npm run preflight:monday -- <aab-code-5>` : **0 échec technique, 1 garde de
-publication**, vidéo FGS manquante. Aucun contournement du garde. Les trois scénarios
-Maestro de la nouvelle interface passent sur l’APK final code 5. La release
-interne reste en brouillon ; aucun lien d’inscription actif n’est annoncé.
+`npm run preflight:monday -- <aab-code-5>` : **0 échec technique, 0 garde de
+publication**. Les trois scénarios Maestro de la nouvelle interface passent sur
+l’APK final code 5. La vidéo MP4 native passe son contrôle : 107,3 s, 720 × 1666,
+1 963 099 octets. Empreinte :
+`757041d628fdd8f695684755fb2cfeee49abda4a8b90dd7e359e30e9e0c4c268`.
+
+Vidéo HTTPS publique vérifiée sans connexion (200, `video/mp4`, SHA identique) :
+https://www.sahelpay.ml/apps/sos-securite-mali/foreground-service-connected-device.mp4
+
+La release **1.0.0 (5) — Test interne** est **active**, accessible aux testeurs
+internes, sortie le 6 novembre 2026 à 11 h 25 UTC. Google l’indique **non examinée**,
+sous le nom temporaire `ml.sossecurite.app (unreviewed)`. Aucun déploiement public.
+Lien d’inscription activé : https://play.google.com/apps/internaltest/4700776084224063532
+Déclaration `FOREGROUND_SERVICE_CONNECTED_DEVICE` enregistrée avec le lien vidéo.
+Les preuves techniques et vidéo sont dans `docs/release-evidence/`.
 
 ## Contrôles source
 

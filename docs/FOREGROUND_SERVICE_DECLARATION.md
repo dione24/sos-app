@@ -69,11 +69,28 @@ le MP4. `npm run verify:fgs-video` contrôle le conteneur, la piste vidéo, la d
 (10 à 180 secondes) et une résolution minimale de 480 × 800. Une vidéo HTTP(S)
 accessible sans connexion peut être fournie ; le guide Google exige un lien et
 la démonstration de la fonctionnalité, sans imposer un hébergeur particulier.
-La vidéo finale et son lien public restent à produire avec l’APK corrigé **code 5**.
-La console affiche dix déclarations traitées et aucune en attention requise après
-l’import du brouillon interne ; le formulaire FGS n’est pas encore proposé dans
-cette vue. Cette absence ne dispense pas de la preuve exigée par ce dossier.
-Une seule unité ne valide pas le transfert multi-appareils ou trois sauts.
+## Preuve finale du 6 novembre 2026
+
+`store-assets/video/foreground-service-connected-device.mp4` : vidéo native de
+l’APK EAS preview **code 5** sur TECNO KN4, Android 16. Deux séquences réelles
+assemblées, avec bandeau explicatif et masquage des notifications des autres apps ;
+les pixels de l’interface SOS ne sont pas recréés. SOS fictif de type « Autre »,
+sans position, aucun appel/SMS envoyé et aucun dossier médical réel.
+
+Le démarrage GATT / FGS est confirmé en natif. Les arrêts depuis l’app et depuis
+la notification réussissent. Après retour dans l’app, l’état est synchronisé ;
+pause et nouvelle demande de recherche ne relancent pas la diffusion antérieure.
+La vidéo valide le contrôle MP4 : **107,3 s, 720 × 1666, 1,9 Mio**.
+
+Lien public vérifié sans compte :
+https://www.sahelpay.ml/apps/sos-securite-mali/foreground-service-connected-device.mp4
+
+La déclaration est enregistrée dans Google Play : « Transfert de données continu
+vers un appareil externe », avec ce lien. Le formulaire est apparu **après** le
+premier déploiement de la piste interne. Il n’était pas disponible avant ce déploiement.
+Les changements de contenu restent distincts de la release interne non examinée.
+Une seule unité ne valide pas le transfert multi-appareils ni trois sauts ; aucune
+garantie multi-hop n’est ajoutée à la fiche.
 
 Références officielles consultées le 6 novembre 2026 :
 
