@@ -24,13 +24,20 @@ function withAndroidManifestHardening(config) {
 
     // BLE's plugin adds legacy SDK-23 location declarations capped at API 30.
     // The app also uses foreground GPS on current Android versions, so retain
-    // only its normal, uncapped declarations. Play rejects conflicting copies.
+    // only its normal, uncapped declarations. Removal markers are also needed
+    // for copies contributed later by dependency AARs during Gradle's merge.
+    // Play rejects conflicting copies, even if runtime permission checks work.
     manifest.manifest['uses-permission-sdk-23'] = (
       manifest.manifest['uses-permission-sdk-23'] || []
     ).filter((permission) => ![
       'android.permission.ACCESS_COARSE_LOCATION',
       'android.permission.ACCESS_FINE_LOCATION',
-    ].includes(permission.$['android:name']));
+    ].includes(permission.$['android:name'])).concat([
+      'android.permission.ACCESS_COARSE_LOCATION',
+      'android.permission.ACCESS_FINE_LOCATION',
+    ].map((name) => ({
+      $: { 'android:name': name, 'tools:node': 'remove' },
+    })));
 
     const application = AndroidConfig.Manifest.getMainApplicationOrThrow(manifest);
     application.$['android:allowBackup'] = 'false';
