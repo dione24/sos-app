@@ -34,3 +34,28 @@ Le cache conserve au maximum Bamako et la dernière position autorisée, dans le
 6. Contrôler le bouton SOS, l’annuaire, les guides et le retour accueil sans émettre d’appel, de SMS ou d’alerte réelle.
 
 L’attente GPS initiale peut toujours prendre plusieurs secondes quand aucune position n’est disponible ; le cache n’attend plus cette recherche. La première récupération de tuiles et le premier chargement réseau restent dépendants de la connexion.
+
+## Recette Android isolée du 6 novembre
+
+22 vérifications passent sur un AVD neuf API32/arm64 avec l’image système déjà
+présente sur le Mac. Premier lancement, passage sans dossier, création et
+modification d’un dossier fictif, navigation, annulations puis suppression
+confirmée restent corrects après redémarrage du processus. Aucun dossier réel
+ni téléphone du propriétaire n’a été utilisé pour cette recette.
+
+La carte native affiche les rues de Bamako. Après déplacement et retour
+d’onglet, le cadrage rendu est identique à celui quitté ; les modes carte et
+liste sont conservés. La météo réelle en ligne passe au cache sans réseau
+Android actif, finit son actualisation hors ligne et retrouve ce cache après
+redémarrage. Aucun crash SOS n’est présent dans le buffer Android contrôlé.
+
+La mesure ActivityManager (trois essais après échauffement) donne une médiane
+de 568 ms pour la référence et 629 ms pour le candidat. Ce petit échantillon ne
+démontre aucun gain de démarrage natif, ne mesure pas l’arrivée du contenu JS
+utilisable et ne s’extrapole pas au Tecno. Les améliorations vérifiées portent
+sur le travail évité, le cache et la navigation. Les temps et la mémoire sur
+appareil physique restent à mesurer. Aucun appel, SMS, SOS ou relais Bluetooth
+n’a été déclenché ; réseaux de l’AVD rétablis, puis émulateur arrêté.
+
+Le bundle de production nécessite une compilation complète avec incrément de
+version ; l’APK de recette reconstruit n’est pas un artefact de publication.
