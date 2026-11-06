@@ -1,18 +1,21 @@
 appId: ml.sossecurite.app
 name: Premier démarrage et routage SOS
+# Efface uniquement l'app sur un appareil de QA dédié, jamais un dossier réel.
 ---
-- clearState
-- launchApp
+- launchApp:
+    clearState: true
+    permissions:
+      all: deny
 - assertVisible: "Votre dossier d'urgence"
 - tapOn: "Accéder au SOS sans dossier"
 - assertVisible: "SOS Sécurité Mali"
-- tapOn:
-    text: "SOS"
-    index: 0
+- tapOn: "Déclencher un SOS"
 - assertVisible: "Quel type d'urgence ?"
 - tapOn: "Agression"
 - assertVisible: "Appeler le 101"
-- assertVisible: "Continuer sans position"
-- tapOn: "Continuer sans position"
-- assertVisible: "Position indisponible"
-- assertVisible: "Envoyer un SMS|Ouvrir le SMS de secours"
+- tapOn: "Continuer le SOS sans position"
+- assertVisible: "Position non ajoutée"
+- scrollUntilVisible:
+    element: "Ouvrir le SMS de secours"
+    direction: DOWN
+- assertVisible: "Appeler le 101"

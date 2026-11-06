@@ -18,7 +18,7 @@ Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 | Pays initial | Mali (étendre ensuite) |
 | Adresse e-mail | **support@sahelpay.ml** |
 | Site web | **https://sahelpay.ml** |
-| URL confidentialité | **https://sahelpay.ml/apps/sos-securite-mali/privacy** |
+| URL confidentialité | **https://www.sahelpay.ml/apps/sos-securite-mali/privacy** |
 | Package | `ml.sossecurite.app` |
 
 La description courte, la description complète et les notes de version prêtes à
@@ -33,8 +33,8 @@ destinataire explicitement choisi. Cette réponse évite de sous-déclarer un fl
 
 | Type | Collectée | Partagée | Finalité | Facultative | Traitement |
 | --- | --- | --- | --- | --- | --- |
-| Localisation précise | Oui | Oui si l'exception fournisseur de service n'est pas contractuellement démontrée | Fonctionnalité de l'app | Oui | HTTPS ; ne pas cocher éphémère pour Open-Meteo |
-| Identifiant d'appareil ou autre (adresse IP, déclaration conservatrice) | Oui | Même règle fournisseur de service | Fonctionnalité de l'app, sécurité/prévention des abus | Non pour la météo Bamako actualisée automatiquement | HTTPS ; journaux gérés par les fournisseurs |
+| Localisation approximative et précise | Oui | Oui si l'exception fournisseur de service n'est pas contractuellement démontrée | Fonctionnalité de l'app | Oui | HTTPS ; ne pas cocher éphémère pour Open-Meteo |
+| Identifiant d'appareil ou autre (adresse IP, déclaration conservatrice) | Oui | Même règle fournisseur de service | Fonctionnalité de l'app | Non pour la météo Bamako actualisée automatiquement | HTTPS ; journaux gérés par les fournisseurs |
 
 - Ne pas déclarer comme collectés par SahelPay le nom, le téléphone, la photo, les
   contacts ou le dossier médical : ils restent dans SQLCipher sur l'appareil.
@@ -87,8 +87,32 @@ dans `store-assets/video/` après un test GATT réussi.
 ## Checklist technique avant envoi
 
 1. Héberger `store-assets/privacy-policy.html` à l'URL ci-dessus.
-2. Injecter `EXPO_PUBLIC_MAPTILER_KEY` (restreinte package Android + iOS bundle).
+2. Injecter `EXPO_PUBLIC_MAPTILER_KEY` (visibilité EAS sensitive ; User-Agent contenant `ml.sossecurite.app`).
 3. `eas build --platform android --profile production`
 4. `npm run verify:android-release -- <aab>`
 5. `npm run verify:play-submission`
-6. Piste interne → testeurs → production.
+6. Piste interne ; promotion publique réservée au propriétaire après QA et validation clinique.
+
+## État au 6 novembre 2026
+
+Compte choisi explicitement par le propriétaire : **MHM Digital Agency**.
+Application Play créée : ID `4975629932621694392`.
+Canal de test interne : `4700776084224063532`.
+Classification IARC enregistrée avec accord du propriétaire : PEGI 3,
+ESRB Everyone, USK 12 ; présence d’interactions utilisateurs et partage de position.
+La cible commerciale reste exclusivement **18 ans et plus**.
+La fiche complète est enregistrée avec ses textes, l’icône d’origine, le nouveau
+visuel et les sept captures natives code 5 ordonnées. Google l’indique prête pour
+examen. L’AAB 1.0.0 (5) est accepté dans le brouillon de la piste interne.
+Deux comptes propriétaires sont sélectionnés dans une liste SOS dédiée ; les
+adresses restent dans la console, hors Git.
+
+Lien d’inscription prévu (inactif tant que la release n’est pas publiée) :
+https://play.google.com/apps/internaltest/4700776084224063532
+
+Les dix déclarations proposées dans « Contenu de l’application » sont traitées,
+y compris l’absence d’identifiant publicitaire. Le formulaire FGS n’est pas encore
+proposé dans cette vue ; sa préparation attend la vidéo native réelle. Le préflight final indique
+0 échec technique et 1 garde de publication (vidéo manquante). Ne pas finaliser
+le déploiement interne avant le retest physique et la preuve FGS ; aucune
+publication publique n’est autorisée par ce dossier.

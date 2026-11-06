@@ -1,41 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500">
-  <defs>
-    <filter id="soft" x="-30%" y="-30%" width="160%" height="170%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#574E43" flood-opacity="0.16"/>
-    </filter>
-  </defs>
-  <rect width="1024" height="500" fill="#F7F6F2"/>
-  <circle cx="920" cy="60" r="190" fill="#E5F6EF"/>
-  <circle cx="72" cy="462" r="150" fill="#FFF0EC"/>
-
-  <circle cx="800" cy="250" r="178" fill="#DDF1E9"/>
-  <circle cx="800" cy="250" r="126" fill="#F7F6F2"/>
-  <circle cx="800" cy="250" r="74" fill="#E5F6EF"/>
-  <g fill="#25A56F">
-    <circle cx="688" cy="117" r="7"/>
-    <circle cx="935" cy="199" r="7"/>
-    <circle cx="885" cy="393" r="7"/>
-  </g>
-  <g transform="translate(88 86)">
-    <rect width="86" height="86" rx="26" fill="#FFFFFF" stroke="#C8EBDD" stroke-width="2" filter="url(#soft)"/>
-    <path d="M43 19c11 9 23 13 35 14v20c0 19-12 32-35 39C20 85 8 72 8 53V33c12-1 24-5 35-14Z" transform="translate(0 -10) scale(.78) translate(12 16)" fill="#FF5A3D"/>
-    <rect x="40" y="32" width="6" height="19" rx="3" fill="#FFFFFF"/>
-    <circle cx="43" cy="58" r="3" fill="#FFFFFF"/>
-  </g>
-
-  <text x="88" y="235" fill="#1E211D" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="700">SOS Sécurité Mali</text>
-  <text x="90" y="285" fill="#646860" font-family="Arial, Helvetica, sans-serif" font-size="24">Alerter. Agir. Trouver de l’aide.</text>
-  <g transform="translate(90 332)">
-    <rect width="204" height="58" rx="29" fill="#FF5A3D"/>
-    <circle cx="32" cy="29" r="12" fill="#FFFFFF" opacity="0.96"/>
-    <path d="M32 20v10l7 4" fill="none" stroke="#FF5A3D" stroke-width="3" stroke-linecap="round"/>
-    <text x="58" y="37" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Prêt à agir</text>
-  </g>
-
-  <g transform="translate(694 144)" filter="url(#soft)">
-    <circle cx="106" cy="106" r="92" fill="#FFFFFF"/>
-    <path d="M106 39c28 22 57 31 88 35v58c0 54-33 91-88 109-55-18-88-55-88-109V74c31-4 60-13 88-35Z" fill="#FF5A3D"/>
-    <rect x="99" y="86" width="14" height="53" rx="7" fill="#FFFFFF"/>
-    <circle cx="106" cy="158" r="8" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-labelledby="title desc">
+  <title id="title">SOS Sécurité Mali</title>
+  <desc id="desc">Alerter. Agir. Trouver de l’aide. Guides hors ligne, numéros utiles, sans compte ni publicité.</desc>
+  <rect width="1024" height="500" fill="#F2F4F7"/>
+  <g font-family="DM Sans, sans-serif">
+    <text x="56" y="78" fill="#0B6E4F" font-size="17" font-weight="600" letter-spacing="2">PREMIERS SECOURS · MALI</text>
+    <text x="52" y="162" fill="#0F172A" font-size="58" font-weight="700">SOS Sécurité Mali</text>
+    <text x="56" y="208" fill="#475467" font-size="26">Alerter. Agir. Trouver de l’aide.</text>
+    <path d="M56 244H620" stroke="#D5DCE5"/>
+    <g fill="#E6F4EE">
+      <rect x="56" y="272" width="36" height="36" rx="10"/>
+      <rect x="56" y="326" width="36" height="36" rx="10"/>
+      <rect x="56" y="380" width="36" height="36" rx="10"/>
+    </g>
+    <g fill="none" stroke="#0B6E4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M66 283h7l2 2 2-2h6v15h-6l-2 2-2-2h-7z M75 286v10"/>
+      <path d="m67 338 3-2 4 5-2 2c2 3 4 5 7 6l2-2 4 3-2 3c-7 2-18-9-16-15z"/>
+      <path d="m67 398 5 5 10-11"/>
+    </g>
+    <text x="108" y="298" fill="#0F172A" font-size="22" font-weight="600">Guides disponibles hors ligne</text>
+    <text x="108" y="352" fill="#0F172A" font-size="22" font-weight="600">Numéros et lieux utiles au Mali</text>
+    <text x="108" y="406" fill="#0F172A" font-size="22" font-weight="600">Gratuite, sans compte ni publicité</text>
+    <rect x="684" y="44" width="292" height="412" rx="24" fill="#FFFFFF" stroke="#E4E7EC"/>
+    <text x="830" y="91" text-anchor="middle" fill="#475467" font-size="19" font-weight="500">En cas d’urgence</text>
+    <circle cx="830" cy="226" r="98" fill="#C8102E"/>
+    <text x="830" y="245" text-anchor="middle" fill="#FFFFFF" font-size="56" font-weight="700">SOS</text>
+    <text x="830" y="375" text-anchor="middle" fill="#0F172A" font-size="21" font-weight="600">Appelez les secours.</text>
+    <text x="830" y="407" text-anchor="middle" fill="#475467" font-size="18">Suivez leurs consignes.</text>
   </g>
 </svg>

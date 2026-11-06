@@ -12,7 +12,7 @@ premier plan** pour l'AAB qui cible Android API 36.
 
 ## Description à copier
 
-> Lorsqu'un utilisateur choisit « Diffuser par relais Bluetooth » pour une alerte
+> Lorsqu'un utilisateur choisit « Alerter autour de moi » pour une alerte
 > SOS, l'application ouvre temporairement un serveur Bluetooth GATT et annonce
 > l'alerte aux téléphones SOS compatibles à proximité. Le transfert contient le type
 > d'urgence, l'heure, un identifiant anonyme et, si l'utilisateur l'a autorisée, sa
@@ -44,19 +44,38 @@ connexion. Le parcours doit montrer :
 2. onglet Relais, divulgation Bluetooth entièrement lisible, puis « Pas maintenant » ;
 3. retour dans Relais pour prouver que le choix reste disponible ;
 4. création d'un SOS de démonstration sans donnée personnelle ;
-5. « Diffuser par relais Bluetooth », divulgation puis « Autoriser et diffuser » ;
+5. « Alerter autour de moi », divulgation puis « Autoriser et alerter » ;
 6. permissions Android ;
-7. notification persistante « Relais SOS actif » et son action d'arrêt ;
+7. notification persistante « Alerte SOS diffusée » et son action d'arrêt ;
 8. retour dans l'application et arrêt de la diffusion.
 
-Le service doit réellement démarrer dans la vidéo. Le TECNO KL5 actuel renvoie un
-timeout GATT HiOS et l'émulateur Android déclare l'annonce BLE non prise en charge :
-enregistrer ce parcours sur un autre téléphone compatible avant la soumission. Le
-script `scripts/record-play-fgs-demo.sh` prépare l'enregistrement ADB et récupère le
-MP4. `npm run verify:fgs-video` contrôle ensuite le conteneur, la piste vidéo, la
-durée (10 à 180 secondes) et une résolution minimale de 480 × 800.
+Le service doit réellement démarrer dans la vidéo. Le 6 novembre 2026, le
+TECNO KN4 (Android 16) a effectivement démarré le serveur GATT, l’annonce et
+`BleRelayForegroundService` (`isForeground=true`, type `connectedDevice`,
+notification permanente ID 122 avec une action d’arrêt). Le TECNO KL5 mentionné
+historiquement renvoyait un timeout GATT ; ce résultat ne vaut pas pour le KN4.
 
-Références officielles vérifiées le 10 août 2026 :
+La nouvelle interface ouvre le relais depuis le SOS : « Alerter autour de moi »,
+divulgation lisible, refus possible, puis « Autoriser et alerter ». Après diffusion,
+choisir « Alertes proches ». L’arrêt doit être vérifié depuis la notification
+**et** depuis « Arrêter de partager mon alerte » dans l’application. Le retour dans
+cet écran et la pause de la recherche ne doivent pas redémarrer une alerte arrêtée.
+L’état de diffusion est synchronisé avec le module natif, y compris après un arrêt
+par notification ou expiration ; l’historique seul ne déclenche plus une nouvelle
+annonce sans action explicite.
+
+Le script `scripts/record-play-fgs-demo.sh` prépare l’enregistrement ADB et récupère
+le MP4. `npm run verify:fgs-video` contrôle le conteneur, la piste vidéo, la durée
+(10 à 180 secondes) et une résolution minimale de 480 × 800. Une vidéo HTTP(S)
+accessible sans connexion peut être fournie ; le guide Google exige un lien et
+la démonstration de la fonctionnalité, sans imposer un hébergeur particulier.
+La vidéo finale et son lien public restent à produire avec l’APK corrigé **code 5**.
+La console affiche dix déclarations traitées et aucune en attention requise après
+l’import du brouillon interne ; le formulaire FGS n’est pas encore proposé dans
+cette vue. Cette absence ne dispense pas de la preuve exigée par ce dossier.
+Une seule unité ne valide pas le transfert multi-appareils ou trois sauts.
+
+Références officielles consultées le 6 novembre 2026 :
 
 - déclaration des types FGS et vidéo du parcours utilisateur :
   https://support.google.com/googleplay/android-developer/answer/13392821

@@ -36,7 +36,8 @@
         "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
         "android.permission.VIBRATE",
         "android.permission.MODIFY_AUDIO_SETTINGS"
-      ]
+      ],
+      "versionCode": 5
     },
     "ios": {
       "bundleIdentifier": "ml.sossecurite.app",

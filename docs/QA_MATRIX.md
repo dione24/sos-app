@@ -1,6 +1,78 @@
 # Matrice QA — SOS Sécurité Mali 1.0.0
 
-Mise à jour : 10 août 2026. Publication visée : lundi 17 août 2026.
+## Vérification de la refonte — 6 novembre 2026
+
+### Artefact final : 1.0.0 (5)
+
+APK EAS preview signé testé en natif sur **Android 12L / API 32 ARM64**,
+émulateur isolé créé pour cette publication, sans compte Google ni donnée réelle.
+Écran 1080 × 1920. Aucune capture web ni barre Expo. Les versions APK et AAB
+finales ainsi que leurs empreintes sont consignées dans `RELEASE_ARTIFACTS.md`.
+
+| Parcours / contrôle | Résultat observé sur le code 5 |
+| --- | --- |
+| Installation release / signature | Réussi, versionCode 5 et certificat d’upload attendu |
+| Trois scénarios Maestro actualisés | Réussis en 1 min 07 s : onboarding/SOS agression, annuaire/guides, confidentialité/liste Bamako |
+| SOS sans dossier / position refusée | Réussi ; appel médical 122 ou agression 101 accessible, aucun appel/SMS envoyé |
+| Refus Bluetooth puis réouverture du consentement | Réussi ; refus explicite conservé, pas de fausse activité Bluetooth sur émulateur |
+| Dossier fictif + contact international réservé | Création/enregistrement réussis ; aucune donnée personnelle |
+| Modifier puis abandonner | Réussi ; le dossier initial est restauré |
+| Redémarrage à froid / dossier | Réussi ; base rouverte, profil et contact conservés |
+| QR médical | Affiché localement avec son avertissement de confidentialité |
+| Export JSON | Feuille Android ouverte sur `dossier-sos-mali.json`, annulée sans partage externe |
+| Import V2 valide | Confirmation de remplacement, import réussi, nouveau nom visible |
+| Double effacement local | Deux confirmations, retour onboarding puis absence du profil et du contact fictifs |
+| Carte MapTiler native | Téléchargement complet, état « Prête », fond de carte et marqueurs Bamako visibles |
+| Carte hors ligne après redémarrage | Réussi avec Wi-Fi et données mobiles désactivés sur l’émulateur |
+| Météo réseau puis hors ligne | Prévision réelle de Bamako puis cache explicite « Dernière prévision » avec âge ; aucune position personnelle |
+| Mode sombre / texte système 200 % | Accueil, SOS et guide RCP consultables ; appel fixe accessible, suite du formulaire disponible par défilement |
+| Guide vocal hors ligne | Première étape en état « Lecture en cours », fichier embarqué disponible, audio physique non validé sur émulateur |
+| Captures finales | Sept PNG RGB 1080 × 1920 relus puis importés en ordre dans Play |
+| Manifeste final | Permissions GPS uniques non limitées ; fusion Gradle réelle et APK/AAB contrôlés |
+| Compatibilité 16 Ko | zipalign réussi, 52 ELF arm64/x86_64 contrôlés sans échec |
+| Préflight final | 0 échec technique, 1 garde publication : vidéo FGS absente |
+
+Les trois scénarios Maestro passent sur le code 5. Les essais RCP longue durée
+ont été effectués sur le code 3 (même écran RCP) : **7 min 36 s, 837 impulsions**,
+maintien d’écran actif malgré une veille de 15 s, arrêt par maintien et absence
+de redémarrage accidentel. Le code 5 a aussi été démarré et arrêté pour sa capture
+RCP. La sortie audio et les vibrations physiques ne sont pas validées par un
+émulateur sans audio.
+
+### Téléphone physique : vérifications partielles
+
+**TECNO KN4, Android 16**, écran physique 720 × 1576, densité 280.
+Le téléphone disponible est un KN4, pas le KL5 du rapport historique d’août.
+La politique d’administration limite la veille à 60 secondes ; elle n’est pas modifiée.
+
+Sur les anciens APK codes 2/3 : installation signée, accès sans dossier, SOS sans
+position, confirmation appel 122 puis retour sans appeler, première narration RCP,
+refus/réouverture de consentement Bluetooth, autorisations appareils proches et
+notifications, annonce GATT et service `BleRelayForegroundService` réellement actif
+(`isForeground=true`, type connectedDevice, notification ID 122 avec action d’arrêt).
+Le défaut d’état du bouton d’arrêt a été corrigé dans le code 5 : observation de
+l’état natif, arrêt synchronisé, suppression des rediffusions automatiques de
+l’historique. **Retest physique du correctif et vidéo finale encore requis.**
+
+Le TECNO s’est déconnecté avant l’installation finale. Les changements temporaires
+d’affichage, d’animations, de veille et de mode démo doivent être restaurés à la
+reconnexion USB ; ne pas considérer cette restauration comme acquise avant lecture
+de confirmation. Aucun vrai SMS/appel, aucune donnée médicale réelle et aucune
+position personnelle n’ont été utilisés par la QA.
+
+### Limites restant à lever
+
+- Retest du code 5 sur le TECNO et vidéo FGS réelle, avec arrêt depuis l’app et la
+  notification, puis vérification qu’une pause/reprise ne relance pas l’ancienne alerte.
+- Parcours complet physique, audio/haptique, GPS simulé accepté/timeout, composeur
+  SMS avec destinataires fictifs, import invalide, TalkBack.
+- Trois Android pour vérifier le transfert et les sauts BLE ; ne pas promettre un
+  multi-hop garanti. Un seul téléphone et un émulateur ne constituent pas cette preuve.
+- iOS hors de la demande de publication Android ; aucun essai iPhone effectué ici.
+- Relecture clinique locale signée avant toute promotion publique.
+
+## Historique du 10 août 2026 (ancienne build)
+
 
 ## Automatisation
 

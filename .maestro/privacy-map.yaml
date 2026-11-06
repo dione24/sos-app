@@ -1,14 +1,27 @@
 appId: ml.sossecurite.app
 name: Consentements carte et confidentialité
 ---
-- launchApp
-- tapOn: "Carte, Autour de moi"
-- assertVisible: "Trier les lieux depuis ma position"
-- assertVisible: "Continuer avec Bamako"
-- tapOn: "Continuer avec Bamako"
-- assertVisible: "CHU Gabriel Touré"
+- launchApp:
+    permissions:
+      all: deny
+- runFlow:
+    when:
+      visible: "Votre dossier d'urgence"
+    commands:
+      - tapOn: "Accéder au SOS sans dossier"
+- tapOn: "Lieux"
+- assertVisible: "Voir les lieux les plus proches"
+- tapOn: "Continuer avec le centre de Bamako"
+- scrollUntilVisible:
+    element: "CHU Gabriel Touré"
+    direction: DOWN
 - tapOn: "Accueil"
-- tapOn: "Ouvrir les paramètres"
-- tapOn: "Confidentialité et données"
+- tapOn: "Réglages"
+- scrollUntilVisible:
+    element: "Ouvrir confidentialité et contrôle des données"
+    direction: DOWN
+- tapOn: "Ouvrir confidentialité et contrôle des données"
 - assertVisible: "Vos données médicales restent sur ce téléphone"
-- assertVisible: "Effacer toutes mes données"
+- scrollUntilVisible:
+    element: "Effacer toutes mes données"
+    direction: DOWN

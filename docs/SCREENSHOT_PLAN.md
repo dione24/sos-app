@@ -27,14 +27,21 @@ de développement Expo, aucune clé API, aucun nom/numéro réel, UI strictement
 à la version soumise. Google exige au moins deux captures ; quatre captures téléphone
 1080p ou plus sont recommandées pour les emplacements de découverte.
 
-Statut du 10 août 2026 : les sept captures finales ont été régénérées avec la
-nouvelle interface claire, puis relues ensemble en planche contact. Les textes
-techniques ont été remplacés par des actions compréhensibles, la capture Lieux ne
-montre plus le nom du fournisseur de données et la capture Alertes proches conserve
-un refus explicite. La septième capture montre la voix IA française intégrée en
-lecture sur une étape de RCP. L'icône 512 × 512 et le visuel 1024 × 500 ont aussi été refaits
-dans la nouvelle identité lumineuse et contrôlés visuellement. Les empreintes se
-trouvent dans `store-assets/CHECKSUMS.sha256`.
+## Statut du 6 novembre 2026
+
+Les sept captures ont été reprises sur l’**APK EAS preview signé 1.0.0, code 5**,
+en natif Android, sur un émulateur Android 12L/API 32 isolé, résolution 1080 × 1920.
+Export PNG RGB sans transparence, aucune donnée personnelle, aucun rendu web ou
+écran Expo. La carte/liste indique explicitement les distances depuis le centre
+de Bamako. Le consentement Bluetooth conserve « Pas maintenant » ; aucune
+activité Bluetooth n’est simulée dans cette capture.
+
+Les sept images ont été relues en planche contact puis importées dans Play,
+dans l’ordre 01 à 07. La fiche complète est enregistrée et indiquée « Prête à être
+envoyée pour examen ». Le visuel 1024 × 500 et son SVG ont été refaits dans
+l’identité actuelle ; l’icône 512 d’origine est conservée. Le visuel de présentation
+créé avec assistance IA est déclaré comme tel dans la console ; les captures sont
+des captures natives réelles. Les empreintes sont dans `store-assets/CHECKSUMS.sha256`.
 
 ## App Store — plan V1
 
