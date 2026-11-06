@@ -1,13 +1,13 @@
-import { PhoneCall, Search, TriangleAlert } from 'lucide-react-native';
+import { PhoneCall, Search, SearchX, TriangleAlert } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
-import { Badge, Card, SectionTitle } from '@/components/ui';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
+import { Divider, EmptyState, ListGroup, SectionHeader } from '@/components/ui';
 import { EMERGENCY_NUMBERS } from '@/data';
 import { confirmCall } from '@/services/phone';
+import { makeStyles, useTheme } from '@/theme';
 import type { EmergencyNumber } from '@/types/models';
 
 const categoryLabels: Record<EmergencyNumber['category'], string> = {
@@ -20,75 +20,69 @@ const categoryLabels: Record<EmergencyNumber['category'], string> = {
 };
 
 function normalizeSearch(value: string) {
-  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
 function matchesSearch(item: EmergencyNumber, query: string) {
   if (!query) return true;
-  const searchable = [item.number, item.dialNumber, item.name, item.description, item.scope, categoryLabels[item.category]]
-    .join(' ');
+  const searchable = [item.number, item.dialNumber, item.name, item.description, item.scope, categoryLabels[item.category]].join(' ');
   return normalizeSearch(searchable).includes(query);
 }
 
-function NumberRow({ item, last }: { item: EmergencyNumber; last: boolean }) {
+function NumberRow({ item }: { item: EmergencyNumber }) {
+  const s = useStyles();
+  const { colors } = useTheme();
   const needsVerification = item.status === 'needs_field_verification';
+  const urgent = item.category === 'urgence';
   return (
-    <View style={[styles.row, !last && styles.rowBorder]}>
-      <View style={styles.rowTop}>
-        <View style={styles.numberBox}>
-          <Text
-            adjustsFontSizeToFit
-            minimumFontScale={0.72}
-            numberOfLines={1}
-            style={[styles.number, needsVerification && styles.numberPending]}
-          >
-            {item.number}
-          </Text>
-          <Text style={styles.category}>{categoryLabels[item.category]}</Text>
-        </View>
-        <View style={styles.copy}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-          <View style={styles.scopeRow}>
-            {needsVerification ? <TriangleAlert size={12} color={colors.amber} /> : null}
-            <Text style={[styles.scope, needsVerification && styles.scopePending]}>
-              {needsVerification ? 'Contact à confirmer' : item.scope}
-            </Text>
-          </View>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Appeler ${item.name} au ${item.number}`}
-          onPress={() => confirmCall(item.dialNumber, item.name)}
-          style={({ pressed }) => [
-            styles.call,
-            item.category === 'urgence' && styles.callUrgent,
-            needsVerification && styles.callPending,
-            pressed && styles.callPressed,
-          ]}
-        >
-          <PhoneCall size={20} color={colors.black} />
-        </Pressable>
+    <View style={s.row}>
+      <View style={s.numberBox}>
+        <Text adjustsFontSizeToFit minimumFontScale={0.7} numberOfLines={1} maxFontSizeMultiplier={1.2} style={[s.number, urgent && s.numberUrgent]}>
+          {item.number}
+        </Text>
+        <Text maxFontSizeMultiplier={1.3} style={s.category}>{categoryLabels[item.category]}</Text>
       </View>
+      <View style={s.copy}>
+        <Text maxFontSizeMultiplier={1.4} style={s.name}>{item.name}</Text>
+        <Text maxFontSizeMultiplier={1.5} style={s.description}>{item.description}</Text>
+        <View style={s.scopeRow}>
+          {needsVerification ? <TriangleAlert size={14} color={colors.warningText} /> : null}
+          <Text maxFontSizeMultiplier={1.4} style={[s.scope, needsVerification && s.scopePending]}>
+            {needsVerification ? 'Contact à confirmer' : item.scope}
+          </Text>
+        </View>
+      </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Appeler ${item.name} au ${item.number}`}
+        onPress={() => confirmCall(item.dialNumber, item.name)}
+        style={({ pressed }) => [s.call, urgent && s.callUrgent, pressed && s.callPressed]}
+      >
+        <PhoneCall size={22} color={urgent ? colors.onColor : colors.primaryText} />
+      </Pressable>
     </View>
   );
 }
 
 function NumberGroup({ items }: { items: EmergencyNumber[] }) {
   return (
-    <Card style={styles.card}>
-      {items.map((item, index) => <NumberRow key={item.number} item={item} last={index === items.length - 1} />)}
-    </Card>
+    <ListGroup>
+      {items.map((item, index) => (
+        <View key={item.number}>
+          {index > 0 ? <Divider inset /> : null}
+          <NumberRow item={item} />
+        </View>
+      ))}
+    </ListGroup>
   );
 }
 
 export default function DirectoryScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const [search, setSearch] = useState('');
   const query = normalizeSearch(search);
-  const visible = useMemo(
-    () => EMERGENCY_NUMBERS.filter((item) => matchesSearch(item, query)),
-    [query],
-  );
+  const visible = useMemo(() => EMERGENCY_NUMBERS.filter((item) => matchesSearch(item, query)), [query]);
   const urgent = visible.filter((item) => item.category === 'urgence');
   const useful = visible.filter((item) => ['orientation', 'assistance', 'signalement'].includes(item.category));
   const alternatives = visible.filter((item) => item.category === 'alternative');
@@ -96,21 +90,26 @@ export default function DirectoryScreen() {
 
   return (
     <Screen>
-      <AppHeader title="Numéros utiles" eyebrow="Mali" back action={<Badge label={`${EMERGENCY_NUMBERS.length} contacts`} />} />
+      <AppHeader title="Numéros utiles" subtitle={`Mali · ${EMERGENCY_NUMBERS.length} contacts, disponibles sans connexion`} back />
 
-      <Card style={styles.priorityCard}>
-        <Text style={styles.priorityNumber}>122</Text>
-        <View style={styles.priorityCopy}>
-          <Text style={styles.priorityTitle}>Danger immédiat ou victime</Text>
-          <Text style={styles.priorityText}>Accident, incendie, noyade, inondation ou secours à personne.</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Appeler la Protection Civile au 122"
+        onPress={() => confirmCall('122', 'Protection Civile')}
+        style={({ pressed }) => [s.priority, pressed && s.priorityPressed]}
+      >
+        <View style={s.priorityCopy}>
+          <Text maxFontSizeMultiplier={1.2} style={s.priorityNumber}>122</Text>
+          <Text maxFontSizeMultiplier={1.4} style={s.priorityTitle}>Danger immédiat ou victime</Text>
+          <Text maxFontSizeMultiplier={1.5} style={s.priorityText}>Accident, incendie, noyade, inondation ou secours à personne.</Text>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Appeler la Protection Civile au 122" onPress={() => confirmCall('122', 'Protection Civile')} style={styles.priorityCall}>
-          <PhoneCall size={23} color={colors.black} />
-        </Pressable>
-      </Card>
+        <View style={s.priorityCall}>
+          <PhoneCall size={26} color={colors.onColor} />
+        </View>
+      </Pressable>
 
-      <View style={styles.searchBox}>
-        <Search size={21} color={colors.sandMuted} />
+      <View style={s.searchBox}>
+        <Search size={22} color={colors.inkFaint} />
         <TextInput
           accessibilityLabel="Rechercher un numéro ou un service"
           autoCapitalize="none"
@@ -119,60 +118,72 @@ export default function DirectoryScreen() {
           maxFontSizeMultiplier={1.5}
           onChangeText={setSearch}
           placeholder="Police, santé, eau, électricité…"
-          placeholderTextColor={colors.sandFaint}
+          placeholderTextColor={colors.inkFaint}
           returnKeyType="search"
-          selectionColor={colors.alert}
-          style={styles.searchInput}
+          selectionColor={colors.primary}
+          style={s.searchInput}
           value={search}
         />
       </View>
 
-      {urgent.length ? <><SectionTitle title="Urgences nationales" aside="numéros courts" /><NumberGroup items={urgent} /></> : null}
-      {useful.length ? <><SectionTitle title="Santé et assistance" /><NumberGroup items={useful} /></> : null}
-      {alternatives.length ? <><SectionTitle title="Autres lignes de secours" /><NumberGroup items={alternatives} /></> : null}
-      {services.length ? <><SectionTitle title="Eau et électricité" /><NumberGroup items={services} /></> : null}
+      {urgent.length ? <><SectionHeader title="Urgences nationales" aside="numéros courts" /><NumberGroup items={urgent} /></> : null}
+      {useful.length ? <><SectionHeader title="Santé et assistance" /><NumberGroup items={useful} /></> : null}
+      {alternatives.length ? <><SectionHeader title="Autres lignes de secours" /><NumberGroup items={alternatives} /></> : null}
+      {services.length ? <><SectionHeader title="Eau et électricité" /><NumberGroup items={services} /></> : null}
 
       {visible.length === 0 ? (
-        <Card style={styles.emptyCard}>
-          <Text style={styles.emptyTitle}>Aucun contact trouvé</Text>
-          <Text style={styles.emptyText}>Essayez par exemple « police », « eau », « santé » ou un numéro.</Text>
-        </Card>
+        <EmptyState icon={<SearchX size={28} color={colors.inkMuted} />} title="Aucun contact trouvé" text="Essayez par exemple « police », « eau », « santé » ou un numéro." />
       ) : null}
 
-      <Text style={styles.note}>Gardez votre calme. Donnez d'abord votre position, un repère visible, la nature du danger et le nombre de personnes concernées. N'appelez jamais une ligne d'urgence pour un test non planifié.</Text>
+      <Text maxFontSizeMultiplier={1.6} style={s.note}>
+        Gardez votre calme. Donnez d'abord votre position, un repère visible, la nature du danger et le nombre de personnes concernées. N'appelez jamais une ligne d'urgence pour un test non planifié.
+      </Text>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  priorityCard: { minHeight: 108, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.alertDark, borderColor: '#FFD2C9' },
-  priorityNumber: { fontFamily: font.display, fontSize: 36, color: colors.alertLight },
-  priorityCopy: { flex: 1 },
-  priorityTitle: { fontFamily: font.bodyBold, fontSize: 14, color: colors.sand },
-  priorityText: { ...type.small, fontSize: 12, lineHeight: 17, marginTop: 3 },
-  priorityCall: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.alert },
-  searchBox: { minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.surface },
-  searchInput: { flex: 1, minHeight: 52, fontFamily: font.body, fontSize: 16, color: colors.sand, paddingVertical: spacing.sm },
-  card: { paddingVertical: 0 },
-  row: { paddingVertical: spacing.sm },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.hairline },
-  rowTop: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  numberBox: { width: 108 },
-  number: { fontFamily: font.display, fontSize: 18, color: colors.amber },
-  numberPending: { color: colors.amberLight },
-  category: { ...type.eyebrow, fontSize: 11, color: colors.sandFaint },
-  copy: { flex: 1 },
-  name: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  description: { ...type.small, fontSize: 12, lineHeight: 17, marginTop: 2 },
-  scopeRow: { minHeight: 16, flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 3 },
-  scope: { flex: 1, fontFamily: font.bodyMedium, fontSize: 11, color: colors.sandMuted },
-  scopePending: { color: colors.amberLight },
-  call: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.green },
-  callUrgent: { backgroundColor: colors.alert },
-  callPending: { backgroundColor: colors.amber },
-  callPressed: { opacity: 0.72, transform: [{ scale: 0.96 }] },
-  emptyCard: { alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.xl },
-  emptyTitle: { fontFamily: font.bodyBold, fontSize: 16, color: colors.sand },
-  emptyText: { ...type.small, textAlign: 'center' },
-  note: { ...type.small, textAlign: 'center', paddingHorizontal: spacing.md, fontSize: 11, lineHeight: 16 },
-});
+const useStyles = makeStyles((t) => ({
+  priority: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: t.spacing.md,
+    padding: t.spacing.md,
+    borderRadius: t.radius.md,
+    backgroundColor: t.colors.dangerBg,
+    borderWidth: 1,
+    borderColor: t.colors.dangerBorder,
+  },
+  priorityPressed: { opacity: 0.85 },
+  priorityCopy: { flex: 1, gap: 2 },
+  priorityNumber: { fontFamily: 'DMSans_700Bold', fontSize: 40, lineHeight: 46, letterSpacing: -0.5, color: t.colors.dangerText },
+  priorityTitle: { ...t.text.bodyStrong },
+  priorityText: { ...t.text.caption },
+  priorityCall: { width: t.hit.action, height: t.hit.action, borderRadius: t.hit.action / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: t.colors.sos },
+  searchBox: {
+    minHeight: t.hit.action,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: t.spacing.sm,
+    paddingHorizontal: t.spacing.md,
+    borderRadius: t.radius.sm,
+    borderWidth: 1,
+    borderColor: t.colors.borderStrong,
+    backgroundColor: t.colors.surface,
+  },
+  searchInput: { flex: 1, minHeight: t.hit.action - 2, fontFamily: 'DMSans_400Regular', fontSize: 16, color: t.colors.ink, paddingVertical: t.spacing.sm },
+  row: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm, paddingHorizontal: t.spacing.md, paddingVertical: t.spacing.sm },
+  numberBox: { width: 96, gap: 2 },
+  number: { fontFamily: 'DMSans_700Bold', fontSize: 20, lineHeight: 26, color: t.colors.ink },
+  numberUrgent: { color: t.colors.dangerText },
+  category: { ...t.text.caption, fontSize: 13, lineHeight: 18, color: t.colors.inkFaint },
+  copy: { flex: 1, gap: 2 },
+  name: { ...t.text.bodyStrong, fontSize: 15, lineHeight: 20 },
+  description: { ...t.text.caption },
+  scopeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  scope: { ...t.text.caption, fontSize: 13, lineHeight: 18, color: t.colors.inkFaint },
+  scopePending: { color: t.colors.warningText },
+  call: { width: t.hit.control, height: t.hit.control, borderRadius: t.hit.control / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: t.colors.primaryBg, borderWidth: 1, borderColor: t.colors.primaryBorder },
+  callUrgent: { backgroundColor: t.colors.sos, borderColor: t.colors.sos },
+  callPressed: { opacity: 0.75 },
+  note: { ...t.text.caption, color: t.colors.inkFaint, textAlign: 'center', paddingHorizontal: t.spacing.sm },
+}));

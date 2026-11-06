@@ -2,30 +2,45 @@ import { BellRing, Database, FileLock2, ImageIcon, MapPinned, Mail, RadioTower, 
 import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
-import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
-import { Badge, Button, Card, SectionTitle } from '@/components/ui';
+import { Button, Card, Divider, IconTile, ListGroup, ListRow, Notice, SectionHeader, useToneColor, type Tone } from '@/components/ui';
 import { PRIVACY_MAILTO, PUBLISHER, SUPPORT_MAILTO } from '@/constants/publisher';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
 import { clearAllUserData } from '@/db/database';
 import { stopBleAdvertising } from '@/services/ble-mesh';
+import { makeStyles, useTheme } from '@/theme';
 
-const flows = [
-  { icon: MapPinned, title: 'Position et météo', text: "Votre position est utilisée uniquement si vous choisissez la météo près de vous ou l'ajoutez à une alerte.", tone: colors.amber },
-  { icon: RadioTower, title: 'Alertes proches', text: "Le type d'urgence, l'heure et la position autorisée peuvent être transmis aux téléphones proches. Votre dossier médical reste privé.", tone: colors.greenLight },
-  { icon: Database, title: 'Carte', text: "Le service de carte reçoit uniquement la zone affichée. Il ne reçoit jamais votre dossier médical.", tone: colors.green },
-] as const;
+type Entry = { icon: typeof MapPinned; title: string; text: string; tone: Tone };
 
-const permissions = [
-  { icon: MapPinned, title: 'Position', text: "Demandée seulement lorsque vous touchez « Utiliser ma position ». L'appel et le SMS restent disponibles sans.", tone: colors.amber },
-  { icon: RadioTower, title: 'Appareils à proximité', text: "Demandée lorsque vous activez les alertes proches. Elle sert uniquement à détecter et transmettre les alertes SOS autour de vous.", tone: colors.green },
-  { icon: BellRing, title: 'Notifications', text: "Demandée sur Android pour montrer qu'une alerte proche est en cours et vous permettre de l'arrêter.", tone: colors.alert },
-  { icon: ImageIcon, title: 'Photo facultative', text: "Vous choisissez vous-même une image pour votre dossier. L'application n'utilise ni la caméra ni le microphone.", tone: colors.blue },
-] as const;
+const flows: Entry[] = [
+  { icon: MapPinned, title: 'Position et météo', text: "Votre position est utilisée uniquement si vous choisissez la météo près de vous ou l'ajoutez à une alerte.", tone: 'info' },
+  { icon: RadioTower, title: 'Alertes proches', text: "Le type d'urgence, l'heure et la position autorisée peuvent être transmis aux téléphones proches. Votre dossier médical reste privé.", tone: 'primary' },
+  { icon: Database, title: 'Carte', text: 'Le service de carte reçoit uniquement la zone affichée. Il ne reçoit jamais votre dossier médical.', tone: 'neutral' },
+];
+
+const permissions: Entry[] = [
+  { icon: MapPinned, title: 'Position', text: "Demandée seulement lorsque vous touchez « Utiliser ma position ». L'appel et le SMS restent disponibles sans.", tone: 'info' },
+  { icon: RadioTower, title: 'Appareils à proximité', text: 'Demandée lorsque vous activez les alertes proches. Elle sert uniquement à détecter et transmettre les alertes SOS autour de vous.', tone: 'primary' },
+  { icon: BellRing, title: 'Notifications', text: "Demandée sur Android pour montrer qu'une alerte proche est en cours et vous permettre de l'arrêter.", tone: 'warning' },
+  { icon: ImageIcon, title: 'Photo facultative', text: "Vous choisissez vous-même une image pour votre dossier. L'application n'utilise ni la caméra ni le microphone.", tone: 'neutral' },
+];
+
+function EntryRow({ entry, first }: { entry: Entry; first: boolean }) {
+  const color = useToneColor(entry.tone);
+  const Icon = entry.icon;
+  return (
+    <>
+      {!first ? <Divider inset /> : null}
+      <ListRow inset title={entry.title} subtitle={entry.text} leading={<IconTile tone={entry.tone}><Icon size={22} color={color} /></IconTile>} />
+    </>
+  );
+}
 
 export default function PrivacyScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const db = useSQLiteContext();
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
@@ -38,10 +53,7 @@ export default function PrivacyScreen() {
       await clearAllUserData(db);
       router.replace('/onboarding');
     } catch {
-      Alert.alert(
-        'Suppression interrompue',
-        "Les données n'ont pas pu être effacées complètement. Réessayez. Si le problème continue, redémarrez l'application.",
-      );
+      Alert.alert('Suppression interrompue', "Les données n'ont pas pu être effacées complètement. Réessayez. Si le problème continue, redémarrez l'application.");
     } finally {
       setDeleting(false);
     }
@@ -63,11 +75,7 @@ export default function PrivacyScreen() {
               "Cette action est irréversible. L'application reviendra au premier démarrage.",
               [
                 { text: 'Garder mes données', style: 'cancel' },
-                {
-                  text: 'Tout effacer',
-                  style: 'destructive',
-                  onPress: () => void eraseEverything(),
-                },
+                { text: 'Tout effacer', style: 'destructive', onPress: () => void eraseEverything() },
               ],
             ),
         },
@@ -77,123 +85,74 @@ export default function PrivacyScreen() {
 
   return (
     <Screen>
-      <AppHeader title="Confidentialité" eyebrow="Vos choix" back action={<Badge label="protégé" tone="green" dot />} />
+      <AppHeader title="Confidentialité" subtitle="Vos données, vos choix" back />
 
-      <Card style={styles.hero}>
-        <View style={styles.heroIcon}><FileLock2 size={28} color={colors.green} /></View>
-        <View style={styles.heroCopy}>
-          <Text maxFontSizeMultiplier={1.4} style={styles.heroTitle}>Vos données médicales restent sur ce téléphone</Text>
-          <Text maxFontSizeMultiplier={1.5} style={styles.heroText}>
-            Elles sont protégées sur votre appareil. Aucun compte n'est requis et elles ne sont pas envoyées à SahelPay.
-          </Text>
+      <Card tone="primary" style={s.hero}>
+        <IconTile tone="primary" size={56}><FileLock2 size={28} color={colors.primaryText} /></IconTile>
+        <View style={s.heroCopy}>
+          <Text maxFontSizeMultiplier={1.3} style={s.heroTitle}>Vos données médicales restent sur ce téléphone</Text>
+          <Text maxFontSizeMultiplier={1.5} style={s.heroText}>Elles sont protégées sur votre appareil. Aucun compte n'est requis et elles ne sont pas envoyées à SahelPay.</Text>
         </View>
       </Card>
 
-      <Card style={styles.publisherCard}>
-        <Text maxFontSizeMultiplier={1.4} style={styles.publisherTitle}>{PUBLISHER.legalName}</Text>
-        <Text maxFontSizeMultiplier={1.5} style={styles.publisherText}>
-          Application gratuite · {PUBLISHER.developerName} · {PUBLISHER.address}
-        </Text>
-        <Text maxFontSizeMultiplier={1.5} style={styles.publisherText}>{PUBLISHER.website}</Text>
+      <SectionHeader title="Quand des informations sont partagées" aside="avec votre accord" />
+      <ListGroup>
+        {flows.map((entry, index) => <EntryRow key={entry.title} entry={entry} first={index === 0} />)}
+      </ListGroup>
+
+      <Notice icon={<ShieldCheck size={20} color={colors.primaryText} />} text="Appels, SMS, QR et fichiers ne sont ouverts ou partagés qu'après votre action. Aucun SMS silencieux et aucune publicité." />
+
+      <SectionHeader title="Autorisations du téléphone" aside="seulement au besoin" />
+      <ListGroup>
+        {permissions.map((entry, index) => <EntryRow key={entry.title} entry={entry} first={index === 0} />)}
+      </ListGroup>
+      <Button label="Gérer les autorisations du téléphone" onPress={() => void Linking.openSettings()} variant="secondary" />
+
+      <SectionHeader title="Vos droits" />
+      <Card style={s.rights}>
+        <Text maxFontSizeMultiplier={1.4} style={s.rightTitle}>Accès, correction et suppression</Text>
+        <Text maxFontSizeMultiplier={1.5} style={s.rightText}>Vous pouvez consulter et modifier le dossier depuis l'onglet Dossier, exporter volontairement son contenu, ou supprimer ici toutes les données de ce téléphone.</Text>
+        <Text maxFontSizeMultiplier={1.5} style={s.rightText}>Aucune donnée n'est vendue ni utilisée pour la publicité, le profilage ou le suivi inter-applications.</Text>
       </Card>
 
-      <SectionTitle title="Quand des informations sont partagées" aside="avec votre accord" />
-      <View style={styles.flowList}>
-        {flows.map(({ icon: Icon, title, text, tone }) => (
-          <Card key={title} style={styles.flow}>
-            <View style={styles.flowIcon}><Icon size={21} color={tone} /></View>
-            <View style={styles.flowCopy}>
-              <Text maxFontSizeMultiplier={1.4} style={styles.flowTitle}>{title}</Text>
-              <Text maxFontSizeMultiplier={1.6} style={styles.flowText}>{text}</Text>
-            </View>
-          </Card>
-        ))}
-      </View>
-
-      <Card style={styles.notice}>
-        <ShieldCheck size={20} color={colors.green} />
-        <Text maxFontSizeMultiplier={1.6} style={styles.noticeText}>Appels, SMS, QR et fichiers ne sont ouverts ou partagés qu'après votre action. Aucun SMS silencieux et aucune publicité.</Text>
+      <SectionHeader title="Éditeur et contact" />
+      <Card style={s.publisher}>
+        <Text maxFontSizeMultiplier={1.4} style={s.publisherTitle}>{PUBLISHER.legalName}</Text>
+        <Text maxFontSizeMultiplier={1.5} style={s.publisherText}>Application gratuite · {PUBLISHER.developerName} · {PUBLISHER.address}</Text>
+        <Text maxFontSizeMultiplier={1.5} style={s.publisherText}>{PUBLISHER.website}</Text>
       </Card>
+      <Button label="Écrire au support" onPress={() => void Linking.openURL(SUPPORT_MAILTO)} variant="secondary" icon={<Mail size={20} color={colors.ink} />} />
+      <Button label="Question confidentialité" onPress={() => void Linking.openURL(PRIVACY_MAILTO)} variant="secondary" icon={<Mail size={20} color={colors.ink} />} />
+      <Button label="Ouvrir la politique en ligne" onPress={() => void Linking.openURL(PUBLISHER.privacyPolicyUrl)} variant="ghost" size="md" />
 
-      <SectionTitle title="Autorisations du téléphone" aside="seulement au besoin" />
-      <View style={styles.flowList}>
-        {permissions.map(({ icon: Icon, title, text, tone }) => (
-          <Card key={title} style={styles.flow}>
-            <View style={styles.flowIcon}><Icon size={21} color={tone} /></View>
-            <View style={styles.flowCopy}>
-              <Text maxFontSizeMultiplier={1.4} style={styles.flowTitle}>{title}</Text>
-              <Text maxFontSizeMultiplier={1.6} style={styles.flowText}>{text}</Text>
-            </View>
-          </Card>
-        ))}
-      </View>
-      <Button label="Gérer les autorisations du téléphone" onPress={() => void Linking.openSettings()} variant="outline" />
-
-      <SectionTitle title="Vos droits" />
-      <Card style={styles.rights}>
-        <Text maxFontSizeMultiplier={1.4} style={styles.rightTitle}>Accès, correction et suppression</Text>
-        <Text maxFontSizeMultiplier={1.6} style={styles.rightText}>Vous pouvez consulter et modifier le dossier depuis l'onglet Dossier, exporter volontairement son contenu, ou supprimer ici toutes les données de ce téléphone.</Text>
-        <View style={styles.legalRow}>
-          <ShieldCheck size={15} color={colors.green} />
-          <Text maxFontSizeMultiplier={1.6} style={styles.legalText}>Aucune donnée n'est vendue ni utilisée pour la publicité, le profilage ou le suivi inter-applications.</Text>
-        </View>
-      </Card>
-
-      <SectionTitle title="Contact éditeur" />
-      <Button
-        label="Écrire au support"
-        onPress={() => void Linking.openURL(SUPPORT_MAILTO)}
-        variant="soft"
-        icon={<Mail size={20} color={colors.sand} />}
-      />
-      <Button
-        label="Question confidentialité"
-        onPress={() => void Linking.openURL(PRIVACY_MAILTO)}
-        variant="outline"
-        icon={<Mail size={20} color={colors.sand} />}
-      />
-      <Button
-        label="Ouvrir la politique en ligne"
-        onPress={() => void Linking.openURL(PUBLISHER.privacyPolicyUrl)}
-        variant="outline"
-      />
-
+      <SectionHeader title="Supprimer" />
       <Button
         label={deleting ? 'Effacement en cours…' : 'Effacer toutes mes données'}
         onPress={requestDeletion}
-        variant="outline"
+        variant="secondary"
         loading={deleting}
         disabled={deleting}
-        icon={<Trash2 size={20} color={colors.alert} />}
+        icon={<Trash2 size={20} color={colors.dangerText} />}
+        style={s.delete}
       />
-      <Text maxFontSizeMultiplier={1.3} style={styles.version}>
-        {PUBLISHER.appName.toUpperCase()} · V{PUBLISHER.version} · {PUBLISHER.legalName.toUpperCase()} · GRATUITE
+      <Text maxFontSizeMultiplier={1.4} style={s.version}>
+        {PUBLISHER.appName} · v{PUBLISHER.version} · {PUBLISHER.legalName} · gratuite
       </Text>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  hero: { minHeight: 128, flexDirection: 'row', gap: spacing.md, alignItems: 'center', backgroundColor: colors.greenDark, borderColor: '#BFE8D1' },
-  heroIcon: { width: 52, height: 52, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface },
-  heroCopy: { flex: 1 },
-  heroTitle: { fontFamily: font.displayMedium, fontSize: 17, lineHeight: 21, color: colors.sand },
-  heroText: { ...type.small, fontSize: 11, lineHeight: 16, marginTop: 5 },
-  flowList: { gap: spacing.xs },
-  flow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
-  flowIcon: { width: 40, height: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface },
-  flowCopy: { flex: 1 },
-  flowTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  flowText: { ...type.small, fontSize: 11, lineHeight: 16, marginTop: 2 },
-  notice: { flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.surface },
-  noticeText: { ...type.small, flex: 1, fontSize: 11, lineHeight: 16, color: colors.sand },
-  rights: { gap: spacing.xs },
-  rightTitle: { fontFamily: font.bodyBold, fontSize: 14, color: colors.sand },
-  rightText: { ...type.small, fontSize: 11, lineHeight: 16 },
-  legalRow: { flexDirection: 'row', gap: spacing.xs, paddingTop: spacing.xs },
-  legalText: { ...type.small, flex: 1, fontSize: 11, lineHeight: 16, color: colors.amberLight },
-  publisherCard: { gap: 4, backgroundColor: colors.surface },
-  publisherTitle: { fontFamily: font.bodyBold, fontSize: 14, color: colors.sand },
-  publisherText: { ...type.small, fontSize: 11, lineHeight: 16 },
-  version: { ...type.eyebrow, textAlign: 'center', color: colors.sandFaint, fontSize: 11 },
-});
+const useStyles = makeStyles((t) => ({
+  hero: { flexDirection: 'row', gap: t.spacing.md, alignItems: 'center' },
+  heroCopy: { flex: 1, gap: 4 },
+  heroTitle: { ...t.text.h3 },
+  heroText: { ...t.text.caption },
+  rights: { gap: t.spacing.xs },
+  rightTitle: { ...t.text.bodyStrong },
+  rightText: { ...t.text.caption },
+  publisher: { gap: 4 },
+  publisherTitle: { ...t.text.bodyStrong },
+  publisherText: { ...t.text.caption },
+  delete: { borderColor: t.colors.dangerBorder },
+  version: { ...t.text.caption, color: t.colors.inkFaint, textAlign: 'center' },
+}));

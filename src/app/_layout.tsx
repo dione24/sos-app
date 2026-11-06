@@ -1,13 +1,4 @@
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_700Bold,
-} from '@expo-google-fonts/dm-sans';
-import {
-  SpaceGrotesk_500Medium,
-  SpaceGrotesk_600SemiBold,
-  SpaceGrotesk_700Bold,
-} from '@expo-google-fonts/space-grotesk';
+import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import * as Crypto from 'expo-crypto';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname, useRouter } from 'expo-router';
@@ -15,12 +6,12 @@ import * as SecureStore from 'expo-secure-store';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
-import { colors } from '@/constants/theme';
 import { getProfile, getSetting, migrateDatabase, setSetting } from '@/db/database';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useAppStore } from '@/store/app-store';
+import { ThemeProvider, makeStyles, useTheme } from '@/theme';
 
 const DATABASE_KEY_NAME = 'sos_mali_database_key_v1';
 
@@ -39,6 +30,7 @@ function BootstrapGate() {
   const db = useSQLiteContext();
   const router = useRouter();
   const pathname = usePathname();
+  const { colors } = useTheme();
   const setLanguage = useAppStore((state) => state.setLanguage);
   const [checked, setChecked] = useState(false);
 
@@ -75,7 +67,7 @@ function BootstrapGate() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.void },
+        contentStyle: { backgroundColor: colors.bg },
         animation: reducedMotion ? 'none' : 'slide_from_right',
       }}
     >
@@ -92,15 +84,9 @@ function BootstrapGate() {
   );
 }
 
-export default function RootLayout() {
-  const [loaded, fontError] = useFonts({
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_700Bold,
-    SpaceGrotesk_500Medium,
-    SpaceGrotesk_600SemiBold,
-    SpaceGrotesk_700Bold,
-  });
+function ThemedApp() {
+  const { dark } = useTheme();
+  const [loaded, fontError] = useFonts({ DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold });
   const [databaseKey, setDatabaseKey] = useState<string | null>(null);
   const [setupError, setSetupError] = useState<string | null>(null);
 
@@ -115,25 +101,35 @@ export default function RootLayout() {
 
   return (
     <SQLiteProvider databaseName="sos-securite-mali-secure-v2.db" onInit={(db) => migrateDatabase(db, databaseKey)}>
-      <StatusBar style="dark" />
+      <StatusBar style={dark ? 'light' : 'dark'} />
       <BootstrapGate />
     </SQLiteProvider>
   );
 }
 
-function BootStatus({ label, error = false }: { label: string; error?: boolean }) {
+export default function RootLayout() {
   return (
-    <View accessibilityRole={error ? 'alert' : undefined} accessibilityLabel={label} style={styles.boot}>
-      {!error ? <ActivityIndicator color={colors.amber} size="large" /> : null}
-      <Text style={[styles.bootText, error && styles.bootError]}>{label}</Text>
-      {error ? <Text style={styles.bootHint}>Redémarrez le téléphone puis réessayez. Aucune donnée non chiffrée ne sera créée.</Text> : null}
+    <ThemeProvider>
+      <ThemedApp />
+    </ThemeProvider>
+  );
+}
+
+function BootStatus({ label, error = false }: { label: string; error?: boolean }) {
+  const s = useStyles();
+  const { colors } = useTheme();
+  return (
+    <View accessibilityRole={error ? 'alert' : undefined} accessibilityLabel={label} style={s.boot}>
+      {!error ? <ActivityIndicator color={colors.primary} size="large" /> : null}
+      <Text style={[s.bootText, error && s.bootError]}>{label}</Text>
+      {error ? <Text style={s.bootHint}>Redémarrez le téléphone puis réessayez. Aucune donnée non chiffrée ne sera créée.</Text> : null}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  boot: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 28, backgroundColor: colors.void },
-  bootText: { color: colors.sand, fontSize: 17, textAlign: 'center' },
-  bootError: { color: colors.alertLight, fontWeight: '700' },
-  bootHint: { color: colors.sandMuted, fontSize: 14, lineHeight: 20, textAlign: 'center' },
-});
+const useStyles = makeStyles((t) => ({
+  boot: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.xl, backgroundColor: t.colors.bg },
+  bootText: { fontSize: 17, lineHeight: 24, color: t.colors.ink, textAlign: 'center' },
+  bootError: { color: t.colors.dangerText, fontWeight: '700' },
+  bootHint: { fontSize: 14, lineHeight: 20, color: t.colors.inkMuted, textAlign: 'center' },
+}));

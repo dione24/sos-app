@@ -1,27 +1,19 @@
 import * as Network from 'expo-network';
 import * as SMS from 'expo-sms';
 import { useRouter } from 'expo-router';
-import {
-  BatteryMedium,
-  Bluetooth,
-  CircleAlert,
-  MapPin,
-  MessageSquareText,
-  RadioTower,
-  ShieldCheck,
-} from 'lucide-react-native';
+import { BatteryMedium, Bluetooth, BluetoothSearching, CircleAlert, MapPin, MessageSquareText, RadioTower, ShieldCheck } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
-import { Badge, Button, Card, SectionTitle } from '@/components/ui';
-import { colors, font, radius, spacing, type } from '@/constants/theme';
+import { Button, Card, EmptyState, IconTile, Notice, SectionHeader, Tag, ToggleRow } from '@/components/ui';
 import { getContacts, getProfile, getSetting, setSetting } from '@/db/database';
 import { contactRecipients, EMERGENCY_LABELS, formatCoordinates } from '@/lib/sos';
 import { readPacketFromDevice, startBleAdvertising, startBleMeshScan, stopBleAdvertising, type BleScanUpdate } from '@/services/ble-mesh';
 import { getRecentMeshMessages, markMessageRelayed, processIncomingMessage, purgeSeenMessages } from '@/services/mesh-repository';
+import { makeStyles, useTheme } from '@/theme';
 import type { MeshMessage } from '@/types/models';
 
 const canBroadcastBle = Platform.OS === 'android';
@@ -55,6 +47,8 @@ function directionLabel(direction: 'sent' | 'received' | 'relayed') {
 }
 
 export default function MeshScreen() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const router = useRouter();
   const db = useSQLiteContext();
   const [scan, setScan] = useState<BleScanUpdate>({ state: 'starting', devices: [] });
@@ -220,181 +214,128 @@ export default function MeshScreen() {
         : scan.state === 'starting' || scan.state === 'active'
           ? 'Écoute des téléphones proches'
           : 'En pause';
+  const alertCount = `${history.length} alerte${history.length > 1 ? 's' : ''} récente${history.length > 1 ? 's' : ''}`;
 
   return (
     <Screen clearFab>
-      <AppHeader title="Alertes proches" eyebrow="Entraide autour de vous" />
+      <AppHeader title="Alertes proches" subtitle="Entraide entre téléphones, même sans réseau" />
 
       {bleConsent === null ? (
-        <Card style={styles.locationCard}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.rescuerTitle}>Préparation des alertes proches…</Text>
-          <Text maxFontSizeMultiplier={1.7} style={styles.rescuerSub}>Vos alertes récentes restent disponibles ci-dessous.</Text>
-        </Card>
+        <Notice icon={<BluetoothSearching size={20} color={colors.inkMuted} />} title="Préparation des alertes proches…" text="Vos alertes récentes restent disponibles ci-dessous." />
       ) : null}
 
       {bleConsent === false && showBleDisclosure ? (
-        <Card style={styles.disclosureCard}>
-          <View style={styles.disclosureTop}>
-            <RadioTower size={24} color={colors.greenLight} />
-            <View style={styles.disclosureCopy}>
-              <Text maxFontSizeMultiplier={1.5} style={styles.disclosureTitle}>Recevoir les alertes autour de moi</Text>
-              <Text maxFontSizeMultiplier={1.7} style={styles.disclosureText}>
-                {canBroadcastBle
-                  ? "Les téléphones proches peuvent s'entraider lorsque le réseau passe mal. Seuls le type d'urgence, la position si vous l'autorisez et l'heure sont partagés. Android affiche une notification pendant qu'une alerte est transmise."
-                  : "Votre iPhone peut recevoir les alertes SOS proches tant que cet écran reste ouvert. Votre dossier médical reste privé."}
-              </Text>
-            </View>
-          </View>
-          <Button label="Activer les alertes proches" onPress={() => void acceptBleDisclosure()} variant="green" icon={<Bluetooth size={19} color={colors.black} />} />
-          <Pressable
-            accessibilityRole="button"
+        <Notice
+          icon={<RadioTower size={20} color={colors.primaryText} />}
+          tone="primary"
+          title="Recevoir les alertes autour de moi"
+          text={
+            canBroadcastBle
+              ? "Les téléphones proches peuvent s'entraider lorsque le réseau passe mal. Seuls le type d'urgence, la position si vous l'autorisez et l'heure sont partagés. Android affiche une notification pendant qu'une alerte est transmise."
+              : "Votre iPhone peut recevoir les alertes SOS proches tant que cet écran reste ouvert. Votre dossier médical reste privé."
+          }
+        >
+          <Button label="Activer les alertes proches" onPress={() => void acceptBleDisclosure()} icon={<Bluetooth size={20} color={colors.onPrimary} />} />
+          <Button
+            label="Pas maintenant"
+            size="md"
+            variant="ghost"
             accessibilityLabel="Refuser le relais Bluetooth pour le moment"
             onPress={() => {
               setBleConsent(false);
               setShowBleDisclosure(false);
               setRunning(false);
             }}
-            style={({ pressed }) => [styles.declineDisclosure, pressed && styles.declineDisclosurePressed]}
-          >
-            <Text maxFontSizeMultiplier={1.5} style={styles.declineDisclosureText}>Pas maintenant</Text>
-          </Pressable>
-        </Card>
+          />
+        </Notice>
       ) : null}
 
       {scan.state === 'denied' ? (
-        <Card style={styles.permissionCard}>
-          <View style={styles.permissionTop}>
-            <CircleAlert size={21} color={colors.alert} />
-            <View style={styles.permissionCopy}>
-              <Text maxFontSizeMultiplier={1.5} style={styles.permissionTitle}>Autorisation nécessaire</Text>
-              <Text maxFontSizeMultiplier={1.7} style={styles.permissionText}>Autorisez « Appareils à proximité » pour recevoir les alertes autour de vous. Le SOS, les appels et les SMS restent disponibles sans cette autorisation.</Text>
-            </View>
-          </View>
-          <Button label="Ouvrir les réglages du téléphone" onPress={() => void Linking.openSettings()} variant="outline" />
-        </Card>
+        <Notice
+          icon={<CircleAlert size={20} color={colors.dangerText} />}
+          tone="danger"
+          title="Autorisation nécessaire"
+          text="Autorisez « Appareils à proximité » pour recevoir les alertes autour de vous. Le SOS, les appels et les SMS restent disponibles sans cette autorisation."
+        >
+          <Button label="Ouvrir les réglages du téléphone" variant="secondary" onPress={() => void Linking.openSettings()} />
+        </Notice>
       ) : scan.state === 'bluetooth-off' ? (
-        <Card style={styles.permissionCard}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.permissionTitle}>Bluetooth désactivé</Text>
-          <Text maxFontSizeMultiplier={1.7} style={styles.permissionText}>Activez le Bluetooth du téléphone, puis touchez « Rechercher à nouveau ».</Text>
-        </Card>
+        <Notice icon={<Bluetooth size={20} color={colors.warningText} />} tone="warning" title="Bluetooth désactivé" text="Activez le Bluetooth du téléphone, puis touchez « Rechercher à nouveau »." />
       ) : null}
 
-      <Card style={styles.statusLine}>
-        <Bluetooth size={21} color={active ? colors.green : colors.amber} />
-        <View style={styles.statusCopy}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.statusValue}>{scanStatus}</Text>
-          <Text maxFontSizeMultiplier={1.5} style={styles.statusCount}>
-            {history.length} alerte{history.length > 1 ? 's' : ''} récente{history.length > 1 ? 's' : ''}
-          </Text>
+      <Card style={s.status}>
+        <IconTile tone={active ? 'primary' : 'neutral'}>
+          <Bluetooth size={22} color={active ? colors.primaryText : colors.inkMuted} />
+        </IconTile>
+        <View style={s.statusCopy}>
+          <Text maxFontSizeMultiplier={1.4} style={s.statusValue}>{scanStatus}</Text>
+          <Text maxFontSizeMultiplier={1.5} style={s.statusCount}>{alertCount}</Text>
         </View>
+        {bleConsent !== true && !showBleDisclosure ? (
+          <Button label="Activer" size="md" onPress={() => setShowBleDisclosure(true)} accessibilityLabel="Activer les alertes proches" />
+        ) : bleConsent === true && !scanning ? (
+          <Button label="Rechercher" size="md" variant="secondary" onPress={retryScan} accessibilityLabel="Rechercher à nouveau" />
+        ) : bleConsent === true ? (
+          <Button label="Pause" size="md" variant="secondary" onPress={() => setRunning(false)} accessibilityLabel="Mettre en pause" icon={<BatteryMedium size={18} color={colors.ink} />} />
+        ) : null}
       </Card>
 
-      <Card style={styles.rescuerCard}>
-        <View style={styles.rescuerIcon}><ShieldCheck size={22} color={colors.green} /></View>
-        <View style={styles.rescuerCopy}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.rescuerTitle}>Je peux aider</Text>
-          <Text maxFontSizeMultiplier={1.7} style={styles.rescuerSub}>
-            Les alertes les plus urgentes apparaîtront en premier. Votre nom ne sera pas partagé.
-          </Text>
-        </View>
-        <Switch
-          accessibilityLabel="Indiquer que je peux aider"
-          value={rescuer}
-          onValueChange={(value) => void toggleRescuer(value)}
-          trackColor={{ false: colors.hairline, true: colors.green }}
-          thumbColor={colors.white}
-        />
-      </Card>
-
-      {bleConsent !== true && !showBleDisclosure ? (
-        <Button
-          label="Activer les alertes proches"
-          onPress={() => setShowBleDisclosure(true)}
-          variant="green"
-          icon={<Bluetooth size={19} color={colors.black} />}
-        />
-      ) : bleConsent === true && !scanning ? (
-        <Button label="Rechercher à nouveau" onPress={retryScan} variant="outline" icon={<Bluetooth size={20} color={colors.sand} />} />
-      ) : bleConsent === true ? (
-        <Button label="Mettre en pause" onPress={() => setRunning(false)} variant="soft" icon={<BatteryMedium size={20} color={colors.amber} />} />
-      ) : null}
+      <ToggleRow
+        title="Je peux aider"
+        subtitle="Les alertes les plus urgentes apparaîtront en premier. Votre nom ne sera pas partagé."
+        accessibilityLabel="Indiquer que je peux aider"
+        value={rescuer}
+        onValueChange={(value) => void toggleRescuer(value)}
+        leading={<IconTile tone="primary"><ShieldCheck size={22} color={colors.primaryText} /></IconTile>}
+      />
 
       {broadcast === 'active' ? (
-        <Button label="Arrêter de partager mon alerte" onPress={() => void stopBroadcast()} variant="outline" icon={<CircleAlert size={20} color={colors.alert} />} />
+        <Button label="Arrêter de partager mon alerte" onPress={() => void stopBroadcast()} variant="secondary" icon={<CircleAlert size={20} color={colors.dangerText} />} />
       ) : null}
 
-      <Card style={styles.bridgeCard}>
-        <MessageSquareText size={20} color={bridgeOnline ? colors.greenLight : colors.sandFaint} />
-        <View style={styles.bridgeCopy}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.bridgeTitle}>Envoyer la dernière alerte par SMS</Text>
-          <Text maxFontSizeMultiplier={1.7} style={styles.bridgeText}>
-            Le message est préparé pour vous. Vous choisissez le destinataire et confirmez toujours l'envoi.
-          </Text>
-        </View>
-      </Card>
-      <Button
-        label={smsBusy ? 'Ouverture du SMS…' : 'Préparer le SMS'}
-        onPress={() => void openSmsBridge()}
-        variant="outline"
-        loading={smsBusy}
-        disabled={smsBusy}
-        icon={<MessageSquareText size={20} color={colors.sand} />}
-      />
+      <Notice
+        icon={<MessageSquareText size={20} color={bridgeOnline ? colors.primaryText : colors.inkFaint} />}
+        title="Envoyer la dernière alerte par SMS"
+        text="Le message est préparé pour vous. Vous choisissez le destinataire et confirmez toujours l'envoi."
+      >
+        <Button label={smsBusy ? 'Ouverture du SMS…' : 'Préparer le SMS'} variant="secondary" loading={smsBusy} disabled={smsBusy} onPress={() => void openSmsBridge()} icon={<MessageSquareText size={20} color={colors.ink} />} />
+      </Notice>
 
-      <SectionTitle
-        title="Alertes récentes"
-        aside={`${history.length} alerte${history.length > 1 ? 's' : ''}`}
-      />
+      <SectionHeader title="Alertes récentes" aside={alertCount} />
       {displayHistory.length ? (
-        <View style={styles.history}>
+        <View style={s.history}>
           {displayHistory.map(({ message, direction, createdAt }, index) => {
-            const expanded = expandedId === `${message.id}-${index}`;
+            const key = `${message.id}-${index}`;
+            const expanded = expandedId === key;
             const priority = rescuer && (direction === 'received' || message.severity === 'critique');
+            const critical = message.severity === 'critique';
             return (
-              <Card key={`${message.id}-${index}`} style={[styles.alertCard, priority && styles.alertPriority]}>
+              <Card key={key} tone={priority ? 'primary' : 'neutral'} style={s.alertCard}>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={`${EMERGENCY_LABELS[message.emergencyType]}, ${direction}, détails`}
                   accessibilityState={{ expanded }}
-                  onPress={() => setExpandedId(expanded ? null : `${message.id}-${index}`)}
+                  onPress={() => setExpandedId(expanded ? null : key)}
+                  style={s.alertHead}
                 >
-                  <View style={styles.alertTop}>
-                    <View style={styles.alertTitleRow}>
-                      <CircleAlert size={17} color={message.severity === 'critique' ? colors.alert : colors.amber} />
-                      <Text maxFontSizeMultiplier={1.5} style={styles.alertName}>{EMERGENCY_LABELS[message.emergencyType]}</Text>
-                    </View>
-                    <Badge label={message.severity} tone={message.severity === 'critique' ? 'alert' : 'amber'} />
+                  <IconTile tone={critical ? 'danger' : 'warning'}>
+                    <CircleAlert size={22} color={critical ? colors.dangerText : colors.warningText} />
+                  </IconTile>
+                  <View style={s.alertCopy}>
+                    <Text maxFontSizeMultiplier={1.4} style={s.alertName}>{EMERGENCY_LABELS[message.emergencyType]}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={s.alertMeta}>
+                      {directionLabel(direction)} · {new Date(createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      {priority ? ' · urgente' : ''}
+                    </Text>
                   </View>
-                  <Text maxFontSizeMultiplier={1.5} style={styles.alertMeta}>
-                    {directionLabel(direction)} · {new Date(createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    {priority ? ' · URGENTE' : ''}
-                  </Text>
+                  <Tag label={message.severity} tone={critical ? 'danger' : 'warning'} />
                 </Pressable>
                 {expanded ? (
-                  <View style={styles.alertDetail}>
-                    <Text maxFontSizeMultiplier={1.6} style={styles.alertDetailText}>
-                      Position : {formatCoordinates(message.position)}
-                    </Text>
-                    <View style={styles.alertActions}>
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel="Ouvrir la position sur la carte"
-                        disabled={!message.position}
-                        onPress={() => void openAlertMap(message)}
-                        style={[styles.alertAction, !message.position && styles.alertActionDisabled]}
-                      >
-                        <MapPin size={16} color={colors.amber} />
-                        <Text maxFontSizeMultiplier={1.4} style={styles.alertActionText}>Carte</Text>
-                      </Pressable>
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel="Préparer un SMS pour cette alerte"
-                        onPress={() => void openSmsBridge(message)}
-                        style={styles.alertAction}
-                      >
-                        <MessageSquareText size={16} color={colors.blue} />
-                        <Text maxFontSizeMultiplier={1.4} style={styles.alertActionText}>SMS</Text>
-                      </Pressable>
+                  <View style={s.alertDetail}>
+                    <Text maxFontSizeMultiplier={1.5} style={s.alertDetailText}>Position : {formatCoordinates(message.position)}</Text>
+                    <View style={s.alertActions}>
+                      <Button label="Carte" size="md" variant="secondary" accessibilityLabel="Ouvrir la position sur la carte" disabled={!message.position} onPress={() => void openAlertMap(message)} icon={<MapPin size={18} color={colors.ink} />} style={s.alertAction} />
+                      <Button label="SMS" size="md" variant="secondary" accessibilityLabel="Préparer un SMS pour cette alerte" onPress={() => void openSmsBridge(message)} icon={<MessageSquareText size={18} color={colors.ink} />} style={s.alertAction} />
                     </View>
                   </View>
                 ) : null}
@@ -403,65 +344,33 @@ export default function MeshScreen() {
           })}
         </View>
       ) : (
-        <Card style={styles.empty}>
-          <Text maxFontSizeMultiplier={1.5} style={styles.emptyTitle}>Aucune alerte autour de vous</Text>
-          <Text maxFontSizeMultiplier={1.7} style={styles.emptyText}>Ça marche seulement si un autre téléphone SOS Sécurité Mali est à quelques mètres, avec cet écran ouvert. L’appel 122 et le SMS restent disponibles sans ça.</Text>
-          <Button label="Appeler le 122" onPress={() => router.push('/sos')} variant="outline" />
-        </Card>
+        <EmptyState
+          icon={<BluetoothSearching size={28} color={colors.inkMuted} />}
+          title="Aucune alerte autour de vous"
+          text="Ça marche seulement si un autre téléphone SOS Sécurité Mali est à quelques mètres, avec cet écran ouvert. L’appel 122 et le SMS restent disponibles sans ça."
+          action={<Button label="Appeler le 122" variant="secondary" onPress={() => router.push('/sos')} />}
+        />
       )}
 
-      <View style={styles.limitNotice}>
-        <CircleAlert size={16} color={colors.amber} />
-        <Text maxFontSizeMultiplier={1.7} style={styles.limitText}>Gardez cet écran ouvert pour recevoir les alertes des téléphones proches.</Text>
-      </View>
+      <Text maxFontSizeMultiplier={1.6} style={s.limitText}>Gardez cet écran ouvert pour recevoir les alertes des téléphones proches.</Text>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  disclosureCard: { gap: spacing.sm, backgroundColor: colors.greenDark, borderColor: '#BFE8D1' },
-  locationCard: { gap: 4 },
-  disclosureTop: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
-  disclosureCopy: { flex: 1 },
-  disclosureTitle: { fontFamily: font.bodyBold, fontSize: 14, color: colors.sand },
-  disclosureText: { ...type.small, fontSize: 12, lineHeight: 17, marginTop: 3 },
-  declineDisclosure: { minHeight: 44, alignItems: 'flex-start', justifyContent: 'center', paddingHorizontal: spacing.sm, borderRadius: radius.sm },
-  declineDisclosurePressed: { opacity: 0.65 },
-  declineDisclosureText: { fontFamily: font.bodyBold, fontSize: 12, color: colors.sandMuted },
-  statusLine: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  statusCopy: { flex: 1 },
-  statusValue: { fontFamily: font.bodyBold, fontSize: 12, color: colors.sand },
-  statusCount: { ...type.small, fontSize: 11, marginTop: 2 },
-  permissionCard: { gap: spacing.sm, backgroundColor: colors.alertDark, borderColor: '#FFD2C9' },
-  permissionTop: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
-  permissionCopy: { flex: 1 },
-  permissionTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  permissionText: { ...type.small, fontSize: 12, lineHeight: 17, marginTop: 3 },
-  rescuerCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  rescuerIcon: { width: 44, height: 44, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.greenDark },
-  rescuerCopy: { flex: 1 },
-  rescuerTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  rescuerSub: { ...type.small, fontSize: 12, marginTop: 2 },
-  bridgeCard: { flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.greenDark, borderColor: '#BFE8D1' },
-  bridgeCopy: { flex: 1 },
-  bridgeTitle: { fontFamily: font.bodyBold, fontSize: 12, color: colors.greenLight },
-  bridgeText: { ...type.small, fontSize: 12, lineHeight: 17, marginTop: 2 },
-  history: { gap: spacing.xs },
-  alertCard: { gap: spacing.xs, padding: spacing.sm },
-  alertPriority: { borderColor: colors.green, backgroundColor: colors.greenDark },
-  alertTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  alertTitleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  alertName: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  alertMeta: { ...type.eyebrow, fontSize: 11 },
-  alertDetail: { gap: spacing.xs, paddingTop: spacing.xs, borderTopWidth: 1, borderTopColor: colors.hairline },
-  alertDetailText: { ...type.small, fontSize: 11, color: colors.sand },
-  alertActions: { flexDirection: 'row', gap: spacing.sm },
-  alertAction: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 40, paddingHorizontal: spacing.sm, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.hairline },
-  alertActionDisabled: { opacity: 0.4 },
-  alertActionText: { fontFamily: font.bodyBold, fontSize: 12, color: colors.sand },
-  empty: { alignItems: 'stretch', gap: spacing.sm },
-  emptyTitle: { fontFamily: font.bodyBold, fontSize: 13, color: colors.sand },
-  emptyText: { ...type.small, fontSize: 12, lineHeight: 17, textAlign: 'center' },
-  limitNotice: { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.sm },
-  limitText: { ...type.small, flex: 1, fontSize: 12, lineHeight: 17 },
-});
+const useStyles = makeStyles((t) => ({
+  status: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  statusCopy: { flex: 1, gap: 2 },
+  statusValue: { ...t.text.bodyStrong },
+  statusCount: { ...t.text.caption },
+  history: { gap: t.spacing.xs },
+  alertCard: { gap: t.spacing.sm, padding: t.spacing.sm },
+  alertHead: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  alertCopy: { flex: 1, gap: 2 },
+  alertName: { ...t.text.bodyStrong },
+  alertMeta: { ...t.text.caption },
+  alertDetail: { gap: t.spacing.sm, paddingTop: t.spacing.sm, borderTopWidth: 1, borderTopColor: t.colors.border },
+  alertDetailText: { ...t.text.caption, color: t.colors.ink },
+  alertActions: { flexDirection: 'row', gap: t.spacing.sm },
+  alertAction: { flex: 1 },
+  limitText: { ...t.text.caption, color: t.colors.inkFaint, textAlign: 'center', paddingHorizontal: t.spacing.sm },
+}));

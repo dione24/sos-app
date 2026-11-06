@@ -1,35 +1,38 @@
 import { Tabs, usePathname } from 'expo-router';
 import { BookOpenText, House, MapPinned, UserRound } from 'lucide-react-native';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmergencyFab } from '@/components/EmergencyFab';
-import { colors, font } from '@/constants/theme';
 import { useI18n } from '@/i18n/use-i18n';
+import { font, makeStyles, useTheme } from '@/theme';
 
 const tabIcon = (Icon: typeof House) =>
   function IconRenderer({ color, focused }: { color: import('react-native').ColorValue; focused: boolean }) {
-    return <Icon color={String(color)} size={focused ? 23 : 21} strokeWidth={focused ? 2.7 : 2} />;
+    return <Icon color={String(color)} size={24} strokeWidth={focused ? 2.4 : 2} />;
   };
 
 export default function TabLayout() {
+  const s = useStyles();
+  const { colors } = useTheme();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
   const { t } = useI18n();
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          sceneStyle: { backgroundColor: colors.void },
-          tabBarActiveTintColor: colors.alert,
-          tabBarInactiveTintColor: colors.sandFaint,
+          sceneStyle: { backgroundColor: colors.bg },
+          tabBarActiveTintColor: colors.primaryText,
+          tabBarInactiveTintColor: colors.inkFaint,
           tabBarAllowFontScaling: true,
-          tabBarLabelStyle: { fontFamily: font.bodyMedium, fontSize: 11, marginTop: 1 },
+          tabBarLabelStyle: { fontFamily: font.semibold, fontSize: 12, marginTop: 2 },
           tabBarStyle: {
-            minHeight: 76,
-            height: undefined,
+            height: 64 + Math.max(insets.bottom, 8),
             paddingTop: 8,
-            paddingBottom: 12,
-            borderTopColor: colors.hairline,
+            paddingBottom: Math.max(insets.bottom, 8),
+            borderTopColor: colors.border,
             borderTopWidth: 1,
             backgroundColor: colors.surface,
           },
@@ -46,4 +49,4 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: colors.void } });
+const useStyles = makeStyles((t) => ({ container: { flex: 1, backgroundColor: t.colors.bg } }));
