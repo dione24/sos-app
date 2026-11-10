@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Animated, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
+import { IndependenceNotice } from '@/components/IndependenceNotice';
 import { Screen } from '@/components/Screen';
 import { IconButton, IconTile, ListRow } from '@/components/ui';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -65,6 +66,8 @@ export default function HomeScreen() {
         subtitle={t('home_ready')}
         action={<IconButton accessibilityLabel={t('settings_title')} icon={<Settings2 size={22} color={colors.inkMuted} />} onPress={() => router.push('/settings')} />}
       />
+
+      <IndependenceNotice />
 
       <View style={s.sosZone}>
         <Animated.View

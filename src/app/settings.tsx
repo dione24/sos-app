@@ -1,6 +1,6 @@
 import { OfflineManager } from '@maplibre/maplibre-react-native';
 import { useRouter } from 'expo-router';
-import { Check, CloudSun, Download, FileLock2, Languages, MapPinned, ShieldCheck } from 'lucide-react-native';
+import { BookOpen, Check, CloudSun, Download, FileLock2, Languages, MapPinned, ShieldCheck } from 'lucide-react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
@@ -126,6 +126,14 @@ export default function SettingsScreen() {
         leading={<IconTile tone="info"><CloudSun size={22} color={colors.infoText} /></IconTile>}
         chevron
         onPress={() => router.push('/weather')}
+      />
+
+      <ListRow
+        title="Sources officielles et indépendance"
+        subtitle="Références des numéros, données de la carte et limites."
+        leading={<IconTile tone="info"><BookOpen size={22} color={colors.infoText} /></IconTile>}
+        chevron
+        onPress={() => router.push('/sources')}
       />
 
       <SectionHeader title={t('settings_privacy')} />
