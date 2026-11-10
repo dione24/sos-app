@@ -4,8 +4,10 @@
 
 Le nouvel AAB cloud a passé les contrôles statiques et les parcours natifs ciblés
 décrits ci-dessous. La version **1.0.1 (7)** est accessible en test interne Play
-depuis le **10 novembre à 16 h 48 UTC**. La production du code 7, **release 2**, est préparée et enregistrée dans la vue
-d’ensemble de la publication, sans envoi à l’examen à l’heure de cette rédaction.
+depuis le **10 novembre à 16 h 48 UTC**. La production du code 7, **release 2**, a été envoyée à Google avec la fiche
+corrigée. Le **10 novembre 2026 à 17 h 28 UTC**, la Console affiche
+**« Modifications en cours d’examen »** pour **1.0.1 (7) — Sources et indépendance**.
+Ce constat ne constitue ni une approbation ni une disponibilité publique.
 
 ## Motif et périmètre
 
@@ -163,14 +165,18 @@ pas une nouvelle preuve de relais Bluetooth physique pour le code 7.
 | --- | --- |
 | Test interne 1.0.1 (7) | Accessible depuis le 10 novembre 2026 à 16:48 UTC |
 | Production 1.0.0 (5) | Refusée |
-| Production 1.0.1 (7) | Release 2 préparée et enregistrée, pas encore envoyée à l’examen |
+| Production 1.0.1 (7) | Release 2 envoyée pour examen, déploiement complet demandé |
 | Fiche française corrigée | Enregistrée avec sources, historique et indépendance |
 | Distribution publique prévue | Mali uniquement, un pays ; déploiement 100 % confirmé sur le récapitulatif de production |
 | Contrôle ANR/logcat après les passages natifs ci-dessus | Aucun ANR depuis le démarrage de l’émulateur API 36 ; aucun message dans le filtre `AndroidRuntime:E` / `ReactNativeJS:E` |
-| Envoi à l’examen du code 7 | **À compléter : date, heure et résultat observé dans Play Console** |
-| Examen Google | **À compléter ; aucune approbation revendiquée** |
-| Disponibilité publique | **À compléter après vérification effective** |
+| Envoi à l’examen du code 7 | Effectué le 10 novembre 2026 ; « Modifications en cours d’examen » constaté à 17:28 UTC |
+| Examen Google | En cours ; aucune approbation revendiquée |
+| Disponibilité publique | Non confirmée ; à vérifier après approbation Google |
 
 Les preuves détaillées sont conservées hors Git dans le dossier local de
 validation de cette version. Aucun identifiant de téléchargement temporaire,
 secret, valeur d’environnement ou journal brut n’est publié dans ce document.
+
+La publication gérée est désactivée dans la Console : le déploiement public
+demandé dépend maintenant de la décision de Google. La capture du reçu
+`play-examen-1.0.1-7.png` est conservée dans le dossier local de validation, hors Git.
