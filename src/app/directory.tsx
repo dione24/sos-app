@@ -3,7 +3,9 @@ import { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
+import { IndependenceNotice } from '@/components/IndependenceNotice';
 import { Screen } from '@/components/Screen';
+import { SourceLink } from '@/components/SourceLink';
 import { Divider, EmptyState, ListGroup, SectionHeader } from '@/components/ui';
 import { EMERGENCY_NUMBERS } from '@/data';
 import { confirmCall } from '@/services/phone';
@@ -51,6 +53,7 @@ function NumberRow({ item }: { item: EmergencyNumber }) {
             {needsVerification ? 'Contact à confirmer' : item.scope}
           </Text>
         </View>
+        <SourceLink label={`Source : ${item.sourceLabel}`} url={item.sourceUrl} />
       </View>
       <Pressable
         accessibilityRole="button"
@@ -91,6 +94,8 @@ export default function DirectoryScreen() {
   return (
     <Screen>
       <AppHeader title="Numéros utiles" subtitle={`Mali · ${EMERGENCY_NUMBERS.length} contacts, disponibles sans connexion`} back />
+
+      <IndependenceNotice />
 
       <Pressable
         accessibilityRole="button"

@@ -71,6 +71,27 @@ describe('routage des appels vitaux', () => {
     expect(selectAlternateEmergencyNumbers('agression', EMERGENCY_NUMBERS).map((item) => item.number)).toContain('111');
   });
 
+  it.each(['medical', 'accident', 'agression', 'incendie', 'noyade', 'autre'] as const)(
+    'ne recommande aucun numéro historique ou non confirmé pour %s',
+    (type) => {
+      const recommendations = [
+        selectEmergencyNumber(type, EMERGENCY_NUMBERS),
+        ...selectAlternateEmergencyNumbers(type, EMERGENCY_NUMBERS),
+      ];
+      for (const number of recommendations) {
+        expect(number?.status).toBe('official');
+        expect(number?.number).not.toBe('80 333');
+      }
+    },
+  );
+
+  it('conserve le 80 333 dans l’annuaire avec sa limite historique', () => {
+    expect(EMERGENCY_NUMBERS.find((item) => item.number === '80 333')).toMatchObject({
+      status: 'needs_field_verification',
+      verifiedAt: '2022-03-21',
+    });
+  });
+
   it('ne présente pas le 36061 comme numéro de secours vital principal', () => {
     expect(selectEmergencyNumber('medical', EMERGENCY_NUMBERS)?.number).toBe('122');
     expect(selectAlternateEmergencyNumbers('medical', EMERGENCY_NUMBERS)[0]?.number).toBe('36061');

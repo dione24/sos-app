@@ -232,7 +232,7 @@ export default function MapScreen() {
         </View>
       )}
 
-      <Button label="Sources de la carte · vérifiez les horaires avant de vous déplacer" size="md" variant="ghost" accessibilityLabel="Voir les sources de la carte" onPress={() => router.push('/privacy')} />
+      <Button label="Sources de la carte · vérifiez les horaires avant de vous déplacer" size="md" variant="ghost" accessibilityLabel="Voir les sources de la carte" onPress={() => router.push('/sources')} />
     </Screen>
   );
 }

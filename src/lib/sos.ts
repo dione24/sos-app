@@ -27,7 +27,7 @@ export const PRIMARY_EMERGENCY_NUMBER: Record<EmergencyType, string> = {
 export const ALTERNATE_EMERGENCY_NUMBERS: Record<EmergencyType, string[]> = {
   medical: ['36061', '80 00 12 01', '20 22 80 81'],
   accident: ['144', '80 00 12 01', '20 22 80 81'],
-  agression: ['111', '145', '80 00 11 15', '80 00 11 14', '80 333'],
+  agression: ['111', '145', '80 00 11 15', '80 00 11 14'],
   incendie: ['144', '80 00 12 01', '20 22 80 81'],
   noyade: ['144', '80 00 12 01', '20 22 80 81'],
   autre: ['101', '111', '144'],

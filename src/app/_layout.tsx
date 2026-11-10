@@ -91,6 +91,7 @@ function BootstrapGate() {
       <Stack.Screen name="weather" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="privacy" />
+      <Stack.Screen name="sources" />
     </Stack>
   );
 }
