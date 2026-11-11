@@ -4,7 +4,9 @@
 Application gratuite · Android + iOS · `ml.sossecurite.app`
 
 État du **11 novembre 2026** : release **1.0.2 (8)** et huit captures rouges
-ordonnées **enregistrées dans Play Console, pas encore envoyées pour examen**.
+ordonnées **envoyées dans une demande de production enregistrée vers 11:02 UTC**.
+Vérifications automatiques Google terminées : version en cours d’examen.
+Aucune approbation ni disponibilité publique confirmée.
 Google accepte l'AAB et le mapping ReTrace ; déploiement 100 % enregistré vers
 les pays existants (Mali).
 Runtime `15bb5e5`, charte rouge `636fc72` et barre système adaptée au thème.
@@ -64,9 +66,9 @@ une soumission ou une approbation des stores.
 
 ## Livraison et support
 
-Le reçu d'envoi Play, le statut d'examen, la disponibilité publique et la fusion
-seront renseignés dans le rapport de version. L'enregistrement de la release et des visuels
-n'est pas encore un envoi pour examen. La console estime l'installation à 27,2 Mo (−11,9 Mo versus code 7) ;
+La [PR #6](https://github.com/dione24/sos-app/pull/6) est fusionnée dans `main`
+(`e52db5214d46c174c9704030ec10098f27b76749`). La demande de production de la
+1.0.2 remplace celle de la 1.0.1 et est maintenant en cours d’examen Google. La disponibilité publique n'est pas confirmée. La console estime l'installation à 27,2 Mo (−11,9 Mo versus code 7) ;
 cela ne mesure pas la vitesse sur téléphone.
 
 - support@sahelpay.ml

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "registered_in_play_console_not_submitted",
+  "status": "submitted_to_google_in_review",
   "version": "1.0.2",
   "android_version_code": 8,
   "package": "ml.sossecurite.app",
@@ -195,13 +195,13 @@
     "live_browser_review": "Nafalan and red CSS confirmed"
   },
   "delivery": {
-    "status": "registered_in_play_console_not_submitted",
+    "status": "submitted_to_google_in_review",
     "play_release": "1.0.2 (8) — Nafalan",
     "play_track": "production",
     "submitted_at_utc": null,
-    "review_status": "not_submitted",
+    "review_status": "in_review",
     "public_availability_verified": false,
-    "merge_status": "pending",
+    "merge_status": "merged",
     "aab_upload_accepted_by_google": true,
     "retrace_mapping_upload_accepted_by_google": true,
     "version_api_abis_accepted_by_google": true,
@@ -214,7 +214,18 @@
     "console_estimated_reduction_vs_code7_mb": 11.9,
     "physical_speed_gain_claimed": false,
     "release_saved_in_console": true,
-    "ordered_red_screenshots_saved_in_console": 8
+    "ordered_red_screenshots_saved_in_console": 8,
+    "play_release_id": "3",
+    "submission_registered_approx_utc": "2026-11-11T11:02:00Z",
+    "submission_registered": true,
+    "automated_checks_pending": false,
+    "google_review_ui_section": "Modifications en cours d’examen",
+    "merge_commit": "e52db5214d46c174c9704030ec10098f27b76749",
+    "pull_request": "https://github.com/dione24/sos-app/pull/6",
+    "managed_publishing": false,
+    "previous_review_restarted": true,
+    "automated_checks_completed": true,
+    "last_live_observed_at_utc": "2026-11-11T11:07:36.785472+00:00"
   },
   "limits": [
     "historical code 7 API 32 ANR remains unexplained",
@@ -224,10 +235,10 @@
     "no physical-device performance percentage",
     "no two-Android or multi-hop proof",
     "no native SQL concurrency stress-test proof",
-    "Play submission, review, public availability and merge remain pending until delivery receipts are added",
     "Mac packet read of Android origin/relay and radio acknowledgement of TTL2 to1 remain unvalidated",
     "automatic harness stop was not claimed as exercised in the final physical pass",
-    "tab labels truncate in the Tecno capture configuration; no font-scale measurement or new color-related metric change established"
+    "tab labels truncate in the Tecno capture configuration; no font-scale measurement or new color-related metric change established",
+    "Google approval and public availability remain unverified"
   ],
   "source_tree": "ba04ca8a778599b96fc366a7e4debacfdbc0ab62"
 }
