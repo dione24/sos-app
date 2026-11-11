@@ -1,0 +1,41 @@
+{
+  "apk": "nafalan-1.0.2-8-arm64-test.apk",
+  "sha256": "d0447f2fb15d7b4697e4ac017ef1bb9ff39889c8b07e03d2f5f693e8a380350a",
+  "bytes": 70605798,
+  "hermes_bundle_bytes": 4128020,
+  "certificate_matches_code_7_upload_key": true,
+  "scope": "arm64-only locally compiled release APK, no Play submission",
+  "source_commit": "5e548d12ee274552664bbe0881d5583d91f0ad4b",
+  "version": "1.0.2",
+  "android_version_code": 8,
+  "package": "ml.sossecurite.app",
+  "test_device": "dedicated disposable Android API 36 arm64 emulator",
+  "test_files": 22,
+  "tests_passed": 188,
+  "jvm_tests_passed": 7,
+  "javascript_bytes_without_bytecode": 3513967,
+  "baseline_hermes_bytes": 5338404,
+  "baseline_javascript_bytes": 4967910,
+  "native_observations": [
+    "upgrade from code 7 without reset preserves synthetic dossier and contact",
+    "named contact remains editable with short number; save validates; corrected value persists after process restart",
+    "map download pauses on Home and resumes",
+    "last weather forecast remains available with update age offline",
+    "erase resets user Stack to onboarding; Android Back cannot restore previous dossier",
+    "guide narration starts",
+    "eight screenshots captured; no fatal app exception and no ANR during session"
+  ],
+  "limits": [
+    "no physical BLE multi-device validation",
+    "no iOS validation",
+    "no physical-device performance percentage",
+    "no actual emergency call or SMS",
+    "historical code 7 API 32 ANR remains unexplained",
+    "no production AAB, Play upload, merge or publication"
+  ],
+  "native_test_source_commits": {
+    "profile_contact_map_weather": "4efb453ccd337fdb819d42dde3e289be9027fe94",
+    "corrected_erase_navigation": "829539d2df511b74e192e596602ab96432c0b7e4",
+    "final_layout_screenshots_runtime": "5e548d12ee274552664bbe0881d5583d91f0ad4b"
+  }
+}
