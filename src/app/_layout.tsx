@@ -34,7 +34,7 @@ function BootstrapGate() {
   const db = useSQLiteContext();
   const router = useRouter();
   const pathname = usePathname();
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const setLanguage = useAppStore((state) => state.setLanguage);
   const [checked, setChecked] = useState(false);
   const [bootstrapError, setBootstrapError] = useState(false);
@@ -72,6 +72,8 @@ function BootstrapGate() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: colors.bg },
+        // Native Stack owns the focused screen's system bars on Android.
+        statusBarStyle: dark ? 'light' : 'dark',
         animation: reducedMotion ? 'none' : 'slide_from_right',
       }}
     >
