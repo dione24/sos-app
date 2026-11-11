@@ -1,69 +1,74 @@
 # Assets stores — Nafalan
 
 Éditeur : **SahelPay Technologies** · Abdoulaye NIANGALY  
-App **gratuite** · Android + iOS · `ml.sossecurite.app`
+Application gratuite · Android + iOS · `ml.sossecurite.app`
 
-État du **11 novembre 2026** : APK final de recette **1.0.2 (8)** compilé et testé,
-non publié et non soumis aux stores. Les parcours Android API 36, dont
-l'effacement et l'absence de l'ancien dossier, ont réussi. Les huit captures
-natives ont été renouvelées et contrôlées visuellement.
-Le nom visible devient Nafalan ; les identifiants
-techniques et les chemins compatibles gardent leur valeur historique.
-Voir [le rapport 1.0.2](../docs/RELEASE_1.0.2.md) et
-[la décision de nommage](../docs/NAMING_NAFALAN.md).
+État du **11 novembre 2026** : release **1.0.2 (8)** et huit captures rouges
+ordonnées **enregistrées dans Play Console, pas encore envoyées pour examen**.
+Google accepte l'AAB et le mapping ReTrace ; déploiement 100 % enregistré vers
+les pays existants (Mali).
+Runtime `15bb5e5`, charte rouge `636fc72` et barre système adaptée au thème.
+Les huit captures finales RGB et leurs empreintes sont en place ;
+`verify:play-submission` passe.
+Voir [le rapport de livraison](../docs/RELEASE_1.0.2.md),
+[le reçu structuré](../docs/validation/nafalan-1.0.2-8.json) et
+[la charte](../docs/design/DESIGN.md).
 
 ## Google Play
 
-- `icon-512.png` : icône 512 × 512
-- `feature-graphic-1024x500.png` : visuel 1024 × 500
-- `screenshots/` : huit captures natives de l'APK final de recette 1.0.2 (8),
-  Android API 36, PNG RGB 1080 × 1920, sans données personnelles. Le retrait du
-  canal alpha entièrement opaque ne modifie aucun pixel visible.
-- `privacy-policy.html` : version Nafalan préparée localement, **non déployée**.
-  La publication et la vérification du 6 novembre concernaient la version
-  historique, pas le contenu courant de ce fichier.
+- `icon-512.png` : 512 × 512, RGB opaque, bouclier rouge et barres Mali conservées.
+- `feature-graphic-1024x500.png` : 1024 × 500, RGB, famille rouge/neutre de la charte.
+- `screenshots/` : huit captures claires de la charte finale, RGB, sans donnée
+  personnelle, renouvelées après la purge QA et relues. Les anciennes captures
+  API 36 de `5e548d1` ne sont plus le jeu retenu pour cette livraison.
+- Deux vues sombres (accueil/guides) ont été relues pour la revue interne ; les
+  icônes blanches de barre système ont été confirmées sur les captures. Les libellés d'onglets sont tronqués sur la configuration Tecno,
+  sans nouveau défaut de métrique lié aux couleurs établi.
+- `CHECKSUMS.sha256` : actualisé avec le jeu de visuels retenu.
 
-Adresse publique utilisée historiquement pour la politique :
+## Politique de confidentialité
 
-`https://www.sahelpay.ml/apps/sos-securite-mali/privacy`
+La politique **Nafalan avec CSS rouge est déployée**, revue dans le navigateur et
+vérifiée en ligne. Source web :
+[`3eadcac6ec7b740728bfa9ab8577d31b8e1628d0`](https://github.com/dione24/sahelpay-landing/commit/3eadcac6ec7b740728bfa9ab8577d31b8e1628d0).
 
-Son contenu en ligne n'a pas été revalidé comme version Nafalan dans cette
-intervention. La présence du fichier local ne prouve pas son déploiement.
+[Politique publique](https://www.sahelpay.ml/apps/sos-securite-mali/privacy).
+Le HTML local `privacy-policy.html` reste un artefact distinct du déploiement web ;
+la modification de charte y touche uniquement le CSS, sans modifier texte ni date.
 
-Contrôle :
+## Vidéos Bluetooth et service au premier plan
 
-```bash
-npm run verify:play-submission
-```
+`video/foreground-service-connected-device.mp4` est la preuve historique du
+**6 novembre 2026**, APK **1.0.0 (5)**. Elle ne valide pas le runtime courant.
+La recette privée a confirmé Mac→Android : réception, validation, retransmission
+et démarrage/arrêt du service observés dans l'interface et les états natifs.
+La lecture retour du paquet par le Mac, l'acquittement radio du TTL 2→1 et deux
+Android restent non validés. Aucun aller-retour complet ni plusieurs sauts réels
+ne sont revendiqués. Les clips privés du harnais ne remplacent pas automatiquement
+la vidéo publique de déclaration. Arrêt UI, automatique et nettoyage système
+restent des résultats distincts. L'arrêt UI est qualifié par PNG et états natifs
+avant/après ; les MP4 privés ne montrent pas une séquence STOP complète. La QA
+a été désinstallée après la recette, sans modifier la production préexistante.
 
-## App Store
+Les conditions de déclaration restent documentées dans
+[FOREGROUND_SERVICE_DECLARATION.md](../docs/FOREGROUND_SERVICE_DECLARATION.md) et
+[video/README.md](video/README.md).
 
-Captures haute résolution à produire depuis le build iOS soumis : iPhone 6,9 pouces
-et, puisque la V1 prend en charge l'iPad, iPad 13 pouces. Le plan et les dimensions
-officielles se trouvent dans `ios/README.md` et `docs/SCREENSHOT_PLAN.md`.
+## App Store et contrôles
 
-Contrôle :
+La recette iOS n'est pas acquise. Les captures iPhone/iPad restent à produire
+sur le build soumis selon [SCREENSHOT_PLAN.md](../docs/SCREENSHOT_PLAN.md).
+Les contrôles locaux disponibles sont `npm run verify:play-submission`,
+`npm run verify:ios-assets` et `npm run verify:fgs-video` ; ils ne prouvent pas
+une soumission ou une approbation des stores.
 
-```bash
-npm run verify:ios-assets
-```
+## Livraison et support
 
-## Vidéo Foreground Service (Android)
-
-`video/foreground-service-connected-device.mp4` est conservée comme preuve
-historique du **6 novembre 2026**, APK **1.0.0 (5)** sur TECNO KN4 / Android 16.
-Elle ne valide pas les changements BLE/FGS du build 1.0.2 (8). Aucun relais BLE
-entre téléphones physiques n'a été testé pour ce candidat.
-
-La déclaration du service `connectedDevice` et les conditions de recette restent
-documentées dans `docs/FOREGROUND_SERVICE_DECLARATION.md` et `video/README.md`.
-
-## Support
+Le reçu d'envoi Play, le statut d'examen, la disponibilité publique et la fusion
+seront renseignés dans le rapport de version. L'enregistrement de la release et des visuels
+n'est pas encore un envoi pour examen. La console estime l'installation à 27,2 Mo (−11,9 Mo versus code 7) ;
+cela ne mesure pas la vitesse sur téléphone.
 
 - support@sahelpay.ml
 - privacy@sahelpay.ml
 - https://sahelpay.ml
-
-Les résultats historiques des scripts et de la vidéo ne prouvent pas une
-publication du candidat. Aucun AAB de production, upload Play ou fusion de la
-branche 1.0.2 n'a été effectué à ce stade.

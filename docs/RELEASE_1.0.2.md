@@ -1,18 +1,24 @@
 # Nafalan 1.0.2 — fiabilité et réactivité
 
-Rapport du **11 novembre 2026**. Candidat de recette (staging) sur
-`fix/reliability-performance-20261111`, à partir de `445b140`.
-L'**APK final de recette release arm64 1.0.2 (8)** a été compilé depuis
-`5e548d12ee274552664bbe0881d5583d91f0ad4b` et signé avec la clé upload existante.
+Rapport du **11 novembre 2026**. Livraison en préparation sur
+`fix/reliability-performance-20261111`, version **1.0.2 (8)**.
+La source runtime courante est **`15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7`** :
+maintenance des dépendances `ba8ff2c`, charte rouge `636fc72`, puis adaptation des
+icônes de la barre système au thème actif `15bb5e5`.
 
-**Statut : APK de recette testé, non publié, non soumis aux stores, branche non
-fusionnée. Aucun AAB de production ni upload Play pour ce candidat.** La recette
-Android API 36, y compris le parcours d'effacement et la disparition de l'ancien
-dossier, a réussi. Les huit captures de fiche ont été renouvelées et contrôlées
-depuis cet APK (1080 × 1920, RGB, aucune donnée personnelle).
-Aucun résultat de la version 1.0.1 (7) n'est présenté comme une validation de
-1.0.2. Les rapports [1.0.1](RELEASE_1.0.1.md) et
-[1.0.1 (7)](RELEASE_1.0.1_7.md) restent inchangés.
+**Statut : release et visuels enregistrés dans Play Console, pas encore envoyés
+pour examen.**
+Google accepte l'AAB 1.0.2 (8), API 36, quatre ABI, et son mapping ReTrace.
+Le déploiement **100 % vers les pays existants, Mali**, et les huit captures
+rouges ordonnées sont enregistrés dans la console.
+Les contrôles statiques, la recette privée et les huit visuels finaux sont acquis
+dans les périmètres détaillés ci-dessous. Le reçu d'envoi, l'examen Google, la
+disponibilité publique et la fusion seront consignés séparément.
+
+Les observations API 36 déjà acquises sur `4efb453`, `829539d` et `5e548d1` sont
+conservées ci-dessous avec leur portée. Elles ne valident pas à elles seules le
+rendu de la nouvelle charte ni le nouvel AAB. Les rapports
+[1.0.1](RELEASE_1.0.1.md) et [1.0.1 (7)](RELEASE_1.0.1_7.md) restent historiques.
 
 ## Nom et compatibilité des données
 
@@ -31,8 +37,9 @@ rotation de ces clés. Le certificat de l'APK de recette correspond à la clé
 upload existante. Les mises à jour par `install -r`, sans remise à zéro des données,
 ont conservé le profil fictif **Audit Fictif** et son contact depuis le code 7.
 Le profil fictif a également été conservé lors de la mise à jour du correctif
-de navigation `829539d`, avant sa recette d'effacement. Le dernier APK `5e548d1`
-ajoute uniquement l'ajustement visuel des filtres des lieux.
+de navigation `829539d`, avant sa recette d'effacement. L'APK historique `5e548d1`
+avait ajouté l'ajustement visuel des filtres des lieux. Ces essais précèdent
+la maintenance et la charte du runtime courant.
 
 La migration SQLite 2 → 3 ajoute des index et applique la rétention des données
 SOS/mesh. Les tests vérifient la conservation des profils, contacts et anciens
@@ -66,52 +73,104 @@ plus rapide. L'initialisation du stockage et de l'affichage peuvent progresser
 en parallèle ; un jalon Android de contenu affiché est ajouté, sans confondre
 une Activity vide ou le chargement du dossier avec le contenu prêt.
 
-## APK final de recette et tailles mesurées
+## Mesures historiques des APK de recette API 36
 
-| Élément | Référence code 7 | Candidat code 8 |
+| Élément | Référence code 7 | APK arm64 historique `5e548d1` |
 | --- | --- | --- |
 | Bytecode Hermes | 5 338 404 octets | 4 128 020 octets (**−22,67 %**) |
 | Export JavaScript sans bytecode (comparaison de diagnostic) | 4 967 910 octets | 3 513 967 octets (**−29,27 %**) |
 
-L'APK arm64 de recette mesure **70 605 798 octets**. Aucune comparaison de taille
+L'APK arm64 historique `5e548d1` mesure **70 605 798 octets**. Aucune comparaison de taille
 d'APK équivalents ni mesure de vitesse, mémoire ou batterie sur téléphone physique
 n'a été réalisée. Les pourcentages ci-dessus portent uniquement sur les bundles.
 
 ```text
-APK SHA-256 : d0447f2fb15d7b4697e4ac017ef1bb9ff39889c8b07e03d2f5f693e8a380350a
+APK historique 5e548d1 SHA-256 : d0447f2fb15d7b4697e4ac017ef1bb9ff39889c8b07e03d2f5f693e8a380350a
 Certificat SHA-256 : 3544b2ddedf591b976249aced85b9a50be31f4efeb5603bdda1e8372ffc05de1
 ```
 
-## Vérifications exécutées
+## Vérifications du runtime courant
 
 | Vérification | Résultat observé |
 | --- | --- |
-| `npm test`, dernier passage le 11 novembre à 09:09 UTC | **188 tests réussis sur 22 fichiers**, aucune suite ignorée |
-| `npm run typecheck` sur la source finale | Réussi |
-| Compilation Gradle de l'APK final | **BUILD SUCCESSFUL**, 41 secondes |
-| Tests carte hors ligne ciblés | **20 tests réussis**, incluant arrière-plan, création native tardive, reprise et nettoyage |
-| SQLite réel de test | `node:sqlite`, données synthétiques en mémoire : concurrence, quotas, rollback, migration 2 → 3, rétention et effacement |
-| Tests JVM natifs exécutés avec Gradle | **7 tests réussis** du modèle de session BLE ; aucune preuve de transport entre téléphones |
+| `npm test` sur `15bb5e5`, 11 novembre à **10:46:36 UTC** | **202 tests réussis / 24 fichiers**, 955 ms |
+| `npm run typecheck` sur `15bb5e5` | Réussi |
+| Audits npm complet et production | **0 vulnérabilité signalée**, après maintenance compatible SDK 57 |
+| Installation propre / compatibilité | `npm ci` avec réapplication du patch, contrôle Expo et export Android Metro réussis lors de la maintenance |
+| Tests JVM natifs du modèle BLE | **7 tests réussis** ; ne prouvent pas le transport physique |
+| SQLite de test | `node:sqlite` en mémoire : concurrence, migration 2 → 3, rollback, rétention et effacement |
+| R8 / ressources / ABI | Build final et contrôles statiques PASS : minification et shrink actifs, quatre ABI présentes ; détails ci-dessous |
 
-Les 188 tests et TypeScript ont été relancés avec succès sur la source finale.
-Les 7 tests JVM ont été exécutés avant les derniers ajustements TypeScript de
-navigation et de libellé ; le code natif BLE n’a pas changé depuis ce passage.
-Le runtime Node expose `node:sqlite` ; la suite n'a donc pas été ignorée.
-Les tests adaptent les appels Expo et simulent la création
-des connexions natives ainsi que `PRAGMA cipher_version`. Leur portée exacte
-est documentée dans [src/db/__tests__/README.md](../src/db/__tests__/README.md).
+Les pins, le patch CJS limité au packaging du décodeur 0.5.1, les contrôles de
+compatibilité et leur maintenance sont documentés dans
+[DEPENDENCY_MAINTENANCE.md](DEPENDENCY_MAINTENANCE.md). Les anciens signalements
+npm ont été traités ; aucune migration forcée du SDK n'a été faite.
 
-Les tests GPS, HTTP, AppState et BLE utilisent des doubles contrôlés. Ils
-vérifient les transitions et les interruptions, pas la précision radio réelle,
-la portée Bluetooth ou les performances d'un téléphone physique.
+Les tests SQLite utilisent un moteur réel en mémoire, mais adaptent les appels
+Expo et simulent les connexions natives et `PRAGMA cipher_version` ; voir
+[src/db/__tests__/README.md](../src/db/__tests__/README.md).
+Les doubles GPS, HTTP, AppState et BLE valident des transitions, pas une portée
+radio ni des performances sur téléphone.
 
-## Recette native Android API 36
+## Charte courante et recette visuelle
+
+La [charte rouge](design/DESIGN.md), les icônes et les supports store proviennent
+de `636fc72865a232f084b866ff4f498be9d91edb3c` ; le runtime `15bb5e5` adapte aussi
+la barre système au thème actif. Le vert est réservé aux états de succès.
+Les tests de contraste ne remplacent pas la recette mobile clair/sombre.
+Les huit captures claires de la nouvelle charte ont été copiées en RGB et leurs
+empreintes store actualisées. `verify:play-submission` passe ; les vues sombres
+ont été relues. Les anciennes captures vertes ne sont plus le jeu retenu.
+
+Les écrans physiques clair/sombre relus montrent une
+charte cohérente et une barre système adaptée au thème. Les libellés
+d'onglets sont tronqués sur cette configuration Tecno ; le layout 12 px avec
+scaling activé et Label sur une ligne est inchangé depuis `5e548d1`. Une influence
+de la préférence de taille de police est compatible avec le constat, sans être
+mesurée ici. Aucun changement de ce réglage utilisateur ni nouvelle régression
+liée aux couleurs n'est établi.
+
+## Artefacts de production — contrôle statique PASS
+
+Source **`15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7`**, arbre
+`ba04ca8a778599b96fc366a7e4debacfdbc0ab62`. Gradle a réussi en **4 min 57 s** avec
+cache de build et reset du cache Metro ; fin de validation statique le
+**11 novembre 2026 à 10:51:05 UTC**.
+
+| Artefact | Taille | SHA-256 |
+| --- | --- | --- |
+| AAB production | 115 906 525 octets | `af03cae92c963ac003762d6a78023209ad2bdae88b853ea5a0e5f21d5c7b4a2c` |
+| APK production, quatre ABI | 170 457 197 octets | `5809de3267010aad0c2742f38daea81884d92dcd9ae4d3f1ff3ef12bd1e2f388` |
+| Hermes courant | 4 129 524 octets | `7553491b62f714362e37a5d970ed4483e4a351c93d175dd15317ba125ee75b54` |
+
+- Bundletool, signatures des **1 782 entrées payload AAB**, certificat upload
+  existant `3544b2ddedf591b976249aced85b9a50be31f4efeb5603bdda1e8372ffc05de1`,
+  API cible 36 / minimum 24 / version 1.0.2 (8) : **PASS**.
+- Quatre ABI présentes : `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` ; contrôles
+  de **52 ELF64** et de l'alignement **16 Ko** : **PASS**.
+- Hermes, assets applicatifs, DEX et **104 bibliothèques `.so`** identiques entre
+  APK et AAB. Deux profils baseline Android sont relocalisés de métadonnées AAB
+  vers `assets/dexopt` dans l'APK : leurs octets ont été comparés et sont égaux.
+- Mapping R8 embarqué identique à la copie de contrôle : **69 664 763 octets**,
+  SHA-256 `74d51088f8975af01a7a959215947b97801a830ea2decb7d8bacb546b5668dfc`,
+  **26 924 classes mappées, 25 479 renommées**. La configuration contient
+  `-dontoptimize` : aucune optimisation complète du DEX ni vitesse gagnée n'est
+  revendiquée. Le mapping lui-même reste hors du dépôt public.
+- Harnais privé absent de la source de production, du HBC brut et désassemblé,
+  et des sourcemaps contrôlées. Son source et son empreinte restent hors Git.
+
+Le HBC courant est **22,64 % plus petit** que celui du code 7 ; ce pourcentage
+mesure des octets, pas la vitesse. Les APK quatre ABI et arm64 seul ne sont pas
+comparables directement en taille. Les champs correspondants figurent dans
+[le reçu de validation](validation/nafalan-1.0.2-8.json).
+
+## Observations historiques de recette Android API 36
 
 Essais réalisés sur les APK code 8 successifs de cette branche, sur un
 **émulateur dédié**, avec des données fictives et sans données personnelles.
 Les tests du dossier, de la carte et de la météo ont porté sur `4efb453`,
 l'effacement corrigé sur `829539d`, puis les captures, les filtres et l'absence
-d'erreur sur l'APK final `5e548d1`. Les deux derniers ajustements ne changent ni
+d'erreur sur l'APK historique `5e548d1`. Les deux derniers ajustements ne changent ni
 le stockage ni les services GPS, météo ou BLE :
 
 | Parcours | Résultat observé |
@@ -128,8 +187,8 @@ Cette mise à jour valide les parcours profil/contacts observés sur l'installat
 Android de recette utilisant SQLCipher. Elle ne remplace pas un test de charge
 des écritures concurrentes natives ni une vérification exhaustive des connexions
 chiffrées. La pause a été observée après Home ; le verrouillage n'a pas été testé
-séparément. Aucun transport BLE sur téléphones physiques, essai iOS, appel/SMS
-réel ou visa médical/clinique n'est validé par cette intervention.
+séparément. Ce tableau de recette émulateur ne valide ni un transport BLE
+physique, ni iOS, ni un appel/SMS réel, ni une validation médicale/clinique.
 Le parcours d'effacement corrigé vérifie la navigation et l'absence du profil et du
 contact précédents dans l'application ; il ne constitue pas un stress test de
 concurrence SQL. Les preuves natives sont conservées dans les séries de recette
@@ -142,28 +201,58 @@ candidat ne permet ni de l'expliquer ni de garantir l'absence globale de
 régression. Voir les preuves et limites du
 [rapport 1.0.1 (7)](RELEASE_1.0.1_7.md#incidents-et-limites-de-la-validation).
 
-## Points restant hors de cette correction
+## Recette Bluetooth privée — résultat et limites
 
-Le triage `npm audit` du 11 novembre signale 9 nœuds de dépendances (4 high,
-5 moderate), correspondant à 6 avis distincts. Une partie concerne l'outillage
-Metro/fingerprint ; une dépendance de décodage d'URI existe aussi dans le graphe
-runtime, sans chemin d'exploitation démontré dans le parseur standard Expo.
-Aucune mise à jour forcée du SDK ou du lockfile n'a été appliquée ici. Une
-maintenance compatible des dépendances reste à réaliser séparément ; ces
-signalements ne constituent pas une cause démontrée des lenteurs ordinaires.
+Passe physique du **11 novembre, 10:47:53 → 10:50:06 UTC**, sur le paquet isolé
+`ml.sossecurite.app.qa`. Le harnais temporaire reste absent de la production.
+Aucun appel, SMS, donnée médicale réelle ni position n'a été utilisé.
 
-## Publication
+Sur un Tecno sous Android 16, une alerte technique **Autre/faible sans position**,
+signée P256 par le banc Mac, a été **reçue, validée puis retransmise** par
+l'application. Le démarrage et l'arrêt du service Bluetooth ont été observés
+dans l'interface et les états natifs. Lecture de la fixture par Android à
+10:48:31, état « Transmise » / faible et FGS actif à 10:48:47, arrêt avec FGS
+inactif à 10:48:56.
 
-La mise à jour du nom dans les écrans et la préparation de textes de fiche ne
-constituent ni une publication, ni un examen Google/Apple du candidat 1.0.2.
-Huit captures natives de l'APK final de recette ont été renouvelées et contrôlées
-visuellement, sans données personnelles, puis encodées en RGB sans modifier
-leurs pixels opaques. Leurs empreintes sont dans `store-assets/CHECKSUMS.sha256`. La vidéo FGS historique
-du code 5 est conservée et ne prouve pas le comportement du nouveau build.
-Le HTML de confidentialité Nafalan est préparé localement et **non déployé**.
-Le statut éventuel d'une version précédente reste distinct. Le reçu d'un envoi
-et l'état réellement affiché par le store devront être consignés ici avant
-de revendiquer une soumission ou une disponibilité publique.
+La **lecture du paquet Android par le Mac**, l'**acquittement radio du TTL 2 → 1**
+et l'**interopérabilité entre deux Android** restent **non validés**. Le harnais
+Android a signé son origine et son service a démarré puis été arrêté ; le Mac
+a découvert et connecté ce pair, sans lecture de paquet validée. Aucun
+aller-retour complet ni plusieurs sauts réels ne sont revendiqués.
 
-Reçu vérifiable de l'artefact et des contrôles :
+La purge QA après deux confirmations et la restauration finale ont réussi :
+720 × 1576, densité 280 et mode nuit `no`. Veille, administration de l'appareil
+et alimentation Bluetooth n'ont pas été modifiées. Les captures publiques ont
+été réalisées après purge. Les arrêts UI observés sont distincts du nettoyage
+système final ; l'arrêt automatique du harnais n'est pas déclaré testé par ce
+passage. Les MP4 privés montrent le démarrage et l'activité ; l'arrêt manuel est
+qualifié par les PNG frais et états de service natif avant/après, pas par une
+séquence vidéo STOP complète. La QA a ensuite été désinstallée et le paquet de
+production préexistant préservé. Un timeout ou une absence de lecture ne
+constitue pas un échec général du transport.
+
+## Politique et livraison
+
+La politique **Nafalan avec CSS rouge est déployée**, revue en navigateur et
+confirmée **READY** dans le navigateur. Source web :
+[`3eadcac6ec7b740728bfa9ab8577d31b8e1628d0`](https://github.com/dione24/sahelpay-landing/commit/3eadcac6ec7b740728bfa9ab8577d31b8e1628d0),
+[politique publique](https://www.sahelpay.ml/apps/sos-securite-mali/privacy).
+Le fichier HTML local et ce déploiement web restent deux artefacts distincts.
+
+Les **huit captures claires RGB** de la charte finale sont en place, leurs
+empreintes sont actualisées et le contrôle `verify:play-submission` passe.
+Les vues sombres et la barre système ont été relues dans le navigateur. La vidéo FGS
+publique conservée reste celle du **code 5**, preuve historique ; les clips du
+banc privé ne sont pas présentés comme une nouvelle démonstration publique de
+tous les parcours de la version Play.
+
+Play Console estime la **nouvelle installation à 27,2 Mo**, soit **11,9 Mo de
+moins que le code 7**. C'est une estimation de distribution, pas un gain de
+vitesse mesuré sur téléphone ni la taille de l'APK universel quatre ABI.
+
+**À compléter par root après envoi :** référence de release/piste, date d'envoi,
+statut d'examen et fusion. L'acceptation de l'AAB et du mapping dans la console
+ne constitue pas une soumission pour examen, une approbation Google ou une
+disponibilité publique.
+Le reçu structuré de cette livraison est
 [validation/nafalan-1.0.2-8.json](validation/nafalan-1.0.2-8.json).

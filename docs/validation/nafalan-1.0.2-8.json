@@ -1,41 +1,233 @@
 {
-  "apk": "nafalan-1.0.2-8-arm64-test.apk",
-  "sha256": "d0447f2fb15d7b4697e4ac017ef1bb9ff39889c8b07e03d2f5f693e8a380350a",
-  "bytes": 70605798,
-  "hermes_bundle_bytes": 4128020,
-  "certificate_matches_code_7_upload_key": true,
-  "scope": "arm64-only locally compiled release APK, no Play submission",
-  "source_commit": "5e548d12ee274552664bbe0881d5583d91f0ad4b",
+  "schema_version": 2,
+  "status": "registered_in_play_console_not_submitted",
   "version": "1.0.2",
   "android_version_code": 8,
   "package": "ml.sossecurite.app",
-  "test_device": "dedicated disposable Android API 36 arm64 emulator",
-  "test_files": 22,
-  "tests_passed": 188,
-  "jvm_tests_passed": 7,
-  "javascript_bytes_without_bytecode": 3513967,
-  "baseline_hermes_bytes": 5338404,
-  "baseline_javascript_bytes": 4967910,
-  "native_observations": [
-    "upgrade from code 7 without reset preserves synthetic dossier and contact",
-    "named contact remains editable with short number; save validates; corrected value persists after process restart",
-    "map download pauses on Home and resumes",
-    "last weather forecast remains available with update age offline",
-    "erase resets user Stack to onboarding; Android Back cannot restore previous dossier",
-    "guide narration starts",
-    "eight screenshots captured; no fatal app exception and no ANR during session"
-  ],
+  "source_commit": "15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7",
+  "branding_commit": "636fc72865a232f084b866ff4f498be9d91edb3c",
+  "dependency_maintenance_commit": "ba8ff2c946d3e19c51bf4c4b27fad9a9eee7a253",
+  "checks": {
+    "tests_passed": 202,
+    "test_files": 24,
+    "tests_duration_ms": 955,
+    "checked_at_utc": "2026-11-11T10:46:36Z",
+    "typecheck_passed": true,
+    "test_source_commit": "15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7",
+    "jvm_tests_passed": 7,
+    "npm_audit_production_vulnerabilities": 0,
+    "npm_audit_all_vulnerabilities": 0,
+    "clean_install_patch_reapplied": true,
+    "expo_sdk_57_alignment_passed": true,
+    "metro_android_export_passed": true
+  },
+  "production_artifacts": {
+    "status": "PASS",
+    "validated_at_utc": "2026-11-11T10:51:05.585505Z",
+    "gradle_build_seconds": 297,
+    "build_cache_used": true,
+    "metro_cache_reset": true,
+    "apk": {
+      "basename": "nafalan-1.0.2-8-production.apk",
+      "bytes": 170457197,
+      "sha256": "5809de3267010aad0c2742f38daea81884d92dcd9ae4d3f1ff3ef12bd1e2f388"
+    },
+    "aab": {
+      "basename": "nafalan-1.0.2-8-production.aab",
+      "bytes": 115906525,
+      "sha256": "af03cae92c963ac003762d6a78023209ad2bdae88b853ea5a0e5f21d5c7b4a2c"
+    },
+    "upload_certificate_sha256": "3544b2ddedf591b976249aced85b9a50be31f4efeb5603bdda1e8372ffc05de1",
+    "same_existing_upload_key_verified": true,
+    "bundletool_validated": true,
+    "all_aab_payload_signatures_verified": true,
+    "signed_aab_payload_entries": 1782,
+    "target_sdk": 36,
+    "minimum_sdk": 24,
+    "manifest_version_package_verified": true,
+    "r8_minify_configured": true,
+    "resource_shrink_configured": true,
+    "verified_abis": [
+      "armeabi-v7a",
+      "arm64-v8a",
+      "x86",
+      "x86_64"
+    ],
+    "native_library_count": 104,
+    "native_elf64_count": 52,
+    "alignment_16k_validation": "PASS",
+    "apk_aab_dex_equal": true,
+    "apk_aab_application_assets_equal": true,
+    "apk_aab_application_asset_entries": 2,
+    "apk_aab_native_payload_equal": true,
+    "baseline_profiles_relocated_equal": true,
+    "baseline_profiles_compared": 2,
+    "hermes": {
+      "bytes": 4129524,
+      "sha256": "7553491b62f714362e37a5d970ed4483e4a351c93d175dd15317ba125ee75b54",
+      "apk_aab_equal": true,
+      "size_reduction_vs_code7_percent": 22.64,
+      "speed_gain_claimed": false
+    },
+    "r8_mapping": {
+      "embedded_matches_control_copy": true,
+      "sha256": "74d51088f8975af01a7a959215947b97801a830ea2decb7d8bacb546b5668dfc",
+      "bytes": 69664763,
+      "class_mappings": 26924,
+      "renamed_class_mappings": 25479,
+      "dontoptimize_present": true,
+      "full_dex_optimization_claimed": false,
+      "mapping_published_in_repository": false
+    },
+    "private_qa_harness_absent_from_source_raw_and_disassembled_hbc_and_sourcemaps": true
+  },
+  "historical_api36_validation": {
+    "scope": "successive arm64 release APKs on dedicated Android API 36 emulator; preceding current dependency and branding changes",
+    "source_commits": {
+      "profile_contact_map_weather": "4efb453ccd337fdb819d42dde3e289be9027fe94",
+      "corrected_erase_navigation": "829539d2df511b74e192e596602ab96432c0b7e4",
+      "final_layout_screenshots_runtime": "5e548d12ee274552664bbe0881d5583d91f0ad4b"
+    },
+    "observations": [
+      "upgrade from code 7 without reset preserves synthetic dossier and contact",
+      "named contact remains editable with short number; save validates; corrected value persists after process restart",
+      "map download pauses on Home and resumes",
+      "last weather forecast remains available with update age offline",
+      "erase resets user Stack to onboarding; Android Back cannot restore previous dossier",
+      "guide narration starts",
+      "eight screenshots captured; no fatal app exception and no ANR during session"
+    ],
+    "apk_5e548d1": {
+      "apk": "nafalan-1.0.2-8-arm64-test.apk",
+      "sha256": "d0447f2fb15d7b4697e4ac017ef1bb9ff39889c8b07e03d2f5f693e8a380350a",
+      "bytes": 70605798,
+      "hermes_bundle_bytes": 4128020,
+      "javascript_bytes_without_bytecode": 3513967,
+      "certificate_matches_code_7_upload_key": true
+    },
+    "baseline_hermes_bytes": 5338404,
+    "baseline_javascript_bytes": 4967910
+  },
+  "bluetooth_private_qa": {
+    "status": "partial_physical_validation_with_explicit_limits",
+    "qa_only_package": "ml.sossecurite.app.qa",
+    "production_package_targeted_for_private_test": false,
+    "production_harness_absent_verified": true,
+    "started_at_utc": "2026-11-11T10:47:53Z",
+    "ended_at_utc": "2026-11-11T10:50:06Z",
+    "fixture": {
+      "emergency_type": "autre",
+      "severity": "faible",
+      "position": null,
+      "initial_ttl": 2,
+      "medical_data": false,
+      "p256_signed_by_mac": true
+    },
+    "mac_to_android": {
+      "fixture_read_at_utc": "2026-11-11T10:48:31Z",
+      "received_and_validated_by_android": true,
+      "android_retransmission_ui_and_fgs_observed": true,
+      "active_ui_and_fgs_at_utc": "2026-11-11T10:48:47Z",
+      "stopped_ui_and_fgs_at_utc": "2026-11-11T10:48:56Z"
+    },
+    "android_origin_harness": {
+      "signed_origin_and_fgs_start_stop_observed": true,
+      "mac_discovery_and_connection_observed": true,
+      "mac_packet_read_validated": false
+    },
+    "mac_read_of_android_relay_validated": false,
+    "radio_acknowledgement_ttl_two_to_one_validated": false,
+    "two_android_validated": false,
+    "multi_hop_validated": false,
+    "round_trip_validated": false,
+    "ui_stop_verified": true,
+    "automatic_stop_verified": null,
+    "system_cleanup_not_counted_as_ui_stop": true,
+    "qa_purge_verified": true,
+    "temporary_settings_restored": {
+      "status": "PASS",
+      "physical_size": "720x1576",
+      "density": 280,
+      "night_mode": "no",
+      "screen_timeout_unchanged": true,
+      "device_administration_unchanged": true,
+      "bluetooth_power_unchanged": true
+    },
+    "actual_emergency_call_or_sms": false,
+    "qa_package_uninstalled": true,
+    "production_package_preserved": true,
+    "ui_stop_evidence": [
+      "fresh_before_after_png",
+      "native_service_before_after_state"
+    ],
+    "private_video_shows_start_and_activity": true,
+    "private_video_complete_manual_stop_sequence": false
+  },
+  "store_assets": {
+    "status": "final_charter_assets_ready",
+    "expected_light_screenshots": 8,
+    "expected_dark_review_screenshots": 2,
+    "current_charter_capture_checks_passed": true,
+    "historical_api36_screenshots_source_commit": "5e548d12ee274552664bbe0881d5583d91f0ad4b",
+    "historical_screenshots_validate_current_charter": false,
+    "historical_fgs_video_version": "1.0.0 (5)",
+    "historical_fgs_video_validates_current_build": false,
+    "observed_status_bar_light_dark": "PASS, native captures visually reviewed",
+    "observed_tab_label_truncation": {
+      "configuration": "Tecno capture configuration, 1080x1920 density420",
+      "layout_changed_since_5e548d1": false,
+      "font_scale_measured": false,
+      "cause": "unconfirmed; one-line scaled labels can truncate",
+      "user_font_setting_modified": false
+    },
+    "light_screenshots": 8,
+    "light_screenshots_color_mode": "RGB",
+    "dark_review_screenshots": 2,
+    "dark_status_bar_review_passed": true,
+    "checksums_updated": true,
+    "verify_play_submission_passed": true
+  },
+  "privacy_policy": {
+    "status": "deployed_and_live_browser_verified",
+    "web_repository": "dione24/sahelpay-landing",
+    "web_source_commit": "3eadcac6ec7b740728bfa9ab8577d31b8e1628d0",
+    "public_url": "https://www.sahelpay.ml/apps/sos-securite-mali/privacy",
+    "live_browser_review": "Nafalan and red CSS confirmed"
+  },
+  "delivery": {
+    "status": "registered_in_play_console_not_submitted",
+    "play_release": "1.0.2 (8) — Nafalan",
+    "play_track": "production",
+    "submitted_at_utc": null,
+    "review_status": "not_submitted",
+    "public_availability_verified": false,
+    "merge_status": "pending",
+    "aab_upload_accepted_by_google": true,
+    "retrace_mapping_upload_accepted_by_google": true,
+    "version_api_abis_accepted_by_google": true,
+    "play_release_version": "1.0.2 (8)",
+    "prepared_rollout_percent": 100,
+    "prepared_existing_countries": [
+      "ML"
+    ],
+    "console_estimated_new_install_mb": 27.2,
+    "console_estimated_reduction_vs_code7_mb": 11.9,
+    "physical_speed_gain_claimed": false,
+    "release_saved_in_console": true,
+    "ordered_red_screenshots_saved_in_console": 8
+  },
   "limits": [
-    "no physical BLE multi-device validation",
-    "no iOS validation",
-    "no physical-device performance percentage",
-    "no actual emergency call or SMS",
     "historical code 7 API 32 ANR remains unexplained",
-    "no production AAB, Play upload, merge or publication"
+    "no iOS validation",
+    "no actual emergency call or SMS",
+    "no clinical validation",
+    "no physical-device performance percentage",
+    "no two-Android or multi-hop proof",
+    "no native SQL concurrency stress-test proof",
+    "Play submission, review, public availability and merge remain pending until delivery receipts are added",
+    "Mac packet read of Android origin/relay and radio acknowledgement of TTL2 to1 remain unvalidated",
+    "automatic harness stop was not claimed as exercised in the final physical pass",
+    "tab labels truncate in the Tecno capture configuration; no font-scale measurement or new color-related metric change established"
   ],
-  "native_test_source_commits": {
-    "profile_contact_map_weather": "4efb453ccd337fdb819d42dde3e289be9027fe94",
-    "corrected_erase_navigation": "829539d2df511b74e192e596602ab96432c0b7e4",
-    "final_layout_screenshots_runtime": "5e548d12ee274552664bbe0881d5583d91f0ad4b"
-  }
+  "source_tree": "ba04ca8a778599b96fc366a7e4debacfdbc0ab62"
 }
