@@ -199,7 +199,7 @@ export default function MapScreen() {
           const on = filter === item.id;
           return (
             <Pressable accessibilityRole="button" accessibilityLabel={`Filtrer : ${item.label}`} accessibilityState={{ selected: on }} key={item.id} onPress={() => setFilter(item.id)} style={[s.filter, largeText && s.filterLarge, on && s.filterOn]}>
-              <Text maxFontSizeMultiplier={1.3} style={[s.filterText, on && s.filterTextOn]}>{item.label}</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} maxFontSizeMultiplier={1.3} style={[s.filterText, on && s.filterTextOn]}>{item.label}</Text>
             </Pressable>
           );
         })}
