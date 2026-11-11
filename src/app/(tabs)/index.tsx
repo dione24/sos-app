@@ -1,6 +1,12 @@
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { HeartPulse, PhoneCall, Settings2, ShieldAlert, UserRoundPlus, WifiOff } from 'lucide-react-native';
+import HeartPulse from 'lucide-react-native/icons/heart-pulse';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import RadioTower from 'lucide-react-native/icons/radio-tower';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
+import UserRoundPlus from 'lucide-react-native/icons/user-round-plus';
+import WifiOff from 'lucide-react-native/icons/wifi-off';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useRef, useState } from 'react';
 import { Animated, Pressable, Text, View, useWindowDimensions } from 'react-native';
@@ -62,7 +68,7 @@ export default function HomeScreen() {
   return (
     <Screen>
       <AppHeader
-        title={profileName ? `Bonjour, ${profileName.split(' ')[0]}` : 'SOS Sécurité Mali'}
+        title={profileName ? `Bonjour, ${profileName.split(' ')[0]}` : 'Nafalan'}
         subtitle={t('home_ready')}
         action={<IconButton accessibilityLabel={t('settings_title')} icon={<Settings2 size={22} color={colors.inkMuted} />} onPress={() => router.push('/settings')} />}
       />
@@ -107,6 +113,16 @@ export default function HomeScreen() {
           </View>
         </Pressable>
       </View>
+
+      <ListRow
+        title="Alertes proches"
+        subtitle="Recevoir les alertes des téléphones autour de vous."
+        leading={<IconTile tone="info"><RadioTower size={22} color={colors.infoText} /></IconTile>}
+        chevron
+        accessibilityLabel="Recevoir les alertes proches"
+        accessibilityHint="Ouvre la réception Bluetooth sans créer votre propre alerte SOS."
+        onPress={() => router.push('/mesh')}
+      />
 
       {!profileName ? (
         <ListRow

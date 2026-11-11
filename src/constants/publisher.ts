@@ -11,14 +11,14 @@ export const PUBLISHER = {
   supportEmail: 'support@sahelpay.ml',
   privacyEmail: 'privacy@sahelpay.ml',
   privacyPolicyUrl: 'https://sahelpay.ml/apps/sos-securite-mali/privacy',
-  appName: 'SOS Sécurité Mali',
+  appName: 'Nafalan',
   androidPackage: 'ml.sossecurite.app',
   iosBundleId: 'ml.sossecurite.app',
-  version: '1.0.1',
+  version: '1.0.2',
   price: 'free' as const,
   containsAds: false,
   requiresAccount: false,
 } as const;
 
-export const SUPPORT_MAILTO = `mailto:${PUBLISHER.supportEmail}?subject=${encodeURIComponent('SOS Sécurité Mali — support')}`;
-export const PRIVACY_MAILTO = `mailto:${PUBLISHER.privacyEmail}?subject=${encodeURIComponent('SOS Sécurité Mali — confidentialité')}`;
+export const SUPPORT_MAILTO = `mailto:${PUBLISHER.supportEmail}?subject=${encodeURIComponent('Nafalan — support')}`;
+export const PRIVACY_MAILTO = `mailto:${PUBLISHER.privacyEmail}?subject=${encodeURIComponent('Nafalan — confidentialité')}`;

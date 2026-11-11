@@ -1,17 +1,25 @@
 import * as Network from 'expo-network';
 import * as SMS from 'expo-sms';
-import { useRouter } from 'expo-router';
-import { BatteryMedium, Bluetooth, BluetoothSearching, CircleAlert, MapPin, MessageSquareText, RadioTower, ShieldCheck } from 'lucide-react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import BatteryMedium from 'lucide-react-native/icons/battery-medium';
+import Bluetooth from 'lucide-react-native/icons/bluetooth';
+import BluetoothSearching from 'lucide-react-native/icons/bluetooth-searching';
+import CircleAlert from 'lucide-react-native/icons/circle-alert';
+import MapPin from 'lucide-react-native/icons/map-pin';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import RadioTower from 'lucide-react-native/icons/radio-tower';
+import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Linking, Platform, Pressable, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, AppState, Linking, Platform, Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
 import { Button, Card, EmptyState, IconTile, Notice, SectionHeader, Tag, ToggleRow } from '@/components/ui';
 import { getContacts, getProfile, getSetting, setSetting } from '@/db/database';
+import { withExclusiveDatabaseTransaction } from '@/db/write-transaction';
 import { contactRecipients, EMERGENCY_LABELS, formatCoordinates } from '@/lib/sos';
-import { getBleAdvertisingStatus, observeBleAdvertising, readPacketFromDevice, startBleAdvertising, startBleMeshScan, stopBleAdvertising, type BleScanUpdate } from '@/services/ble-mesh';
+import { getBleAdvertisingStatus, observeBleAdvertising, startBleAdvertising, startBleMeshScan, stopBleAdvertising, type BleMeshScanSession, type BleScanUpdate } from '@/services/ble-mesh';
 import { getRecentMeshMessages, markMessageRelayed, processIncomingMessage, purgeSeenMessages } from '@/services/mesh-repository';
 import { makeStyles, useTheme } from '@/theme';
 import type { MeshMessage } from '@/types/models';
@@ -36,7 +44,7 @@ function formatRelaySms(message: MeshMessage) {
   if (message.position) {
     lines.push(`Carte : https://maps.google.com/?q=${message.position.latitude},${message.position.longitude}`);
   }
-  lines.push('Message préparé depuis SOS Sécurité Mali. Confirmez l\'envoi dans l\'app SMS.');
+  lines.push('Message préparé depuis Nafalan. Confirmez l\'envoi dans l\'app SMS.');
   return lines.join('\n');
 }
 
@@ -63,15 +71,12 @@ export default function MeshScreen() {
   const [history, setHistory] = useState<Awaited<ReturnType<typeof getRecentMeshMessages>>>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [smsBusy, setSmsBusy] = useState(false);
-  const readingDevices = useRef(new Set<string>());
+  const [appState, setAppState] = useState(AppState.currentState);
 
   useEffect(() => {
-    let mounted = true;
-    void getSetting(db, 'ble_disclosure_accepted').then((consent) => {
-      if (mounted) setBleConsent(consent === '1');
-    });
-    return () => { mounted = false; };
-  }, [db]);
+    const subscription = AppState.addEventListener('change', setAppState);
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -86,55 +91,60 @@ export default function MeshScreen() {
     return () => { mounted = false; subscription.remove(); };
   }, []);
 
-  useEffect(() => {
-    if (bleConsent === null) return;
-    let stop: (() => void) | undefined;
+  useFocusEffect(useCallback(() => {
+    if (appState !== 'active') return;
+    let session: BleMeshScanSession | undefined;
     let mounted = true;
+    // Re-read on every focus/resume: erasing data revokes the stored consent.
+    setBleConsent(null);
     async function start() {
+      const consent = await getSetting(db, 'ble_disclosure_accepted');
+      if (!mounted) return;
+      const allowed = consent === '1';
+      setBleConsent(allowed);
       await purgeSeenMessages(db);
-      const [network, saved, rescuerRow] = await Promise.all([
-        Network.getNetworkStateAsync(),
+      const [saved, rescuerRow] = await Promise.all([
         getRecentMeshMessages(db),
         db.getFirstAsync<{ enabled: number }>('SELECT enabled FROM rescuer_opt_in WHERE id = 1'),
       ]);
       if (!mounted) return;
-      setBridgeOnline(Boolean(network.isConnected && network.isInternetReachable !== false));
       setHistory(saved);
       setRescuer(rescuerRow?.enabled === 1);
-      if (!bleConsent) return;
-      if (running) {
-        stop = await startBleMeshScan((update) => {
-          if (!mounted) return;
-          setScan(update);
-          for (const device of update.devices) {
-            if (readingDevices.current.has(device.id)) continue;
-            readingDevices.current.add(device.id);
-            void readPacketFromDevice(device)
-              .then(async (packet) => {
-                if (!packet) return;
-                const decision = await processIncomingMessage(db, packet);
-                if (decision.relay && canBroadcastBle) {
-                  const result = await startBleAdvertising(decision.packet);
-                  if (mounted) setBroadcast(result.state === 'active' ? 'active' : 'error');
-                  if (result.state === 'active') await markMessageRelayed(db, decision.packet);
-                }
-                if (mounted) setHistory(await getRecentMeshMessages(db));
-              })
-              .finally(() => readingDevices.current.delete(device.id));
+      if (!allowed || !running) return;
+      session = startBleMeshScan((update) => { if (mounted) setScan(update); }, {
+        onPacket: async (packet, signal) => {
+          if (!mounted || signal.aborted) return;
+          const decision = await processIncomingMessage(db, packet);
+          if (!mounted || signal.aborted) return;
+          if (decision.relay && canBroadcastBle) {
+            const result = await startBleAdvertising(decision.packet, { signal });
+            if (!mounted || signal.aborted) return;
+            setBroadcast(result.state === 'active' ? 'active' : 'error');
+            if (result.state === 'active') await markMessageRelayed(db, decision.packet);
           }
-        });
-      }
+          if (!mounted || signal.aborted) return;
+          const recent = await getRecentMeshMessages(db);
+          if (mounted && !signal.aborted) setHistory(recent);
+        },
+      });
     }
-    void start();
+    // Network status is optional and must not delay the local BLE scan.
+    void Network.getNetworkStateAsync().then((network) => {
+      if (mounted) setBridgeOnline(Boolean(network.isConnected && network.isInternetReachable !== false));
+    }).catch(() => { if (mounted) setBridgeOnline(false); });
+    void start().catch(() => {
+      if (mounted) setScan({ state: 'error', devices: [], message: 'Les alertes proches ne sont pas disponibles. Réessayez.' });
+    });
     return () => {
       mounted = false;
-      stop?.();
+      void session?.stop();
     };
-  }, [bleConsent, db, running, scanAttempt]);
+  }, [appState, db, running, scanAttempt]));
 
   async function acceptBleDisclosure() {
     await setSetting(db, 'ble_disclosure_accepted', '1');
     setBleConsent(true);
+    setScanAttempt((value) => value + 1);
   }
 
   async function stopBroadcast() {
@@ -164,11 +174,13 @@ export default function MeshScreen() {
 
   async function toggleRescuer(value: boolean) {
     setRescuer(value);
-    await db.runAsync(
-      'INSERT INTO rescuer_opt_in (id, enabled, alias) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET enabled = excluded.enabled',
-      value ? 1 : 0,
-      '',
-    );
+    await withExclusiveDatabaseTransaction(db, async (transaction) => {
+      await transaction.runAsync(
+        'INSERT INTO rescuer_opt_in (id, enabled, alias) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET enabled = excluded.enabled',
+        value ? 1 : 0,
+        '',
+      );
+    });
   }
 
   const displayHistory = useMemo(() => {
@@ -197,7 +209,7 @@ export default function MeshScreen() {
         history[0]?.message;
       const body = target
         ? formatRelaySms(target)
-        : 'SOS Mali — aucune alerte reçue à transmettre. Ajoutez le détail manuellement avant envoi.';
+        : 'Nafalan — aucune alerte reçue à transmettre. Ajoutez le détail manuellement avant envoi.';
       const profile = await getProfile(db);
       const contacts = profile ? await getContacts(db, profile.phone) : [];
       const recipients = contactRecipients(contacts);
@@ -290,11 +302,15 @@ export default function MeshScreen() {
         </Notice>
       ) : scan.state === 'bluetooth-off' ? (
         <Notice icon={<Bluetooth size={20} color={colors.warningText} />} tone="warning" title="Bluetooth désactivé" text="Activez le Bluetooth du téléphone, puis touchez « Rechercher à nouveau »." />
+      ) : scan.state === 'error' ? (
+        <Notice tone="warning" title="Recherche interrompue" text={scan.message ?? 'Réessayez ou utilisez les appels et les SMS.'}>
+          <Button label="Rechercher à nouveau" variant="secondary" onPress={retryScan} />
+        </Notice>
       ) : null}
 
       <Card style={s.status}>
-        <IconTile tone={active ? 'primary' : 'neutral'}>
-          <Bluetooth size={22} color={active ? colors.primaryText : colors.inkMuted} />
+        <IconTile tone={active ? 'success' : 'neutral'}>
+          <Bluetooth size={22} color={active ? colors.successText : colors.inkMuted} />
         </IconTile>
         <View style={s.statusCopy}>
           <Text maxFontSizeMultiplier={1.4} style={s.statusValue}>{scanStatus}</Text>
@@ -325,7 +341,7 @@ export default function MeshScreen() {
       ) : null}
 
       <Notice
-        icon={<MessageSquareText size={20} color={bridgeOnline ? colors.primaryText : colors.inkFaint} />}
+        icon={<MessageSquareText size={20} color={bridgeOnline ? colors.successText : colors.inkFaint} />}
         title="Envoyer la dernière alerte par SMS"
         text="Le message est préparé pour vous. Vous choisissez le destinataire et confirmez toujours l'envoi."
       >
@@ -378,7 +394,7 @@ export default function MeshScreen() {
         <EmptyState
           icon={<BluetoothSearching size={28} color={colors.inkMuted} />}
           title="Aucune alerte autour de vous"
-          text="Ça marche seulement si un autre téléphone SOS Sécurité Mali est à quelques mètres, avec cet écran ouvert. L’appel 122 et le SMS restent disponibles sans ça."
+          text="Ça marche seulement si un autre téléphone Nafalan est à quelques mètres, avec cet écran ouvert. L’appel 122 et le SMS restent disponibles sans ça."
           action={<Button label="Appeler le 122" variant="secondary" onPress={() => router.push('/sos')} />}
         />
       )}

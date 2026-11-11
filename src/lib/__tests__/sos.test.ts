@@ -33,6 +33,12 @@ describe('SOS SMS formatting', () => {
     expect(result).not.toContain('maps.google.com');
   });
 
+  it('labels an older fallback fix instead of presenting it as a current position', () => {
+    const position = { latitude: 12.6392, longitude: -8.0029, timestamp: Date.now() - 20 * 60_000 };
+    expect(formatSosMessage({ type: 'medical', position })).toContain('Dernière position connue');
+    expect(formatSosMessage({ type: 'medical', position: { ...position, timestamp: Date.now() } })).not.toContain('Dernière position connue');
+  });
+
   it('only includes the limited medical summary after opt-in', () => {
     const withoutOptIn = formatSosMessage({ type: 'medical', position: null, profile, includeMedical: false });
     const withOptIn = formatSosMessage({ type: 'medical', position: null, profile, includeMedical: true });

@@ -1,7 +1,13 @@
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ChevronLeft, ChevronRight, Pause, PhoneCall, Play, Volume2, VolumeX } from 'lucide-react-native';
+import ChevronLeft from 'lucide-react-native/icons/chevron-left';
+import ChevronRight from 'lucide-react-native/icons/chevron-right';
+import Pause from 'lucide-react-native/icons/pause';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import Play from 'lucide-react-native/icons/play';
+import Volume2 from 'lucide-react-native/icons/volume-2';
+import VolumeX from 'lucide-react-native/icons/volume-x';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 

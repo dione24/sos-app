@@ -1,5 +1,8 @@
 import { Tabs, usePathname } from 'expo-router';
-import { BookOpenText, House, MapPinned, UserRound } from 'lucide-react-native';
+import BookOpenText from 'lucide-react-native/icons/book-open-text';
+import House from 'lucide-react-native/icons/house';
+import MapPinned from 'lucide-react-native/icons/map-pinned';
+import UserRound from 'lucide-react-native/icons/user-round';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

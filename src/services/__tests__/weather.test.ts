@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ getSetting: vi.fn(), setSetting: vi.fn(), netw
 vi.mock('expo-network', () => ({ getNetworkStateAsync: mocks.network }));
 vi.mock('@/db/database', () => ({ getSetting: mocks.getSetting, setSetting: mocks.setSetting }));
 
-import { getCachedWeather, getLastCachedWeather, loadWeather, WEATHER_CACHE_MAX_AGE_MS, WEATHER_REQUEST_TIMEOUT_MS } from '../weather';
+import { flushWeatherCache, getCachedWeather, getLastCachedWeather, invalidateWeather, loadWeather, WEATHER_CACHE_MAX_AGE_MS, WEATHER_REQUEST_TIMEOUT_MS } from '../weather';
 import type { WeatherSnapshot } from '@/types/models';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
@@ -30,7 +30,7 @@ beforeEach(() => {
   fetchMock = vi.fn().mockImplementation(async () => response());
   vi.stubGlobal('fetch', fetchMock);
 });
-afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
+afterEach(async () => { await flushWeatherCache(db); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 function putCache(value: WeatherSnapshot, coords: typeof position | null = null) {
   const slot = coords ? 'position' : 'bamako';
@@ -150,6 +150,91 @@ describe('weather loading without unnecessary network waits', () => {
   it('still displays received data if optional cache persistence fails', async () => {
     mocks.setSetting.mockRejectedValue(new Error('disk unavailable'));
     expect(await loadWeather(db, null)).toMatchObject({ source: 'network', temperature: 31 });
+  });
+
+  it('returns a received forecast while optional persistence is still pending', async () => {
+    let release!: () => void;
+    mocks.setSetting.mockImplementation(() => new Promise<void>((resolve) => { release = resolve; }));
+    const actual = await loadWeather(db, null);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(actual).toMatchObject({ source: 'network', temperature: 31 });
+    expect(mocks.setSetting).toHaveBeenCalledOnce();
+    expect(await getCachedWeather(db, null)).toMatchObject({ temperature: 31 });
+    await loadWeather(db, null);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    release(); await flushWeatherCache(db);
+  });
+
+  it('serializes non-blocking writes and preserves both places when one write is delayed', async () => {
+    const releases: (() => void)[] = [];
+    mocks.setSetting.mockImplementation(async (_db, key: string, value: string) => {
+      await new Promise<void>((resolve) => { releases.push(resolve); }); storage.set(key, value);
+    });
+    await loadWeather(db, null); await vi.advanceTimersByTimeAsync(0);
+    await loadWeather(db, position); await vi.advanceTimersByTimeAsync(0);
+    expect(mocks.setSetting).toHaveBeenCalledOnce();
+    expect(await getCachedWeather(db, position)).toMatchObject({ city: 'Ma position' });
+    releases[0]!(); await vi.advanceTimersByTimeAsync(0);
+    expect(mocks.setSetting).toHaveBeenCalledTimes(2);
+    releases[1]!(); await flushWeatherCache(db);
+    const saved = JSON.parse(storage.get('weather_cache_v2')!);
+    expect(saved.bamako.snapshot.city).toBe('Bamako'); expect(saved.position.snapshot.city).toBe('Ma position');
+  });
+
+  it('recovers the write queue after a rejected persistence without losing the existing cache', async () => {
+    putCache(snapshot());
+    mocks.setSetting.mockRejectedValueOnce(new Error('disk busy'));
+    await loadWeather(db, null, { forceRefresh: true }); await flushWeatherCache(db);
+    await loadWeather(db, position); await flushWeatherCache(db);
+    const saved = JSON.parse(storage.get('weather_cache_v2')!);
+    expect(saved.bamako.snapshot.temperature).toBe(29); expect(saved.position.snapshot.city).toBe('Ma position');
+  });
+
+  it('privacy invalidation aborts a pending request and late HTTP cannot repopulate the cache', async () => {
+    let deliver!: (value: ReturnType<typeof response>) => void;
+    let signal: AbortSignal | undefined;
+    fetchMock.mockImplementation((_url, options: { signal: AbortSignal }) => {
+      signal = options.signal; return new Promise((resolve) => { deliver = resolve; });
+    });
+    const pending = loadWeather(db, null); await vi.advanceTimersByTimeAsync(0);
+    await invalidateWeather(db); storage.clear();
+    expect(signal?.aborted).toBe(true); expect(await pending).toMatchObject({ source: 'fallback' });
+    deliver(response()); await vi.advanceTimersByTimeAsync(0);
+    expect(mocks.setSetting).not.toHaveBeenCalled(); expect(await getCachedWeather(db, null)).toBeNull();
+  });
+
+  it('privacy invalidation bounds a pending network lookup without starting a late fetch', async () => {
+    let networkReady!: (value: { isConnected: boolean; isInternetReachable: boolean }) => void;
+    mocks.network.mockReturnValue(new Promise((resolve) => { networkReady = resolve; }));
+    const pending = loadWeather(db, null); await vi.advanceTimersByTimeAsync(0);
+    await invalidateWeather(db); expect(await pending).toMatchObject({ source: 'fallback' });
+    networkReady({ isConnected: true, isInternetReachable: true }); await vi.advanceTimersByTimeAsync(0);
+    expect(fetchMock).not.toHaveBeenCalled(); expect(mocks.setSetting).not.toHaveBeenCalled();
+  });
+
+  it('privacy invalidation drains the engaged write and drops queued writes before SQLite is cleared', async () => {
+    let release!: () => void;
+    mocks.setSetting.mockImplementation(async (_db, key: string, value: string) => {
+      await new Promise<void>((resolve) => { release = resolve; }); storage.set(key, value);
+    });
+    await loadWeather(db, null); await vi.advanceTimersByTimeAsync(0);
+    await loadWeather(db, position);
+    let invalidated = false;
+    const deleting = invalidateWeather(db).then(() => { invalidated = true; storage.clear(); });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(invalidated).toBe(false); expect(mocks.setSetting).toHaveBeenCalledOnce();
+    release(); await deleting; await vi.advanceTimersByTimeAsync(0);
+    expect(mocks.setSetting).toHaveBeenCalledOnce(); expect(storage.size).toBe(0);
+    expect(await getCachedWeather(db, null)).toBeNull(); expect(await getLastCachedWeather(db)).toBeNull();
+  });
+
+  it('ignores a disk cache read that resolves after privacy invalidation', async () => {
+    let diskReady!: (value: string) => void;
+    mocks.getSetting.mockImplementationOnce(() => new Promise((resolve) => { diskReady = resolve; }));
+    const pending = getCachedWeather(db, null);
+    await invalidateWeather(db);
+    diskReady(JSON.stringify({ version: 2, bamako: entry(snapshot()), latest: 'bamako' }));
+    expect(await pending).toBeNull(); expect(mocks.setSetting).not.toHaveBeenCalled();
   });
 
   it('does not invent a rain probability when the provider omits it', async () => {

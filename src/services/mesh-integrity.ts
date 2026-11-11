@@ -2,18 +2,8 @@ import * as Crypto from 'expo-crypto';
 
 import ExpoBleAdvertiser from '../../modules/expo-ble-advertiser/src/ExpoBleAdvertiserModule';
 import type { MeshMessage } from '@/types/models';
-
-export function canonicalOriginPayload(message: Omit<MeshMessage, 'originHash' | 'originPublicKey' | 'originSignature'> | MeshMessage) {
-  return JSON.stringify({
-    version: 1,
-    id: message.id,
-    emergencyType: message.emergencyType,
-    position: message.position,
-    createdAt: message.createdAt,
-    initialTtl: message.initialTtl,
-    severity: message.severity,
-  });
-}
+import { canonicalOriginPayload } from '@/lib/mesh-origin-payload';
+export { canonicalOriginPayload } from '@/lib/mesh-origin-payload';
 
 export async function signMeshOrigin(
   message: Omit<MeshMessage, 'originHash' | 'originPublicKey' | 'originSignature'>,

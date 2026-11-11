@@ -65,6 +65,9 @@ export function formatSosMessage({ type, position, profile, includeMedical }: So
   ];
 
   if (position) {
+    if (position.timestamp && Date.now() - position.timestamp >= 5 * 60 * 1000) {
+      lines.push(`Dernière position connue, relevée à ${new Date(position.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} : à confirmer.`);
+    }
     lines.push(`Carte : https://maps.google.com/?q=${position.latitude},${position.longitude}`);
     lines.push(`URI GPS : geo:${position.latitude},${position.longitude}`);
   }
@@ -74,7 +77,7 @@ export function formatSosMessage({ type, position, profile, includeMedical }: So
     if (profile.allergies.trim()) lines.push(`Allergies : ${profile.allergies.trim()}`);
   }
 
-  lines.push(`Envoyé depuis SOS Sécurité Mali à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`);
+  lines.push(`Envoyé depuis Nafalan à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`);
   return lines.join('\n');
 }
 

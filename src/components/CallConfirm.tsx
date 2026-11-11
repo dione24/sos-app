@@ -1,4 +1,4 @@
-import { PhoneCall } from 'lucide-react-native';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
 import { useEffect, useRef } from 'react';
 import { AccessibilityInfo, findNodeHandle, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 

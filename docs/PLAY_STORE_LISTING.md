@@ -1,10 +1,10 @@
-# Fiche Google Play — SOS Sécurité Mali 1.0.1
+# Fiche Google Play — Nafalan 1.0.2
 
 ## Identité
 
 | Champ | Valeur |
 | --- | --- |
-| Nom de l’app | **SOS Sécurité Mali** |
+| Nom de l’app | **Nafalan — SOS & secours** |
 | Package | `ml.sossecurite.app` |
 | Éditeur | **SahelPay Technologies** |
 | Développeur | Abdoulaye NIANGALY |
@@ -26,7 +26,7 @@ Secours et contacts du Mali, sources publiques. App indépendante et hors ligne.
 
 Application indépendante, non affiliée au gouvernement du Mali ni aux services publics de secours.
 
-SOS Sécurité Mali est une application gratuite éditée par SahelPay Technologies (Bamako, Mali). Elle rassemble des outils utiles pour préparer une alerte et consulter des informations lorsque la connexion internet est faible ou absente. Elle ne représente aucune administration et n'assure pas elle-même les secours.
+Nafalan est une application gratuite éditée par SahelPay Technologies (Bamako, Mali). Elle rassemble des outils utiles pour préparer une alerte et consulter des informations lorsque la connexion internet est faible ou absente. Elle ne représente aucune administration et n'assure pas elle-même les secours.
 
 Fonctions principales :
 - appel des numéros du Mali avec accès aux sources de chaque contact ;
@@ -60,7 +60,7 @@ Consulter une publication ne garantit pas qu'une ligne répond actuellement. Les
 https://www.openstreetmap.org/copyright
 
 LIMITES IMPORTANTES
-SOS Sécurité Mali n'est pas un dispositif médical et ne diagnostique, ne traite, ne guérit ni ne prévient aucune affection. Pour tout conseil, diagnostic ou traitement, consultez un professionnel de santé. L'app ne remplace ni les services d'urgence ni une formation pratique. En cas d'urgence, appelez le service compétent et suivez ses instructions.
+Nafalan n'est pas un dispositif médical et ne diagnostique, ne traite, ne guérit ni ne prévient aucune affection. Pour tout conseil, diagnostic ou traitement, consultez un professionnel de santé. L'app ne remplace ni les services d'urgence ni une formation pratique. En cas d'urgence, appelez le service compétent et suivez ses instructions.
 
 L'app ne contient ni publicité, ni traqueur publicitaire, ni compte en ligne. Les appels et les SMS restent sous votre contrôle et nécessitent une confirmation.
 
@@ -68,6 +68,6 @@ Le relais Bluetooth dépend du téléphone, de la distance, des obstacles et des
 
 Support : support@sahelpay.ml — https://sahelpay.ml
 
-## Notes de version 1.0.1
+## Notes de version 1.0.2
 
 Sources publiques accessibles depuis l'accueil, les réglages et chaque contact de l'annuaire. Mention claire d'indépendance vis-à-vis du gouvernement et des services publics. Numéros historiques distingués des contacts actuels. Améliorations du démarrage, de la carte et de la météo.

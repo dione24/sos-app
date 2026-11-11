@@ -1,4 +1,7 @@
-import { PhoneCall, Search, SearchX, TriangleAlert } from 'lucide-react-native';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import Search from 'lucide-react-native/icons/search';
+import SearchX from 'lucide-react-native/icons/search-x';
+import TriangleAlert from 'lucide-react-native/icons/triangle-alert';
 import { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 

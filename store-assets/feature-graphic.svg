@@ -1,30 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-labelledby="title desc">
-  <title id="title">SOS Sécurité Mali</title>
+  <title id="title">Nafalan — SOS &amp; secours</title>
   <desc id="desc">Alerter. Agir. Trouver de l’aide. Guides hors ligne, numéros utiles, sans compte ni publicité.</desc>
-  <rect width="1024" height="500" fill="#F2F4F7"/>
+  <rect width="1024" height="500" fill="#F7F7F8"/>
   <g font-family="DM Sans, sans-serif">
-    <text x="56" y="78" fill="#0B6E4F" font-size="17" font-weight="600" letter-spacing="2">PREMIERS SECOURS · MALI</text>
-    <text x="52" y="162" fill="#0F172A" font-size="58" font-weight="700">SOS Sécurité Mali</text>
-    <text x="56" y="208" fill="#475467" font-size="26">Alerter. Agir. Trouver de l’aide.</text>
-    <path d="M56 244H620" stroke="#D5DCE5"/>
-    <g fill="#E6F4EE">
+    <text x="56" y="78" fill="#A61B35" font-size="17" font-weight="600" letter-spacing="2">PREMIERS SECOURS · MALI</text>
+    <text x="52" y="162" fill="#1C1C24" font-size="42" font-weight="700">Nafalan — SOS &amp; secours</text>
+    <text x="56" y="208" fill="#52525F" font-size="26">Alerter. Agir. Trouver de l’aide.</text>
+    <path d="M56 244H620" stroke="#E4E4E8"/>
+    <g fill="#FCECEF">
       <rect x="56" y="272" width="36" height="36" rx="10"/>
       <rect x="56" y="326" width="36" height="36" rx="10"/>
       <rect x="56" y="380" width="36" height="36" rx="10"/>
     </g>
-    <g fill="none" stroke="#0B6E4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="none" stroke="#A61B35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M66 283h7l2 2 2-2h6v15h-6l-2 2-2-2h-7z M75 286v10"/>
       <path d="m67 338 3-2 4 5-2 2c2 3 4 5 7 6l2-2 4 3-2 3c-7 2-18-9-16-15z"/>
       <path d="m67 398 5 5 10-11"/>
     </g>
-    <text x="108" y="298" fill="#0F172A" font-size="22" font-weight="600">Guides disponibles hors ligne</text>
-    <text x="108" y="352" fill="#0F172A" font-size="22" font-weight="600">Numéros et lieux utiles au Mali</text>
-    <text x="108" y="406" fill="#0F172A" font-size="22" font-weight="600">Gratuite, sans compte ni publicité</text>
-    <rect x="684" y="44" width="292" height="412" rx="24" fill="#FFFFFF" stroke="#E4E7EC"/>
-    <text x="830" y="91" text-anchor="middle" fill="#475467" font-size="19" font-weight="500">En cas d’urgence</text>
+    <text x="108" y="298" fill="#1C1C24" font-size="22" font-weight="600">Guides disponibles hors ligne</text>
+    <text x="108" y="352" fill="#1C1C24" font-size="22" font-weight="600">Numéros et lieux utiles au Mali</text>
+    <text x="108" y="406" fill="#1C1C24" font-size="22" font-weight="600">Gratuite, sans compte ni publicité</text>
+    <rect x="684" y="44" width="292" height="412" rx="24" fill="#FFFFFF" stroke="#E4E4E8"/>
+    <text x="830" y="91" text-anchor="middle" fill="#52525F" font-size="19" font-weight="500">En cas d’urgence</text>
     <circle cx="830" cy="226" r="98" fill="#C8102E"/>
     <text x="830" y="245" text-anchor="middle" fill="#FFFFFF" font-size="56" font-weight="700">SOS</text>
-    <text x="830" y="375" text-anchor="middle" fill="#0F172A" font-size="21" font-weight="600">Appelez les secours.</text>
-    <text x="830" y="407" text-anchor="middle" fill="#475467" font-size="18">Suivez leurs consignes.</text>
+    <text x="830" y="375" text-anchor="middle" fill="#1C1C24" font-size="21" font-weight="600">Appelez les secours.</text>
+    <text x="830" y="407" text-anchor="middle" fill="#52525F" font-size="18">Suivez leurs consignes.</text>
   </g>
 </svg>

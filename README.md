@@ -1,7 +1,13 @@
-# SOS Sécurité Mali
+# Nafalan
 
 Application mobile Expo (**Android + iOS**), hors-ligne d'abord, dédiée aux
 premiers secours et à l'alerte d'urgence au Mali.
+
+Nafalan est le nom courant du projet, anciennement **SOS Sécurité Mali**.
+Le choix du nom et sa source linguistique sont documentés dans
+[`docs/NAMING_NAFALAN.md`](docs/NAMING_NAFALAN.md). Le candidat 1.0.2 est décrit dans
+[`docs/RELEASE_1.0.2.md`](docs/RELEASE_1.0.2.md) ; les rapports des versions précédentes
+conservent leur nom historique.
 
 **Éditeur :** SahelPay Technologies · **Développeur :** Abdoulaye NIANGALY  
 **Site :** https://sahelpay.ml · **Support :** support@sahelpay.ml  

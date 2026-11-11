@@ -15,6 +15,12 @@ type WeatherCache = { version: 2; bamako?: CacheEntry; position?: CacheEntry; la
 const cacheReads = new WeakMap<SQLiteDatabase, Promise<WeatherCache>>();
 const cacheWrites = new WeakMap<SQLiteDatabase, Promise<void>>();
 const requests = new WeakMap<SQLiteDatabase, Map<string, Promise<WeatherSnapshot>>>();
+type CacheSlot = 'bamako' | 'position';
+const pendingCache = new WeakMap<SQLiteDatabase, { entries: Partial<Record<CacheSlot, CacheEntry>>; latest: CacheSlot }>();
+const writeBases = new WeakMap<SQLiteDatabase, WeatherCache>();
+const generations = new WeakMap<SQLiteDatabase, number>();
+const requestControllers = new WeakMap<SQLiteDatabase, Set<AbortController>>();
+const generationOf = (db: SQLiteDatabase) => generations.get(db) ?? 0;
 
 function locationKey(position: Coordinates | null) {
   return position ? `position:${position.latitude},${position.longitude}` : 'bamako';
@@ -82,30 +88,71 @@ function fromCache(snapshot: WeatherSnapshot): WeatherSnapshot {
 
 /** Cache du lieu demandé uniquement ; aucune requête réseau. */
 export async function getCachedWeather(db: SQLiteDatabase, position: Coordinates | null): Promise<WeatherSnapshot | null> {
+  const generation = generationOf(db);
+  const slot = position ? 'position' : 'bamako';
+  const queued = pendingCache.get(db)?.entries[slot];
+  if (queued?.locationKey === locationKey(position)) return fromCache(queued.snapshot);
   const cache = await readCache(db);
-  const entry = position ? cache.position : cache.bamako;
+  if (generation !== generationOf(db)) return null;
+  const entry = pendingCache.get(db)?.entries[slot] ?? cache[slot];
   return entry?.locationKey === locationKey(position) ? fromCache(entry.snapshot) : null;
 }
 
 /** À afficher avec son lieu et son âge pendant la recherche GPS, jamais comme une nouvelle position. */
 export async function getLastCachedWeather(db: SQLiteDatabase): Promise<WeatherSnapshot | null> {
+  const generation = generationOf(db);
+  const queued = pendingCache.get(db);
+  if (queued?.entries[queued.latest]) return fromCache(queued.entries[queued.latest]!.snapshot);
   const cache = await readCache(db);
-  const snapshot = (cache.latest ? cache[cache.latest]?.snapshot : null) ?? cache.legacy;
+  if (generation !== generationOf(db)) return null;
+  const latest = pendingCache.get(db);
+  const snapshot = (latest ? latest.entries[latest.latest]?.snapshot : null) ?? (cache.latest ? cache[cache.latest]?.snapshot : null) ?? cache.legacy;
   return snapshot ? fromCache(snapshot) : null;
 }
 
-async function saveCache(db: SQLiteDatabase, position: Coordinates | null, snapshot: WeatherSnapshot) {
+async function saveCache(db: SQLiteDatabase, position: Coordinates | null, snapshot: WeatherSnapshot, generation: number) {
+  if (generation !== generationOf(db)) return;
+  const slot: CacheSlot = position ? 'position' : 'bamako';
+  const entry = { locationKey: locationKey(position), snapshot };
+  const pending = pendingCache.get(db) ?? { entries: {}, latest: slot };
+  pending.entries[slot] = entry;
+  pending.latest = slot;
+  pendingCache.set(db, pending);
   const previous = cacheWrites.get(db) ?? Promise.resolve();
   const task = previous.catch(() => undefined).then(async () => {
-    const cache = await readCache(db);
-    const slot = position ? 'position' : 'bamako';
+    if (generation !== generationOf(db)) return;
+    const cache = writeBases.get(db) ?? await readCache(db);
+    if (generation !== generationOf(db)) return;
     // Deux entrées maximum : Bamako et la dernière position autorisée. Stockage
     // chiffré existant ; aucune donnée médicale ni migration n'est modifiée.
-    const updated: WeatherCache = { version: 2, ...(cache.bamako ? { bamako: cache.bamako } : {}), ...(cache.position ? { position: cache.position } : {}), [slot]: { locationKey: locationKey(position), snapshot }, latest: slot };
+    const updated: WeatherCache = { version: 2, ...(cache.bamako ? { bamako: cache.bamako } : {}), ...(cache.position ? { position: cache.position } : {}), [slot]: entry, latest: slot };
     await setSetting(db, WEATHER_KEY, JSON.stringify(updated));
+    if (generation === generationOf(db)) writeBases.set(db, updated);
   });
   cacheWrites.set(db, task);
-  try { await task; } finally { if (cacheWrites.get(db) === task) cacheWrites.delete(db); }
+  try { await task; } finally {
+    if (cacheWrites.get(db) === task) { cacheWrites.delete(db); writeBases.delete(db); }
+    if (pending.entries[slot] === entry) delete pending.entries[slot];
+    if (!pending.entries.bamako && !pending.entries.position && pendingCache.get(db) === pending) pendingCache.delete(db);
+    else if (!pending.entries[pending.latest]) pending.latest = pending.entries.position ? 'position' : 'bamako';
+  }
+}
+
+/** Optional persistence stays ordered; callers never need this to display a forecast. */
+export async function flushWeatherCache(db: SQLiteDatabase): Promise<void> {
+  await cacheWrites.get(db)?.catch(() => undefined);
+}
+
+/** Call and await before clearing SQLite: abort requests, then drain existing writes. */
+export async function invalidateWeather(db: SQLiteDatabase): Promise<void> {
+  generations.set(db, generationOf(db) + 1);
+  for (const controller of requestControllers.get(db) ?? []) controller.abort();
+  requestControllers.delete(db);
+  requests.delete(db);
+  pendingCache.delete(db);
+  cacheReads.delete(db);
+  await flushWeatherCache(db);
+  writeBases.delete(db);
 }
 
 function weatherLabel(code: number) {
@@ -123,16 +170,22 @@ function unavailable(position: Coordinates | null, description: string): Weather
   return { city: position ? 'Ma position' : 'Bamako', temperature: 0, description, weatherCode: -1, updatedAt: 0, source: 'fallback' };
 }
 
-async function requestWeather(position: Coordinates | null): Promise<WeatherSnapshot> {
-  const controller = new AbortController();
+async function requestWeather(position: Coordinates | null, controller: AbortController): Promise<WeatherSnapshot> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => { controller.abort(); reject(new Error('Weather request timeout')); }, WEATHER_REQUEST_TIMEOUT_MS);
   });
+  let rejectAbort!: (error: Error) => void;
+  const aborted = new Promise<never>((_, reject) => { rejectAbort = reject; });
+  const onAbort = () => rejectAbort(new Error('Weather request cancelled'));
+  controller.signal.addEventListener('abort', onAbort, { once: true });
+  if (controller.signal.aborted) onAbort();
   try {
     return await Promise.race([
       (async () => {
+        if (controller.signal.aborted) throw new Error('Weather request cancelled');
         const network = await Network.getNetworkStateAsync();
+        if (controller.signal.aborted) throw new Error('Weather request cancelled');
         if (!network.isConnected || network.isInternetReachable === false) throw new Error('Weather offline');
         const coords = position ?? BAMAKO;
         const query = new URLSearchParams({ latitude: String(coords.latitude), longitude: String(coords.longitude), current: 'temperature_2m,weather_code', hourly: 'precipitation_probability', forecast_days: '1', timezone: 'Africa/Bamako' });
@@ -150,12 +203,15 @@ async function requestWeather(position: Coordinates | null): Promise<WeatherSnap
         } satisfies WeatherSnapshot;
       })(),
       timeout,
+      aborted,
     ]);
-  } finally { if (timer) clearTimeout(timer); }
+  } finally { if (timer) clearTimeout(timer); controller.signal.removeEventListener('abort', onAbort); }
 }
 
 export async function loadWeather(db: SQLiteDatabase, position: Coordinates | null, options: { forceRefresh?: boolean } = {}): Promise<WeatherSnapshot> {
+  const generation = generationOf(db);
   const cached = await getCachedWeather(db, position);
+  if (generation !== generationOf(db)) return unavailable(position, 'Prévision indisponible');
   const age = cached ? Date.now() - cached.updatedAt : Infinity;
   if (!options.forceRefresh && cached && age >= 0 && age < WEATHER_CACHE_MAX_AGE_MS) return cached;
 
@@ -164,16 +220,25 @@ export async function loadWeather(db: SQLiteDatabase, position: Coordinates | nu
   const key = locationKey(position);
   const pending = active.get(key);
   if (pending) return pending;
+  const controller = new AbortController();
+  let controllers = requestControllers.get(db);
+  if (!controllers) { controllers = new Set(); requestControllers.set(db, controllers); }
+  controllers.add(controller);
   const task = (async () => {
     try {
-      const snapshot = await requestWeather(position);
+      const snapshot = await requestWeather(position, controller);
+      if (generation !== generationOf(db)) return unavailable(position, 'Prévision indisponible');
       // Une écriture du cache refusée ne doit pas masquer une prévision reçue.
-      try { await saveCache(db, position, snapshot); } catch { /* Cache facultatif. */ }
+      void saveCache(db, position, snapshot, generation).catch(() => undefined);
       return snapshot;
     } catch {
-      return cached ?? unavailable(position, 'Actualisation impossible ou réseau indisponible');
+      return (generation === generationOf(db) ? cached : null) ?? unavailable(position, 'Actualisation impossible ou réseau indisponible');
     }
   })();
   active.set(key, task);
-  try { return await task; } finally { if (active.get(key) === task) active.delete(key); }
+  try { return await task; } finally {
+    if (active.get(key) === task) active.delete(key);
+    controllers.delete(controller);
+    if (controllers.size === 0 && requestControllers.get(db) === controllers) requestControllers.delete(db);
+  }
 }

@@ -14,6 +14,8 @@ export type Coordinates = {
   latitude: number;
   longitude: number;
   accuracy?: number;
+  /** Time of the native fix, not the time it was read from a cache. */
+  timestamp?: number;
 };
 
 export type EmergencyContact = {

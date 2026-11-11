@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
-import { BookCheck, Volume2 } from 'lucide-react-native';
+import BookCheck from 'lucide-react-native/icons/book-check';
+import Volume2 from 'lucide-react-native/icons/volume-2';
 import { Text } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';

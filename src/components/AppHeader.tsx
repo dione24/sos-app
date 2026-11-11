@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 

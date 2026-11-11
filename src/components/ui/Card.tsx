@@ -3,7 +3,7 @@ import { View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { makeStyles } from '@/theme';
 
-export type Tone = 'neutral' | 'primary' | 'warning' | 'danger' | 'info';
+export type Tone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
 
 export function Card({
   children,
@@ -26,6 +26,7 @@ const useStyles = makeStyles((t) => ({
   padded: { padding: t.spacing.md },
   neutral: {},
   primary: { backgroundColor: t.colors.primaryBg, borderColor: t.colors.primaryBorder },
+  success: { backgroundColor: t.colors.successBg, borderColor: t.colors.successBorder },
   warning: { backgroundColor: t.colors.warningBg, borderColor: t.colors.warningBorder },
   danger: { backgroundColor: t.colors.dangerBg, borderColor: t.colors.dangerBorder },
   info: { backgroundColor: t.colors.infoBg, borderColor: t.colors.infoBorder },

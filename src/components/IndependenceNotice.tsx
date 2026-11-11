@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Info } from 'lucide-react-native';
+import Info from 'lucide-react-native/icons/info';
 
 import { Button, Notice } from '@/components/ui';
 import { GOVT_INDEPENDENCE_NOTICE } from '@/constants/governmentSources';

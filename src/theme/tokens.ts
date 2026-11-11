@@ -1,8 +1,8 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
 /**
- * Système de design SOS Sécurité Mali — voir docs/design/DESIGN.md.
- * Une seule famille (DM Sans), une grille 4/8, le rouge réservé au SOS.
+ * Système de design Nafalan — voir docs/design/DESIGN.md.
+ * Une seule famille (DM Sans), une grille 4/8 et une identité rouge cohérente.
  */
 
 export const font = {
@@ -48,7 +48,7 @@ export type Palette = {
   inkFaint: string;
   onColor: string;
 
-  /** Rouge d'alerte : uniquement SOS, appels d'urgence et erreurs. */
+  /** Rouge vif : SOS et appels d'urgence ; danger reste un état explicite. */
   sos: string;
   sosPressed: string;
   sosRing: string;
@@ -56,13 +56,18 @@ export type Palette = {
   dangerBg: string;
   dangerBorder: string;
 
-  /** Vert profond : actions normales, sélection, états positifs. */
+  /** Rouge profond de marque : actions normales, sélection et navigation. */
   primary: string;
   primaryPressed: string;
   onPrimary: string;
   primaryText: string;
   primaryBg: string;
   primaryBorder: string;
+
+  /** Vert sémantique : résultat réussi ou état confirmé, jamais le CTA par défaut. */
+  successText: string;
+  successBg: string;
+  successBorder: string;
 
   warningText: string;
   warningBg: string;
@@ -77,74 +82,82 @@ export type Palette = {
 };
 
 export const lightPalette: Palette = {
-  bg: '#F2F4F7',
+  bg: '#F7F7F8',
   surface: '#FFFFFF',
-  surfaceAlt: '#F9FAFB',
-  border: '#E4E7EC',
-  borderStrong: '#D0D5DD',
-  ink: '#0F172A',
-  inkMuted: '#475467',
-  inkFaint: '#667085',
+  surfaceAlt: '#F3F3F5',
+  border: '#E4E4E8',
+  borderStrong: '#8E8795',
+  ink: '#1C1C24',
+  inkMuted: '#52525F',
+  inkFaint: '#6B6B78',
   onColor: '#FFFFFF',
 
   sos: '#C8102E',
   sosPressed: '#A50D25',
   sosRing: '#F8C9D0',
-  dangerText: '#B42318',
-  dangerBg: '#FEF3F2',
-  dangerBorder: '#FECDCA',
+  dangerText: '#B4232D',
+  dangerBg: '#FDEFF1',
+  dangerBorder: '#F2BAC3',
 
-  primary: '#0B6E4F',
-  primaryPressed: '#09583F',
+  primary: '#A61B35',
+  primaryPressed: '#87142A',
   onPrimary: '#FFFFFF',
-  primaryText: '#0B6E4F',
-  primaryBg: '#E6F4EE',
-  primaryBorder: '#B7E1CF',
+  primaryText: '#A61B35',
+  primaryBg: '#FCECEF',
+  primaryBorder: '#E8B6C1',
+
+  successText: '#16634A',
+  successBg: '#ECF6F0',
+  successBorder: '#BADBC7',
 
   warningText: '#B54708',
   warningBg: '#FFF6ED',
   warningBorder: '#FEDF89',
 
-  infoText: '#175CD3',
-  infoBg: '#EFF6FF',
-  infoBorder: '#B2D4FF',
+  infoText: '#475569',
+  infoBg: '#F0F1F4',
+  infoBorder: '#D8DAE2',
 
-  overlay: 'rgba(15, 23, 42, 0.55)',
-  shadow: '#0F172A',
+  overlay: 'rgba(28, 28, 36, 0.55)',
+  shadow: '#1C1C24',
 };
 
 export const darkPalette: Palette = {
-  bg: '#0B1220',
-  surface: '#141B2B',
-  surfaceAlt: '#1B2335',
-  border: '#27324A',
-  borderStrong: '#344156',
-  ink: '#F3F4F6',
-  inkMuted: '#AAB4C3',
-  inkFaint: '#8A94A6',
+  bg: '#121114',
+  surface: '#1D1B20',
+  surfaceAlt: '#26232A',
+  border: '#39343E',
+  borderStrong: '#81778A',
+  ink: '#F7F4F6',
+  inkMuted: '#C4BEC6',
+  inkFaint: '#A39CA8',
   onColor: '#FFFFFF',
 
-  sos: '#C8102E',
-  sosPressed: '#A50D25',
-  sosRing: '#4A1A22',
-  dangerText: '#FDA29B',
-  dangerBg: '#2B1210',
-  dangerBorder: '#5A2521',
+  sos: '#DE163B',
+  sosPressed: '#BA1231',
+  sosRing: '#541A29',
+  dangerText: '#FFB1B9',
+  dangerBg: '#38191E',
+  dangerBorder: '#81424A',
 
-  primary: '#3CCB9A',
-  primaryPressed: '#2FB487',
-  onPrimary: '#04281E',
-  primaryText: '#6CE9B9',
-  primaryBg: '#12352B',
-  primaryBorder: '#1F5A47',
+  primary: '#C83C59',
+  primaryPressed: '#AD2B47',
+  onPrimary: '#FFFFFF',
+  primaryText: '#FDA4B5',
+  primaryBg: '#371D27',
+  primaryBorder: '#764051',
+
+  successText: '#87D8AE',
+  successBg: '#172D25',
+  successBorder: '#335B48',
 
   warningText: '#FDB022',
   warningBg: '#2E1F08',
   warningBorder: '#5C3E0E',
 
-  infoText: '#84CAFF',
-  infoBg: '#102A4A',
-  infoBorder: '#1E4A7A',
+  infoText: '#BDC7D6',
+  infoBg: '#22262F',
+  infoBorder: '#47505F',
 
   overlay: 'rgba(0, 0, 0, 0.65)',
   shadow: '#000000',

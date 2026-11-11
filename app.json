@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "SOS Sécurité Mali",
+    "name": "Nafalan",
     "slug": "sos-securite-mali",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "sosmali",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#F7F6F2",
+    "backgroundColor": "#F7F7F8",
     "android": {
       "package": "ml.sossecurite.app",
       "allowBackup": false,
@@ -21,7 +21,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-foreground.png",
-        "backgroundColor": "#F7F6F2"
+        "backgroundColor": "#F7F7F8"
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -37,7 +37,7 @@
         "android.permission.VIBRATE",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "versionCode": 7
+      "versionCode": 8
     },
     "ios": {
       "bundleIdentifier": "ml.sossecurite.app",
@@ -47,7 +47,7 @@
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "CFBundleDisplayName": "SOS Sécurité Mali",
+        "CFBundleDisplayName": "Nafalan",
         "NSLocationWhenInUseUsageDescription": "Votre position permet de joindre des coordonnées précises à votre alerte SOS et de trier les lieux proches.",
         "NSBluetoothAlwaysUsageDescription": "Le Bluetooth permet de recevoir les alertes SOS proches lorsque vous ouvrez l'écran Alertes proches.",
         "NSPhotoLibraryUsageDescription": "Choisir une photo facultative pour votre dossier médical.",
@@ -69,6 +69,15 @@
       "expo-dev-client",
       "./plugins/with-android-manifest-hardening",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
+      [
         "expo-sqlite",
         {
           "useSQLCipher": true
@@ -77,7 +86,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Autoriser SOS Sécurité Mali à joindre votre position à une alerte.",
+          "locationWhenInUsePermission": "Autoriser Nafalan à joindre votre position à une alerte.",
           "locationAlwaysAndWhenInUsePermission": false,
           "locationAlwaysPermission": false,
           "motionUsagePermission": false,
@@ -93,7 +102,7 @@
           "isBackgroundEnabled": false,
           "neverForLocation": true,
           "modes": [],
-          "bluetoothAlwaysPermission": "Autoriser SOS Sécurité Mali à recevoir les alertes SOS proches lorsque vous ouvrez l'écran Alertes proches."
+          "bluetoothAlwaysPermission": "Autoriser Nafalan à recevoir les alertes SOS proches lorsque vous ouvrez l'écran Alertes proches."
         }
       ],
       "@maplibre/maplibre-react-native",
@@ -109,18 +118,62 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Autoriser SOS Sécurité Mali à choisir une photo facultative pour votre dossier médical.",
+          "photosPermission": "Autoriser Nafalan à choisir une photo facultative pour votre dossier médical.",
           "cameraPermission": false,
           "microphonePermission": false
         }
       ],
       "expo-sharing",
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "DMSans_400Regular",
+                "fontDefinitions": [
+                  {
+                    "path": "./node_modules/@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
+                    "weight": 400
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans_500Medium",
+                "fontDefinitions": [
+                  {
+                    "path": "./node_modules/@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
+                    "weight": 500
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans_600SemiBold",
+                "fontDefinitions": [
+                  {
+                    "path": "./node_modules/@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf",
+                    "weight": 600
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans_700Bold",
+                "fontDefinitions": [
+                  {
+                    "path": "./node_modules/@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
+                    "weight": 700
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "expo-asset",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F6F2",
+          "backgroundColor": "#F7F7F8",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 220,
           "resizeMode": "contain"

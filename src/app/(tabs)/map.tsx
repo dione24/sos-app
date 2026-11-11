@@ -1,8 +1,15 @@
 import { Camera, Map, Marker, type MapProps } from '@maplibre/maplibre-react-native';
 import { useFocusEffect, useIsFocused, useRouter } from 'expo-router';
-import { Building2, Download, Hospital, List, MapIcon, Navigation, Pill, Shield } from 'lucide-react-native';
+import Building2 from 'lucide-react-native/icons/building-2';
+import Download from 'lucide-react-native/icons/download';
+import Hospital from 'lucide-react-native/icons/hospital';
+import List from 'lucide-react-native/icons/list';
+import MapIcon from 'lucide-react-native/icons/map';
+import Navigation from 'lucide-react-native/icons/navigation';
+import Pill from 'lucide-react-native/icons/pill';
+import Shield from 'lucide-react-native/icons/shield';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Linking, Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
@@ -13,7 +20,9 @@ import { FACILITIES } from '@/data';
 import { getSetting, setSetting } from '@/db/database';
 import { distanceKm, formatDistance } from '@/lib/distance';
 import { rememberMapViewport, type SavedMapViewport } from '@/lib/map-viewport';
-import { getEmergencyPosition } from '@/services/location';
+import { getEmergencyPosition, isFreshPosition, POSITION_FRESH_MAX_AGE_MS } from '@/services/location';
+import { ensureMapHeaders } from '@/services/map-headers';
+import { getOfflineMapController } from '@/services/offline-map';
 import { useAppStore } from '@/store/app-store';
 import { makeStyles, useTheme, type Palette } from '@/theme';
 import type { Coordinates, Facility, FacilityCategory } from '@/types/models';
@@ -74,14 +83,32 @@ export default function MapScreen() {
   const isFocused = useIsFocused();
   const focused = useRef(false);
   const locationRequest = useRef<Promise<Coordinates | null> | null>(null);
+  const locationAbort = useRef<AbortController | null>(null);
   const savedViewport = useRef<SavedMapViewport | null>(null);
   const position = useAppStore((state) => state.lastPosition);
   const setStoredPosition = useAppStore((state) => state.setLastPosition);
   const [locationConsent, setLocationConsent] = useState<'loading' | 'prompt' | 'accepted' | 'declined'>('loading');
   const [filter, setFilter] = useState<Filter>('tout');
   const [mapDownloaded, setMapDownloaded] = useState(false);
+  const [headersReady, setHeadersReady] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [, refreshPositionAge] = useState(0);
   const [modeChoice, setModeChoice] = useState<'map' | 'list' | null>(null);
   const mode = mapDownloaded ? modeChoice ?? 'map' : 'list';
+  const mapController = getOfflineMapController(db);
+
+  useEffect(() => {
+    if (isFocused && mode === 'map' && mapDownloaded) {
+      try { ensureMapHeaders(); setHeadersReady(true); } catch { setHeadersReady(false); }
+    }
+  }, [isFocused, mapDownloaded, mode]);
+
+  useEffect(() => {
+    if (!isFocused || !isFreshPosition(position)) return;
+    const remaining = position.timestamp! + POSITION_FRESH_MAX_AGE_MS - Date.now();
+    const timer = setTimeout(() => refreshPositionAge((value) => value + 1), remaining + 1);
+    return () => clearTimeout(timer);
+  }, [isFocused, position]);
 
   const saveViewport = useCallback<NonNullable<MapProps['onRegionDidChange']>>(({ nativeEvent }) => {
     // Pas de setState : déplacer la carte ne déclenche aucun rendu React.
@@ -89,35 +116,49 @@ export default function MapScreen() {
   }, []);
 
   const locate = useCallback(async () => {
-    // Un retour rapide sur cet onglet réutilise la demande GPS déjà en cours.
-    locationRequest.current ??= getEmergencyPosition().catch(() => null).finally(() => {
-      locationRequest.current = null;
-    });
+    if (!locationRequest.current) {
+      const controller = new AbortController();
+      locationAbort.current = controller;
+      setLocating(true);
+      const request = getEmergencyPosition({ signal: controller.signal }).catch(() => null).finally(() => {
+        if (locationRequest.current === request) {
+          locationRequest.current = null;
+          locationAbort.current = null;
+          if (focused.current) setLocating(false);
+        }
+      });
+      locationRequest.current = request;
+    }
+    const controller = locationAbort.current;
     const next = await locationRequest.current;
-    if (focused.current) setStoredPosition(next);
+    if (focused.current && !controller?.signal.aborted && next) setStoredPosition(next);
   }, [setStoredPosition]);
 
   useFocusEffect(useCallback(() => {
     let active = true;
     focused.current = true;
+    setLocating(false);
     void Promise.all([
-      getSetting(db, 'map_offline_ready'),
+      mapController.reconcile(),
       getSetting(db, 'map_location_disclosure_accepted'),
     ]).then(([mapValue, consentValue]) => {
       if (!active) return;
-      const ready = mapValue === '1' && MAP_PROVIDER_READY;
+      const ready = mapValue.status === 'ready' && MAP_PROVIDER_READY;
       setMapDownloaded(ready);
       const allowed = consentValue === '1';
       setLocationConsent((current) => allowed ? 'accepted' : current === 'declined' ? current : 'prompt');
-      if (allowed && !useAppStore.getState().lastPosition) void locate();
+      if (allowed && !isFreshPosition(useAppStore.getState().lastPosition)) void locate();
     }).catch(() => {
       if (active) setLocationConsent((current) => current === 'loading' ? 'prompt' : current);
     });
     return () => {
       active = false;
       focused.current = false;
+      locationAbort.current?.abort();
+      locationAbort.current = null;
+      locationRequest.current = null;
     };
-  }, [db, locate]));
+  }, [db, locate, mapController]));
 
   async function acceptLocationDisclosure() {
     await setSetting(db, 'map_location_disclosure_accepted', '1');
@@ -126,7 +167,8 @@ export default function MapScreen() {
     await locate();
   }
 
-  const origin = position ?? BAMAKO;
+  const permittedPosition = locationConsent === 'accepted' ? position : null;
+  const origin = permittedPosition ?? BAMAKO;
   const visible = useMemo(
     () => FACILITIES
       .filter((facility) => filter === 'tout' || facility.category === filter || (filter === 'police' && facility.category === 'gendarmerie'))
@@ -157,7 +199,7 @@ export default function MapScreen() {
           const on = filter === item.id;
           return (
             <Pressable accessibilityRole="button" accessibilityLabel={`Filtrer : ${item.label}`} accessibilityState={{ selected: on }} key={item.id} onPress={() => setFilter(item.id)} style={[s.filter, largeText && s.filterLarge, on && s.filterOn]}>
-              <Text maxFontSizeMultiplier={1.3} style={[s.filterText, on && s.filterTextOn]}>{item.label}</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} maxFontSizeMultiplier={1.3} style={[s.filterText, on && s.filterTextOn]}>{item.label}</Text>
             </Pressable>
           );
         })}
@@ -175,11 +217,12 @@ export default function MapScreen() {
         </Notice>
       ) : null}
 
-      {!position && locationConsent !== 'loading' && locationConsent !== 'prompt' ? (
+      {!permittedPosition && locationConsent !== 'loading' && locationConsent !== 'prompt' ? (
         <Tag label="Distances depuis le centre de Bamako" tone="warning" dot />
-      ) : position ? (
-        <Tag label="Distances depuis ma position" tone="primary" dot />
+      ) : permittedPosition ? (
+        <Tag label={isFreshPosition(permittedPosition) ? 'Distances depuis ma position' : 'Distances depuis la dernière position connue'} tone={isFreshPosition(permittedPosition) ? 'success' : 'warning'} dot />
       ) : null}
+      {locationConsent === 'accepted' ? <Button label="Actualiser ma position" size="md" variant="ghost" loading={locating} onPress={() => void locate()} /> : null}
 
       {!mapDownloaded ? (
         <ListRow
@@ -194,7 +237,7 @@ export default function MapScreen() {
 
       {mode === 'map' && mapDownloaded ? (
         <View style={s.mapWrap}>
-          {isFocused ? (
+          {isFocused && headersReady ? (
             <Map mapStyle={MAP_STYLE_URL!} style={s.map} onRegionIsChanging={saveViewport} onRegionDidChange={saveViewport}>
               <Camera initialViewState={savedViewport.current ?? { center: [origin.longitude, origin.latitude], zoom: 12 }} />
               {visible.map(({ facility }) => (

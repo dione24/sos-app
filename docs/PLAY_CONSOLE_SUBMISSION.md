@@ -1,4 +1,4 @@
-# Saisie Play Console — SOS Sécurité Mali 1.0.0
+# Saisie Play Console — Nafalan 1.0.2
 
 ## Passage en production — 6 novembre 2026
 
@@ -24,7 +24,7 @@ Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 
 | Champ | Valeur à saisir |
 | --- | --- |
-| Nom | SOS Sécurité Mali |
+| Nom | Nafalan — SOS & secours |
 | Langue par défaut | Français (fr-FR) |
 | Type | Application |
 | Catégorie | Médecine |
@@ -80,7 +80,7 @@ corporels, recherche clinique, vente de médicaments ou télémédecine.
 
 Justification à copier :
 
-> SOS Sécurité Mali fournit des instructions générales de premiers secours, un
+> Nafalan fournit des instructions générales de premiers secours, un
 > métronome RCP, un annuaire d'urgence et un dossier médical facultatif stocké
 > localement. L'application n'est pas un dispositif médical et ne diagnostique, ne
 > traite, ne guérit ni ne prévient aucune affection. Pour tout conseil, diagnostic

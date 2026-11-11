@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@/db/write-transaction', () => ({
+  registerDatabaseEncryptionKey: vi.fn(),
+  withExclusiveDatabaseTransaction: async (db: { withTransactionAsync: (task: () => Promise<void>) => Promise<void> }, task: (db: unknown) => Promise<void>) => db.withTransactionAsync(() => task(db)),
+}));
+
 import { migrateDatabase, replaceProfileFromImport } from '../database';
 
 describe('database lifecycle', () => {
@@ -7,7 +12,7 @@ describe('database lifecycle', () => {
     const execAsync = vi.fn().mockResolvedValue(undefined);
     const getFirstAsync = vi.fn()
       .mockResolvedValueOnce({ cipher_version: '4.6.1' })
-      .mockResolvedValueOnce({ user_version: 2 });
+      .mockResolvedValueOnce({ user_version: 3 });
     const db = { execAsync, getFirstAsync } as never;
 
     await migrateDatabase(db, 'a'.repeat(64));
