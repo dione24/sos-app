@@ -126,7 +126,7 @@ export default function WeatherScreen() {
   const fallback = weather?.source === 'fallback';
   const sourceTag =
     weather?.source === 'network'
-      ? { label: 'À jour', tone: 'primary' as const }
+      ? { label: 'À jour', tone: 'success' as const }
       : weather?.source === 'cache'
         ? { label: 'Dernière prévision', tone: 'warning' as const }
         : weather?.source === 'fallback'

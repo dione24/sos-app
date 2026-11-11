@@ -43,6 +43,8 @@ const useStyles = makeStyles((t) => ({
   neutralTitle: {},
   primary: { backgroundColor: t.colors.primaryBg, borderColor: t.colors.primaryBorder },
   primaryTitle: { color: t.colors.primaryText },
+  success: { backgroundColor: t.colors.successBg, borderColor: t.colors.successBorder },
+  successTitle: { color: t.colors.successText },
   warning: { backgroundColor: t.colors.warningBg, borderColor: t.colors.warningBorder },
   warningTitle: { color: t.colors.warningText },
   danger: { backgroundColor: t.colors.dangerBg, borderColor: t.colors.dangerBorder },

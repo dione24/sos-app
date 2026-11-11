@@ -220,7 +220,7 @@ export default function MapScreen() {
       {!permittedPosition && locationConsent !== 'loading' && locationConsent !== 'prompt' ? (
         <Tag label="Distances depuis le centre de Bamako" tone="warning" dot />
       ) : permittedPosition ? (
-        <Tag label={isFreshPosition(permittedPosition) ? 'Distances depuis ma position' : 'Distances depuis la dernière position connue'} tone={isFreshPosition(permittedPosition) ? 'primary' : 'warning'} dot />
+        <Tag label={isFreshPosition(permittedPosition) ? 'Distances depuis ma position' : 'Distances depuis la dernière position connue'} tone={isFreshPosition(permittedPosition) ? 'success' : 'warning'} dot />
       ) : null}
       {locationConsent === 'accepted' ? <Button label="Actualiser ma position" size="md" variant="ghost" loading={locating} onPress={() => void locate()} /> : null}
 

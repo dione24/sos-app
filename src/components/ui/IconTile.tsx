@@ -10,6 +10,7 @@ export function useToneColor(tone: Tone = 'neutral') {
   return {
     neutral: colors.inkMuted,
     primary: colors.primaryText,
+    success: colors.successText,
     warning: colors.warningText,
     danger: colors.dangerText,
     info: colors.infoText,
@@ -39,6 +40,7 @@ const useStyles = makeStyles((t) => ({
   base: { alignItems: 'center', justifyContent: 'center' },
   neutral: { backgroundColor: t.colors.surfaceAlt, borderWidth: 1, borderColor: t.colors.border },
   primary: { backgroundColor: t.colors.primaryBg },
+  success: { backgroundColor: t.colors.successBg },
   warning: { backgroundColor: t.colors.warningBg },
   danger: { backgroundColor: t.colors.dangerBg },
   info: { backgroundColor: t.colors.infoBg },

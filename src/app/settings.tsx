@@ -81,12 +81,12 @@ export default function SettingsScreen() {
       <SectionHeader title={t('settings_map')} aside="≈ 85 Mo" />
       <Card style={s.mapCard}>
         <View style={s.cardTop}>
-          <IconTile tone={mapReady ? 'primary' : 'info'}>{mapReady ? <Check size={22} color={colors.primaryText} /> : <MapPinned size={22} color={colors.infoText} />}</IconTile>
+          <IconTile tone={mapReady ? 'success' : 'info'}>{mapReady ? <Check size={22} color={colors.successText} /> : <MapPinned size={22} color={colors.infoText} />}</IconTile>
           <View style={s.cardCopy}>
             <Text maxFontSizeMultiplier={1.4} style={s.cardTitle}>{mapReady ? 'Carte de Bamako prête' : mapAvailable ? 'Ajouter la carte de Bamako' : 'Liste des lieux prête'}</Text>
             <Text maxFontSizeMultiplier={1.5} style={s.cardText}>{mapReady ? 'Vous pouvez maintenant afficher les lieux sur la carte.' : mapAvailable ? 'Téléchargez-la une fois avec une connexion Wi-Fi.' : 'Hôpitaux, pharmacies et commissariats restent consultables.'}</Text>
           </View>
-          <Tag label={mapReady ? 'Prête' : mapAvailable ? 'À télécharger' : 'Indisponible'} tone={mapReady ? 'primary' : mapAvailable ? 'info' : 'neutral'} />
+          <Tag label={mapReady ? 'Prête' : mapAvailable ? 'À télécharger' : 'Indisponible'} tone={mapReady ? 'success' : mapAvailable ? 'info' : 'neutral'} />
         </View>
         {downloading ? (
           <View style={s.progressWrap}>

@@ -7,7 +7,7 @@
     "icon": "./assets/images/app-icon.png",
     "scheme": "sosmali",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#F7F6F2",
+    "backgroundColor": "#F7F7F8",
     "android": {
       "package": "ml.sossecurite.app",
       "allowBackup": false,
@@ -21,7 +21,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-foreground.png",
-        "backgroundColor": "#F7F6F2"
+        "backgroundColor": "#F7F7F8"
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -173,7 +173,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F6F2",
+          "backgroundColor": "#F7F7F8",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 220,
           "resizeMode": "contain"

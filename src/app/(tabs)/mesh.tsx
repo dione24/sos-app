@@ -309,8 +309,8 @@ export default function MeshScreen() {
       ) : null}
 
       <Card style={s.status}>
-        <IconTile tone={active ? 'primary' : 'neutral'}>
-          <Bluetooth size={22} color={active ? colors.primaryText : colors.inkMuted} />
+        <IconTile tone={active ? 'success' : 'neutral'}>
+          <Bluetooth size={22} color={active ? colors.successText : colors.inkMuted} />
         </IconTile>
         <View style={s.statusCopy}>
           <Text maxFontSizeMultiplier={1.4} style={s.statusValue}>{scanStatus}</Text>
@@ -341,7 +341,7 @@ export default function MeshScreen() {
       ) : null}
 
       <Notice
-        icon={<MessageSquareText size={20} color={bridgeOnline ? colors.primaryText : colors.inkFaint} />}
+        icon={<MessageSquareText size={20} color={bridgeOnline ? colors.successText : colors.inkFaint} />}
         title="Envoyer la dernière alerte par SMS"
         text="Le message est préparé pour vous. Vous choisissez le destinataire et confirmez toujours l'envoi."
       >

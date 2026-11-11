@@ -194,10 +194,11 @@ export default function SosScreen() {
     await sendMesh(true);
   }
 
+  const freshPosition = position ? isFreshPosition(position) : false;
   const positionLabel = locating
     ? 'Recherche de la position…'
     : position
-      ? `${isFreshPosition(position) ? 'Position ajoutée' : 'Dernière position connue'}${position.accuracy ? ` · ± ${Math.round(position.accuracy)} m` : ''}`
+      ? `${freshPosition ? 'Position ajoutée' : 'Dernière position connue'}${position.accuracy ? ` · ± ${Math.round(position.accuracy)} m` : ''}`
       : locationConsent === 'declined'
         ? 'Position non ajoutée'
         : 'Position indisponible';
@@ -247,8 +248,8 @@ export default function SosScreen() {
 
         <Card style={s.positionCard}>
           <View style={s.positionRow}>
-            {locating ? <LoaderCircle size={22} color={colors.inkMuted} /> : <MapPin size={22} color={position ? colors.primaryText : colors.infoText} />}
-            <Text maxFontSizeMultiplier={1.4} style={[s.positionText, position && s.positionOk]}>
+            {locating ? <LoaderCircle size={22} color={colors.inkMuted} /> : <MapPin size={22} color={position ? freshPosition ? colors.successText : colors.warningText : colors.infoText} />}
+            <Text maxFontSizeMultiplier={1.4} style={[s.positionText, position && (freshPosition ? s.positionOk : s.positionStale)]}>
               {locationConsent === 'loading' ? 'Préparation de la position…' : locationConsent === 'prompt' ? 'Ajouter votre position au SOS' : positionLabel}
             </Text>
           </View>
@@ -317,7 +318,7 @@ export default function SosScreen() {
               label={meshSending ? 'Partage en cours…' : meshSent ? 'Partager à nouveau autour de moi' : 'Alerter autour de moi'}
               onPress={() => void sendMesh()}
               variant="secondary"
-              icon={<RadioTower size={22} color={meshSent && !meshSending ? colors.primaryText : colors.ink} />}
+              icon={<RadioTower size={22} color={meshSent && !meshSending ? colors.successText : colors.ink} />}
               loading={meshSending}
               disabled={meshSending}
             />
@@ -393,7 +394,8 @@ const useStyles = makeStyles((t) => ({
   positionCard: { gap: t.spacing.sm },
   positionRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
   positionText: { ...t.text.bodyStrong, flex: 1 },
-  positionOk: { color: t.colors.primaryText },
+  positionOk: { color: t.colors.successText },
+  positionStale: { color: t.colors.warningText },
   positionActions: { flexDirection: 'row', gap: t.spacing.xs },
   positionButton: { flex: 1 },
   actions: { gap: t.spacing.sm },

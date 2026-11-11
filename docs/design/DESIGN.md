@@ -1,41 +1,104 @@
-# Système de design — SOS Sécurité Mali
+# Système de design — Nafalan
 
-Direction : **sobre, lisible au soleil, utilisable d'une main et sous stress**. Le rouge est réservé au SOS ; tout le reste est calme. Une seule famille de police, un seul set d'icônes, une grille 4/8. Comparatif avant/après : `docs/design/screens/comparatif.html`.
+Direction validée le **11 novembre 2026** : sobre, lisible et cohérente avec le
+bouclier rouge du logo. Les actions ordinaires et les liens appartiennent à la
+famille rouge profond ; le SOS reste distinct par son rouge vif, sa taille et
+son libellé. Le vert sert uniquement à un état positif explicite, jamais au CTA
+principal. Les trois petites barres du drapeau malien dans l'icône sont conservées.
 
 ## Principes
-- **SOS en un geste** : bouton SOS de 220 px sur l'accueil, bouton flottant « SOS » sur les autres onglets, appel principal toujours en pied d'écran fixe.
-- **Cibles ≥ 56 px** pour les actions critiques (appeler, SOS, suivant), ≥ 48 px pour les contrôles secondaires ; jamais de lien texte sans zone de touche.
-- **Lisibilité** : corps 16 px, jamais moins de 13 px ; contrastes AA (texte ≥ 4,5:1, grands titres et icônes ≥ 3:1) vérifiés dans les deux thèmes.
-- **Sobriété** : aplats, pas de dégradé, pas de halo décoratif ; cartes blanches sur fond gris clair, bordures 1 px.
-- **Français d'abord**, bambara prévu (chaînes dans `src/i18n`, sélecteur présent mais désactivé jusqu'à validation).
-- **Un seul set d'icônes** : Lucide, trait 2, tailles 20 / 24 (32 pour les tuiles de guide).
 
-## Couleurs (`src/theme/tokens.ts`)
-| Rôle | Clair | Sombre | Usage |
-|---|---|---|---|
-| Fond / surface | `#F2F4F7` / `#FFFFFF` | `#0B1220` / `#141B2B` | écran, cartes |
-| Bordure | `#E4E7EC` | `#27324A` | cartes, champs |
-| Encre / atténuée / discrète | `#0F172A` / `#475467` / `#667085` | `#F3F4F6` / `#AAB4C3` / `#8A94A6` | texte |
-| **SOS** | `#C8102E` (pressé `#A50D25`) | identique | bouton SOS, appels d'urgence, erreurs |
-| Danger (texte / fond) | `#B42318` / `#FEF3F2` | `#FDA29B` / `#2B1210` | messages critiques |
-| **Primaire** (vert profond) | `#0B6E4F` (pressé `#09583F`) | `#3CCB9A` sur texte `#04281E` | actions normales, sélection, positif |
-| Primaire (texte / fond) | `#0B6E4F` / `#E6F4EE` | `#6CE9B9` / `#12352B` | liens, états validés |
-| Avertissement | `#B54708` / `#FFF6ED` | `#FDB022` / `#2E1F08` | données périmées, à vérifier |
-| Info | `#175CD3` / `#EFF6FF` | `#84CAFF` / `#102A4A` | position, carte |
+- **SOS en un geste** : bouton de 220 px sur l'accueil, bouton flottant sur les
+  autres onglets, appel principal clairement identifié en pied d'écran.
+- **Cibles tactiles** : au moins 56 px pour les actions critiques, 48 px pour les
+  contrôles secondaires ; ne pas réduire un lien à une petite zone de texte.
+- **Cible AA** : texte courant au moins 4,5:1 ; grands textes et icônes utiles au
+  moins 3:1. Vérifier le couple texte/fond réel dans les deux thèmes et les états
+  pressé/focus ; les bordures décoratives ne constituent pas le seul repère.
+- **États explicites** : couleur accompagnée de texte et/ou d'une icône. Le vert
+  signifie succès ou vérification, l'ambre une attente ou une donnée à confirmer.
+- **Sobriété** : surfaces neutres, aplats, bordures discrètes ; les halos rosés
+  appartiennent au logo. Pas de dégradé décoratif dans les écrans.
+- **Français d'abord** : le bamanankan reste désactivé jusqu'à validation des
+  traductions et enregistrements.
 
-Pourquoi changer : le corail `#FF5A3D` + texte noir se lisait « orange » (3,6:1) et l'appel au 122 était brun. Le rouge `#C8102E` (5,9:1 avec du blanc) est le rouge des secours ; le vert profond rappelle le drapeau sans crier et laisse le rouge au seul SOS. Le mode sombre suit le réglage du téléphone (`userInterfaceStyle: automatic`).
+## Palette de référence
 
-## Typographie (DM Sans uniquement)
-display 40/46 bold (« SOS ») · h1 28/34 bold · h2 22/28 bold · h3 18/24 semibold · body 16/24 · bodyStrong 16 semibold · caption 14/20 · overline 13/16 semibold capitales (rare). `maxFontSizeMultiplier` 1,3–1,6 selon le rôle ; les grilles passent en colonne au-delà de 1,3.
+La source applicative est [`src/theme/tokens.ts`](../../src/theme/tokens.ts).
+Le mode sombre suit le réglage du téléphone.
 
-## Espacement, rayons, ombres
-Grille 4/8 : 4, 8, 12, 16, 20, 24, 32, 40. Marge d'écran 16, écart entre blocs 16. Rayons : 8 (puces), 12 (contrôles), 16 (cartes), 20 (grandes cartes), pleine (pilules, SOS). Ombres : aucune sur les cartes (bordure 1 px), une ombre douce uniquement sur les éléments flottants (SOS, FAB).
+| Rôle | Clair | Sombre |
+| --- | --- | --- |
+| Fond / surface / alternative | `#F7F7F8` / `#FFFFFF` / `#F3F3F5` | `#121114` / `#1D1B20` / `#26232A` |
+| Bordure / focus neutre | `#E4E4E8` / `#8E8795` | `#39343E` / `#81778A` |
+| Encre / atténuée / discrète | `#1C1C24` / `#52525F` / `#6B6B78` | `#F7F4F6` / `#C4BEC6` / `#A39CA8` |
+| Primaire / pressé / texte sur bouton | `#A61B35` / `#87142A` / `#FFFFFF` | `#C83C59` / `#AD2B47` / `#FFFFFF` |
+| Primaire texte / fond / bordure | `#A61B35` / `#FCECEF` / `#E8B6C1` | `#FDA4B5` / `#371D27` / `#764051` |
+| SOS / pressé / texte | `#C8102E` / `#A50D25` / `#FFFFFF` | `#DE163B` / `#BA1231` / `#FFFFFF` |
+| Danger texte / fond / bordure | `#B4232D` / `#FDEFF1` / `#F2BAC3` | `#FFB1B9` / `#38191E` / `#81424A` |
+| Succès texte / fond / bordure | `#16634A` / `#ECF6F0` / `#BADBC7` | `#87D8AE` / `#172D25` / `#335B48` |
+| Avertissement texte / fond | `#B54708` / `#FFF6ED` | `#FDB022` / `#2E1F08` |
+| Information texte / fond | `#475569` / `#F0F1F4` | `#BDC7D6` / `#22262F` |
 
-## Composants (`src/components/ui/`)
-- **Button** : `sos` (rouge), `primary` (vert), `secondary` (surface + bordure), `ghost` ; hauteur 56 (`size="md"` : 48) ; icône à gauche, état chargement, désactivé à 45 %.
-- **IconButton** 48 px ; **EmergencyFab** : pilule rouge « SOS » avec icône, au-dessus de la barre d'onglets.
-- **Card** (`tone` neutral / primary / warning / danger / info) ; **ListRow** (tuile d'icône 44, titre, sous-titre, chevron ou texte) ; **IconTile** ; **SectionHeader** (titre + aparté) ; **Tag** (pilule 28 px, rare) ; **Notice** (bandeau icône + texte) ; **ToggleRow** (titre + Switch) ; **Field** (libellé 14, champ 56, focus vert) ; **EmptyState** (icône, titre, texte, action) ; **StepProgress** ; **Divider**.
-- **AppHeader** : retour 48 px, titre h1 (ou h2 si long), sous-titre caption, action à droite. **Screen** : marges, pied fixe, dégagement du FAB.
+## Contrastes calculés sur les aplats
 
-## États
-Chargement : `ActivityIndicator` couleur primaire + texte. Vide : `EmptyState` avec action. Erreur / données périmées : `Notice` warning ou danger, jamais un simple texte gris. Pressé : fond pressé (boutons pleins) ou opacité 0,7. Désactivé : opacité 0,45 + `accessibilityState`.
+| Couple mesuré | Clair | Sombre |
+| --- | --- | --- |
+| Texte blanc / bouton primaire | **7,42:1** | **4,95:1** |
+| Texte blanc / primaire pressé | **9,71:1** | **6,54:1** |
+| Texte blanc / SOS | **5,88:1** | **4,90:1** |
+| Texte primaire / fond primaire | **6,50:1** | **8,16:1** |
+| Texte succès / fond succès | **6,51:1** | **8,66:1** |
+
+Ces rapports sont des calculs de luminance des couleurs fournies. Ils ne remplacent
+pas une recette visuelle native de tous les composants, états et tailles de texte.
+La recette fonctionnelle réalisée avec l'ancienne palette ne valide pas le rendu
+de la nouvelle charte. Les captures de fiche doivent provenir du nouveau build.
+
+## Typographie et composants
+
+Une seule famille de texte : **DM Sans**. Display 40/46 bold ; h1 28/34 bold ;
+h2 22/28 bold ; h3 18/24 semibold ; corps 16/24 ; légende 14/20 ; surligne 13/16.
+Respecter le redimensionnement de police et passer les grilles en colonne quand
+nécessaire. Les icônes Lucide utilisent les tailles 20/24, 32 pour les guides.
+
+- **Button** : `primary` rouge profond, `sos` rouge vif, `secondary` surface neutre,
+  `ghost` texte primaire ; icône et libellé utilisent le même contraste.
+- **Field / ToggleRow / onglet actif / StepProgress** : sélection et focus dans la
+  famille primaire rouge. Un état positif métier utilise le ton `success` dédié.
+- **Card / Notice / Tag / IconTile** : tons neutral, primary, success, warning,
+  danger ou info selon le sens ; ne pas convertir une donnée « à confirmer » en
+  validation verte.
+- **QR médical** : conserver son fond blanc et ses modules foncés, indépendamment
+  du thème ; ne pas recolorer le QR avec la palette de marque.
+
+Grille 4/8, marge d'écran 16, espacements 4/8/12/16/20/24/32/40. Rayons
+8/12/16/20 ou pleine pilule. Ombre douce réservée aux éléments flottants.
+Chargement accompagné de texte ; erreurs et données périmées explicitement
+nommées. L'état désactivé garde une indication accessible et ne repose pas sur
+la seule transparence.
+
+## Logo, splash et supports store
+
+Les SVG restent les sources : bouclier **`#C8102E`**, halo **`#FCECEF`**, trait
+rosé **`#E8B6C1`**, ponctuation blanche, fond neutre **`#F7F7F8`**. La géométrie
+du bouclier et les barres du drapeau sont conservées ; aucun corail ni anneau
+menthe ne sert d'accent de marque.
+
+Les PNG sont rendus par `rsvg-convert` : icône app 1024² et store 512² en **RGB
+opaque** ; adaptive foreground 1024² et splash 512² avec **alpha conservé** ;
+feature graphic 1024 × 500 en RGB. Le visuel store emploie les rouges et neutres
+ci-dessus. Le HTML de confidentialité utilise les mêmes familles de couleurs et
+DM Sans ; son contenu et sa date restent indépendants de cette modification CSS.
+Pour le rendu texte du SVG, Fontconfig charge les fontes DM Sans 400/500/600/700
+de `node_modules/@expo-google-fonts/dm-sans/` ; aucune fonte système n'est installée.
+
+Sur le visuel store, les rapports calculés sont **15,81:1** pour le titre,
+**7,18:1** pour le texte secondaire, **6,93:1** pour l'accent et **5,88:1** pour
+le texte blanc du SOS. Sur le HTML, les textes et liens atteignent au moins
+**6,93:1** en clair et **9,07:1** en sombre sur les fonds et surfaces déclarés.
+Ces calculs portent sur les aplats, sans promesse de validation complète des
+écrans ni du rendu des stores.
+
+Les captures historiques et le [comparatif antérieur](screens/comparatif.html)
+restent des archives. Ils ne décrivent pas la charte du 11 novembre 2026.

@@ -43,7 +43,7 @@ const useStyles = makeStyles((t) => ({
     borderWidth: 1,
     borderColor: t.colors.border,
   },
-  selected: { backgroundColor: t.colors.primaryBg, borderColor: t.colors.primaryBorder },
+  selected: { backgroundColor: t.colors.primaryBg, borderColor: t.colors.primary },
   pressed: { opacity: 0.7 },
   disabled: { opacity: 0.45 },
 }));

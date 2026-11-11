@@ -373,8 +373,8 @@ export default function ProfileScreen() {
           )}
 
           <Notice
-            icon={<ShieldCheck size={20} color={profile.includeInSos ? colors.primaryText : colors.inkFaint} />}
-            tone={profile.includeInSos ? 'primary' : 'neutral'}
+            icon={<ShieldCheck size={20} color={profile.includeInSos ? colors.successText : colors.inkFaint} />}
+            tone={profile.includeInSos ? 'success' : 'neutral'}
             title={`Partage SOS ${profile.includeInSos ? 'autorisé' : 'désactivé'}`}
             text="Une confirmation reste demandée au déclenchement."
           />
