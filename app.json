@@ -69,6 +69,15 @@
       "expo-dev-client",
       "./plugins/with-android-manifest-hardening",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
+      [
         "expo-sqlite",
         {
           "useSQLCipher": true

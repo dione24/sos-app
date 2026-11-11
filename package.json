@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "postinstall": "patch-package --error-on-fail",
     "verify:android-manifest": "bash scripts/verify-android-manifest.sh",
     "verify:android-release": "bash scripts/verify-android-release.sh",
     "verify:fgs-video": "node scripts/verify-fgs-video.mjs",
@@ -28,6 +29,7 @@
     "expo": "~57.0.32",
     "expo-asset": "~57.0.10",
     "expo-audio": "~57.0.5",
+    "expo-build-properties": "~57.0.23",
     "expo-clipboard": "~57.0.2",
     "expo-constants": "~57.0.10",
     "expo-crypto": "~57.0.4",
@@ -50,6 +52,7 @@
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.4",
     "lucide-react-native": "^1.31.0",
+    "patch-package": "8.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
@@ -67,6 +70,18 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "typescript": "~6.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "@expo/fingerprint": {
+      "glob": "14.0.4",
+      "minimatch": "11.0.5"
+    },
+    "metro": {
+      "image-size": "2.0.3"
+    },
+    "query-string": {
+      "decode-uri-component": "0.5.1"
+    }
   }
 }
