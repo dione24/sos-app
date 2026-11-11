@@ -7,7 +7,7 @@ import Mail from 'lucide-react-native/icons/mail';
 import RadioTower from 'lucide-react-native/icons/radio-tower';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import Trash2 from 'lucide-react-native/icons/trash-2';
-import { useNavigationContainerRef } from 'expo-router';
+import { useNavigation, type NativeStackNavigationProp } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { Alert, Linking, Text, View } from 'react-native';
@@ -55,7 +55,7 @@ export default function PrivacyScreen() {
   const s = useStyles();
   const { colors } = useTheme();
   const db = useSQLiteContext();
-  const navigation = useNavigationContainerRef();
+  const navigation = useNavigation<NativeStackNavigationProp<{ onboarding: undefined }>>();
   const [deleting, setDeleting] = useState(false);
 
   async function eraseEverything() {
@@ -71,7 +71,9 @@ export default function PrivacyScreen() {
       clearMedicalTemporaryFiles();
       // Replace the entire history, not only Privacy: an old mounted dossier
       // must never be reachable (or saved again) with Android's Back button.
-      navigation.resetRoot({ index: 0, routes: [{ name: 'onboarding' }] });
+      // Reset this Stack, whose routes include onboarding. Expo Router wraps
+      // it in an outer navigator: resetRoot with a Stack route is ignored there.
+      navigation.reset({ index: 0, routes: [{ name: 'onboarding' }] });
     } catch {
       Alert.alert('Suppression interrompue', "Les données n'ont pas pu être effacées complètement. Réessayez. Si le problème continue, redémarrez l'application.");
     } finally {
