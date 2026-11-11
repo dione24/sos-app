@@ -6,14 +6,18 @@ La source runtime courante est **`15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7`** :
 maintenance des dépendances `ba8ff2c`, charte rouge `636fc72`, puis adaptation des
 icônes de la barre système au thème actif `15bb5e5`.
 
-**Statut : release et visuels enregistrés dans Play Console, pas encore envoyés
-pour examen.**
-Google accepte l'AAB 1.0.2 (8), API 36, quatre ABI, et son mapping ReTrace.
-Le déploiement **100 % vers les pays existants, Mali**, et les huit captures
-rouges ordonnées sont enregistrés dans la console.
-Les contrôles statiques, la recette privée et les huit visuels finaux sont acquis
-dans les périmètres détaillés ci-dessous. Le reçu d'envoi, l'examen Google, la
-disponibilité publique et la fusion seront consignés séparément.
+**Statut : branche fusionnée et soumission de production enregistrée le
+11 novembre 2026 vers 11:02 UTC. Les vérifications automatiques Google sont
+terminées et la Console affiche « Vos modifications sont en cours d’examen ».
+Aucune approbation ni disponibilité publique n'est encore confirmée.**
+
+[PR #6](https://github.com/dione24/sos-app/pull/6) fusionnée dans `main` :
+`e52db5214d46c174c9704030ec10098f27b76749`. La release **1.0.2 (8) — Nafalan**
+remplace la demande d'examen de la 1.0.1 (7). Elle prévoit le déploiement complet
+**100 % au Mali**, avec le nouveau nom, l'icône, les huit captures rouges et le
+visuel de présentation. La publication gérée reste désactivée : la diffusion
+suivra l'approbation Google.
+
 
 Les observations API 36 déjà acquises sur `4efb453`, `829539d` et `5e548d1` sont
 conservées ci-dessous avec leur portée. Elles ne valident pas à elles seules le
@@ -234,14 +238,14 @@ constitue pas un échec général du transport.
 ## Politique et livraison
 
 La politique **Nafalan avec CSS rouge est déployée**, revue en navigateur et
-confirmée **READY** dans le navigateur. Source web :
+vérifiée en ligne. Source web :
 [`3eadcac6ec7b740728bfa9ab8577d31b8e1628d0`](https://github.com/dione24/sahelpay-landing/commit/3eadcac6ec7b740728bfa9ab8577d31b8e1628d0),
 [politique publique](https://www.sahelpay.ml/apps/sos-securite-mali/privacy).
 Le fichier HTML local et ce déploiement web restent deux artefacts distincts.
 
 Les **huit captures claires RGB** de la charte finale sont en place, leurs
 empreintes sont actualisées et le contrôle `verify:play-submission` passe.
-Les vues sombres et la barre système ont été relues dans le navigateur. La vidéo FGS
+Les vues sombres et la barre système ont été contrôlées sur les captures natives. La vidéo FGS
 publique conservée reste celle du **code 5**, preuve historique ; les clips du
 banc privé ne sont pas présentés comme une nouvelle démonstration publique de
 tous les parcours de la version Play.
@@ -250,9 +254,14 @@ Play Console estime la **nouvelle installation à 27,2 Mo**, soit **11,9 Mo de
 moins que le code 7**. C'est une estimation de distribution, pas un gain de
 vitesse mesuré sur téléphone ni la taille de l'APK universel quatre ABI.
 
-**À compléter par root après envoi :** référence de release/piste, date d'envoi,
-statut d'examen et fusion. L'acceptation de l'AAB et du mapping dans la console
-ne constitue pas une soumission pour examen, une approbation Google ou une
-disponibilité publique.
+La demande de production a été enregistrée dans la Console (release `3`, piste
+production) après confirmation de « Recommencer l'examen ». Cette confirmation
+annule et relance la demande précédente pour examiner la nouvelle version.
+La Console affiche la 1.0.2 (8) sous « Modifications en cours d'examen » et n'affiche
+plus de modifications non envoyées. Les vérifications rapides sont terminées : la Console confirme l’examen de
+la nouvelle version, sans action d’envoi restante.
+
+L'enregistrement de cette demande ne constitue ni une approbation Google ni une
+preuve de disponibilité publique. Aucun délai de validation n'est garanti.
 Le reçu structuré de cette livraison est
 [validation/nafalan-1.0.2-8.json](validation/nafalan-1.0.2-8.json).
