@@ -1,7 +1,10 @@
 import * as Crypto from 'expo-crypto';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { decideRelay, MESH_DEFAULT_TTL, MESH_ORIGIN_RATE_MAX, MESH_ORIGIN_RATE_WINDOW_MS, purgeBeforeTimestamp, type RelayDecision } from '@/lib/mesh';
+import { decideRelay, MESH_DEFAULT_TTL, MESH_ORIGIN_RATE_MAX, MESH_ORIGIN_RATE_WINDOW_MS, type RelayDecision } from '@/lib/mesh';
+import { MESH_HISTORY_RETENTION_MS, pruneMeshRecords } from '@/db/mesh-retention';
+import { withExclusiveDatabaseTransaction } from '@/db/write-transaction';
+import { meshOriginPosition } from '@/lib/mesh-origin-payload';
 import type { Coordinates, EmergencyType, MeshMessage, Severity } from '@/types/models';
 import { signMeshOrigin, verifyMeshOrigin } from '@/services/mesh-integrity';
 
@@ -15,14 +18,17 @@ export async function createMeshMessage(options: {
   const unsigned: Omit<MeshMessage, 'originHash' | 'originPublicKey' | 'originSignature'> = {
     id,
     emergencyType: options.emergencyType,
-    position: options.position,
+    position: meshOriginPosition(options.position),
     createdAt: Date.now(),
     hopsRemaining: MESH_DEFAULT_TTL,
     initialTtl: MESH_DEFAULT_TTL,
     severity: options.severity,
   };
-  const packet = await signMeshOrigin(unsigned);
-  await rememberAndSave(options.db, packet, 'sent');
+  let packet!: MeshMessage;
+  await withExclusiveDatabaseTransaction(options.db, async (transaction) => {
+    await claimAndSave(transaction, packet, 'sent');
+    await pruneMeshRecords(transaction);
+  }, { prepare: async () => { packet = await signMeshOrigin(unsigned); } });
   return packet;
 }
 
@@ -31,82 +37,104 @@ export async function rememberAndSave(
   message: MeshMessage,
   direction: 'sent' | 'received' | 'relayed',
 ) {
-  await db.withTransactionAsync(async () => {
-    await db.runAsync(
-      'INSERT OR IGNORE INTO mesh_seen_messages (message_id, seen_at) VALUES (?, ?)',
-      message.id,
-      Date.now(),
-    );
-    await db.runAsync(
-      `INSERT INTO sos_history
-        (message_id, direction, emergency_type, severity, payload_json, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)`,
-      message.id,
-      direction,
-      message.emergencyType,
-      message.severity,
-      JSON.stringify(message),
-      Date.now(),
-    );
+  await withExclusiveDatabaseTransaction(db, async (transaction) => {
+    await claimAndSave(transaction, message, direction);
+    await pruneMeshRecords(transaction);
   });
 }
 
-export async function markMessageRelayed(db: SQLiteDatabase, message: MeshMessage) {
-  await db.runAsync(
-    `UPDATE sos_history
-     SET direction = 'relayed', payload_json = ?, created_at = ?
-     WHERE id = (
-       SELECT id FROM sos_history WHERE message_id = ? ORDER BY id DESC LIMIT 1
-     )`,
-    JSON.stringify(message),
-    Date.now(),
+async function claimAndSave(db: SQLiteDatabase, message: MeshMessage, direction: 'sent' | 'received' | 'relayed') {
+  const claimed = await db.runAsync(
+    'INSERT OR IGNORE INTO mesh_seen_messages (message_id, seen_at) VALUES (?, ?)',
     message.id,
+    // Signed creation time aligns expiry with decideRelay, including future skew.
+    // An accepted packet must never become unseen while it is still valid.
+    message.createdAt,
   );
+  if (claimed.changes !== 1) return false;
+  const { medicalSummary: _medicalSummary, ...safeMessage } = message;
+  await db.runAsync(
+    `INSERT INTO sos_history
+      (message_id, direction, emergency_type, severity, payload_json, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+    message.id,
+    direction,
+    message.emergencyType,
+    message.severity,
+    JSON.stringify(safeMessage),
+    Date.now(),
+  );
+  return true;
 }
+
+export async function markMessageRelayed(db: SQLiteDatabase, message: MeshMessage) {
+  await withExclusiveDatabaseTransaction(db, async (transaction) => {
+    const { medicalSummary: _medicalSummary, ...safeMessage } = message;
+    await transaction.runAsync(
+      `UPDATE sos_history
+       SET direction = 'relayed', payload_json = ?, created_at = ?
+       WHERE direction = 'received' AND id = (
+         SELECT id FROM sos_history WHERE message_id = ? ORDER BY id DESC LIMIT 1
+       )`,
+      JSON.stringify(safeMessage),
+      Date.now(),
+      message.id,
+    );
+    await pruneMeshRecords(transaction);
+  });
+}
+
+class InvalidSignature extends Error {}
 
 export async function processIncomingMessage(db: SQLiteDatabase, message: MeshMessage) {
   const { medicalSummary: _medicalSummary, ...safeMessage } = message;
-  if (!(await verifyMeshOrigin(safeMessage))) {
-    return { relay: false, reason: 'invalid-signature' } satisfies RelayDecision;
+  try {
+    return await withExclusiveDatabaseTransaction(db, async (transaction): Promise<RelayDecision> => {
+      const now = Date.now();
+      const seen = await transaction.getFirstAsync<{ message_id: string }>(
+        'SELECT message_id FROM mesh_seen_messages WHERE message_id = ?', safeMessage.id,
+      );
+      const decision = decideRelay(safeMessage, new Set(seen ? [seen.message_id] : []), now);
+      if (!decision.relay) return decision;
+      const rate = await transaction.getFirstAsync<{ window_started_at: number; message_count: number }>(
+        'SELECT window_started_at, message_count FROM mesh_origin_rate WHERE origin_hash = ?', safeMessage.originHash,
+      );
+      if (rate && now - rate.window_started_at < MESH_ORIGIN_RATE_WINDOW_MS && rate.message_count >= MESH_ORIGIN_RATE_MAX) {
+        return { relay: false, reason: 'rate-limited' };
+      }
+      if (!(await claimAndSave(transaction, safeMessage, 'received'))) return { relay: false, reason: 'duplicate' };
+      if (!rate || now - rate.window_started_at >= MESH_ORIGIN_RATE_WINDOW_MS) {
+        await transaction.runAsync(
+          'INSERT INTO mesh_origin_rate (origin_hash, window_started_at, message_count) VALUES (?, ?, 1) ON CONFLICT(origin_hash) DO UPDATE SET window_started_at = excluded.window_started_at, message_count = 1',
+          safeMessage.originHash, now,
+        );
+      } else {
+        await transaction.runAsync('UPDATE mesh_origin_rate SET message_count = message_count + 1 WHERE origin_hash = ?', safeMessage.originHash);
+      }
+      // Return relay=true only after claim, quota and received history commit.
+      // Transport confirmation remains a separate, idempotent state transition.
+      await pruneMeshRecords(transaction, now);
+      return decision;
+    }, {
+      prepare: async () => {
+        if (!(await verifyMeshOrigin(safeMessage))) throw new InvalidSignature();
+      },
+    });
+  } catch (error) {
+    if (error instanceof InvalidSignature) return { relay: false, reason: 'invalid-signature' } satisfies RelayDecision;
+    throw error;
   }
-  const seen = await db.getFirstAsync<{ message_id: string }>(
-    'SELECT message_id FROM mesh_seen_messages WHERE message_id = ?',
-    safeMessage.id,
-  );
-  const decision = decideRelay(safeMessage, new Set(seen ? [seen.message_id] : []));
-  if (!decision.relay) return decision;
-  const now = Date.now();
-  const rate = await db.getFirstAsync<{ window_started_at: number; message_count: number }>(
-    'SELECT window_started_at, message_count FROM mesh_origin_rate WHERE origin_hash = ?',
-    safeMessage.originHash,
-  );
-  if (rate && now - rate.window_started_at < MESH_ORIGIN_RATE_WINDOW_MS && rate.message_count >= MESH_ORIGIN_RATE_MAX) {
-    return { relay: false, reason: 'rate-limited' } satisfies RelayDecision;
-  }
-  if (!rate || now - rate.window_started_at >= MESH_ORIGIN_RATE_WINDOW_MS) {
-    await db.runAsync(
-      'INSERT INTO mesh_origin_rate (origin_hash, window_started_at, message_count) VALUES (?, ?, 1) ON CONFLICT(origin_hash) DO UPDATE SET window_started_at = excluded.window_started_at, message_count = 1',
-      safeMessage.originHash,
-      now,
-    );
-  } else {
-    await db.runAsync('UPDATE mesh_origin_rate SET message_count = message_count + 1 WHERE origin_hash = ?', safeMessage.originHash);
-  }
-  // Receiving and actually retransmitting are distinct states. The caller only
-  // marks this row as relayed after Android confirms that BLE advertising began.
-  await rememberAndSave(db, safeMessage, 'received');
-  return decision;
 }
 
 export async function purgeSeenMessages(db: SQLiteDatabase) {
-  await db.runAsync('DELETE FROM mesh_seen_messages WHERE seen_at < ?', purgeBeforeTimestamp());
-  await db.runAsync('DELETE FROM mesh_origin_rate WHERE window_started_at < ?', Date.now() - MESH_ORIGIN_RATE_WINDOW_MS);
+  await withExclusiveDatabaseTransaction(db, (transaction) => pruneMeshRecords(transaction));
 }
 
 export async function getRecentMeshMessages(db: SQLiteDatabase) {
   const rows = await db.getAllAsync<{ payload_json: string; direction: string; created_at: number }>(
     `SELECT payload_json, direction, created_at FROM sos_history
-     ORDER BY created_at DESC LIMIT 30`,
+     WHERE created_at >= ? ORDER BY created_at DESC, id DESC LIMIT 30`,
+    Date.now() - MESH_HISTORY_RETENTION_MS,
   );
   return rows.map((row) => ({
     message: JSON.parse(row.payload_json) as MeshMessage,

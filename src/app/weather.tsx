@@ -1,4 +1,9 @@
-import { CloudLightning, CloudRain, CloudSun, MapPin, RefreshCw, Waves } from 'lucide-react-native';
+import CloudLightning from 'lucide-react-native/icons/cloud-lightning';
+import CloudRain from 'lucide-react-native/icons/cloud-rain';
+import CloudSun from 'lucide-react-native/icons/cloud-sun';
+import MapPin from 'lucide-react-native/icons/map-pin';
+import RefreshCw from 'lucide-react-native/icons/refresh-cw';
+import Waves from 'lucide-react-native/icons/waves-horizontal';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View, useWindowDimensions } from 'react-native';
@@ -7,7 +12,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
 import { Button, Card, Notice, Tag } from '@/components/ui';
 import { getSetting, setSetting } from '@/db/database';
-import { getEmergencyPosition } from '@/services/location';
+import { getEmergencyPosition, isFreshPosition } from '@/services/location';
 import { getCachedWeather, getLastCachedWeather, loadWeather } from '@/services/weather';
 import { useAppStore } from '@/store/app-store';
 import { makeStyles, useTheme } from '@/theme';
@@ -37,13 +42,18 @@ export default function WeatherScreen() {
   const [unsavedLocationChoice, setUnsavedLocationChoice] = useState<boolean | null>(null);
 
   const requestId = useRef(0);
+  const positionRequest = useRef<AbortController | null>(null);
 
   const refresh = useCallback(async (usePreciseLocation: boolean, forceRefresh = false) => {
     const request = ++requestId.current;
+    positionRequest.current?.abort();
+    const controller = new AbortController();
+    positionRequest.current = controller;
     const current = () => request === requestId.current;
     setLoading(true);
     setLocating(false);
-    let nextPosition = usePreciseLocation ? useAppStore.getState().lastPosition : null;
+    const previousPosition = useAppStore.getState().lastPosition;
+    let nextPosition = usePreciseLocation && isFreshPosition(previousPosition) ? previousPosition : null;
     try {
       // Montrer la prévision enregistrée avec son lieu et sa date avant d'attendre
       // un GPS ou le réseau. La dernière position n'est pas attribuée à Bamako.
@@ -54,8 +64,9 @@ export default function WeatherScreen() {
       setWeather(preview);
       if (usePreciseLocation && !nextPosition) {
         setLocating(true);
-        try { nextPosition = await getEmergencyPosition(); } catch { nextPosition = null; }
+        try { nextPosition = await getEmergencyPosition({ signal: controller.signal }); } catch { nextPosition = null; }
         if (!current()) return;
+        if (!isFreshPosition(nextPosition)) nextPosition = null;
         setLocating(false);
         if (nextPosition) setLastPosition(nextPosition);
         // Le cache affiché pendant le GPS pouvait appartenir à l'ancien lieu.
@@ -68,6 +79,7 @@ export default function WeatherScreen() {
       const nextWeather = await loadWeather(db, nextPosition, { forceRefresh });
       if (current()) setWeather(nextWeather);
     } finally {
+      if (positionRequest.current === controller) positionRequest.current = null;
       if (current()) { setLoading(false); setLocating(false); }
     }
   }, [db, setLastPosition]);
@@ -84,11 +96,12 @@ export default function WeatherScreen() {
       setWeatherLocationConsent(false);
       void refresh(false);
     });
-    return () => { mounted = false; requestId.current += 1; };
+    return () => { mounted = false; requestId.current += 1; positionRequest.current?.abort(); };
   }, [db, refresh]);
 
   async function changeWeatherLocation(accepted: boolean) {
     const request = ++requestId.current;
+    positionRequest.current?.abort();
     setLoading(true);
     setLocating(false);
     setUnsavedLocationChoice(null);

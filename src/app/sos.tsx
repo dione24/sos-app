@@ -1,24 +1,22 @@
 import * as SMS from 'expo-sms';
 import { useRouter } from 'expo-router';
-import {
-  Ambulance,
-  Bike,
-  Check,
-  CircleAlert,
-  Flame,
-  Info,
-  LoaderCircle,
-  MapPin,
-  MessageSquareText,
-  PhoneCall,
-  RadioTower,
-  ShieldAlert,
-  Stethoscope,
-  Waves,
-} from 'lucide-react-native';
+import Ambulance from 'lucide-react-native/icons/ambulance';
+import Bike from 'lucide-react-native/icons/bike';
+import Check from 'lucide-react-native/icons/check';
+import CircleAlert from 'lucide-react-native/icons/circle-alert';
+import Flame from 'lucide-react-native/icons/flame';
+import Info from 'lucide-react-native/icons/info';
+import LoaderCircle from 'lucide-react-native/icons/loader-circle';
+import MapPin from 'lucide-react-native/icons/map-pin';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import RadioTower from 'lucide-react-native/icons/radio-tower';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
+import Stethoscope from 'lucide-react-native/icons/stethoscope';
+import Waves from 'lucide-react-native/icons/waves-horizontal';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, AppState, Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { CallConfirm } from '@/components/CallConfirm';
@@ -27,7 +25,7 @@ import { Button, Card, Notice, ToggleRow } from '@/components/ui';
 import { EMERGENCY_NUMBERS } from '@/data';
 import { getContacts, getProfile, getSetting, setSetting } from '@/db/database';
 import { contactRecipients, formatSosMessage, selectAlternateEmergencyNumbers, selectEmergencyNumber } from '@/lib/sos';
-import { getEmergencyPosition } from '@/services/location';
+import { getEmergencyPosition, isFreshPosition } from '@/services/location';
 import { startBleAdvertising } from '@/services/ble-mesh';
 import { createMeshMessage } from '@/services/mesh-repository';
 import { confirmCall, openPhoneDialer } from '@/services/phone';
@@ -65,42 +63,64 @@ export default function SosScreen() {
   const [bleConsent, setBleConsent] = useState<boolean | null>(null);
   const [showBleDisclosure, setShowBleDisclosure] = useState(false);
   const [pendingCall, setPendingCall] = useState<{ number: string; service: string } | null>(null);
+  const mountedRef = useRef(true);
+  const locationRequest = useRef<AbortController | null>(null);
+  const broadcastRequest = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    mountedRef.current = true;
     void getSetting(db, 'location_disclosure_accepted').then((accepted) => {
       if (!mounted) return;
       const allowed = accepted === '1';
       setLocationConsent(allowed ? 'accepted' : 'prompt');
       if (allowed) void locate();
-    });
+    }).catch(() => { if (mounted) setLocationConsent('prompt'); });
     void getSetting(db, 'ble_disclosure_accepted').then((accepted) => {
       if (mounted) setBleConsent(accepted === '1');
-    });
+    }).catch(() => { if (mounted) setBleConsent(false); });
     void getProfile(db).then(async (nextProfile) => {
       if (!mounted) return;
       setProfile(nextProfile);
       setIncludeMedical(Boolean(nextProfile?.includeInSos));
-      if (nextProfile) setContacts(await getContacts(db, nextProfile.phone));
+      if (nextProfile) {
+        const nextContacts = await getContacts(db, nextProfile.phone);
+        if (mounted) setContacts(nextContacts);
+      }
+    }).catch(() => { /* Public emergency actions remain usable without a dossier. */ });
+    const appState = AppState.addEventListener('change', (state) => {
+      if (state === 'background') locationRequest.current?.abort();
     });
     return () => {
       mounted = false;
+      mountedRef.current = false;
+      locationRequest.current?.abort();
+      broadcastRequest.current?.abort();
+      appState.remove();
     };
   }, [db, setLastPosition]);
 
   async function locate() {
+    locationRequest.current?.abort();
+    const request = new AbortController();
+    locationRequest.current = request;
     setLocating(true);
     try {
-      const next = await getEmergencyPosition();
+      const next = await getEmergencyPosition({ signal: request.signal });
+      if (!mountedRef.current || request.signal.aborted) return;
       setPosition(next);
       setLastPosition(next);
     } finally {
-      setLocating(false);
+      if (mountedRef.current && locationRequest.current === request) setLocating(false);
     }
   }
 
   async function acceptLocationDisclosure() {
-    await setSetting(db, 'location_disclosure_accepted', '1');
+    try { await setSetting(db, 'location_disclosure_accepted', '1'); } catch {
+      Alert.alert('Choix non enregistré', 'Réessayez pour ajouter votre position. Les appels restent disponibles.');
+      return;
+    }
+    if (!mountedRef.current) return;
     setLocationConsent('accepted');
     await locate();
   }
@@ -112,6 +132,7 @@ export default function SosScreen() {
 
   async function sendSms() {
     const available = await SMS.isAvailableAsync();
+    if (!mountedRef.current) return;
     if (!available) {
       Alert.alert('SMS indisponible', "L'application SMS native n'est pas accessible sur cet appareil.");
       return;
@@ -137,6 +158,8 @@ export default function SosScreen() {
       return;
     }
     setMeshSending(true);
+    const request = new AbortController();
+    broadcastRequest.current = request;
     try {
       const packet = await createMeshMessage({
         db,
@@ -144,7 +167,9 @@ export default function SosScreen() {
         position,
         severity: type === 'autre' ? 'eleve' : 'critique',
       });
-      const broadcast = await startBleAdvertising(packet);
+      if (!mountedRef.current || request.signal.aborted) return;
+      const broadcast = await startBleAdvertising(packet, { signal: request.signal });
+      if (!mountedRef.current || request.signal.aborted) return;
       setMeshSent(broadcast.state === 'active');
       Alert.alert(
         broadcast.state === 'active' ? 'Alerte partagée autour de vous' : 'Alerte prête',
@@ -157,7 +182,7 @@ export default function SosScreen() {
         ],
       );
     } finally {
-      setMeshSending(false);
+      if (mountedRef.current) setMeshSending(false);
     }
   }
 
@@ -172,7 +197,7 @@ export default function SosScreen() {
   const positionLabel = locating
     ? 'Recherche de la position…'
     : position
-      ? `Position ajoutée${position.accuracy ? ` · ± ${Math.round(position.accuracy)} m` : ''}`
+      ? `${isFreshPosition(position) ? 'Position ajoutée' : 'Dernière position connue'}${position.accuracy ? ` · ± ${Math.round(position.accuracy)} m` : ''}`
       : locationConsent === 'declined'
         ? 'Position non ajoutée'
         : 'Position indisponible';

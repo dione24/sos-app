@@ -1,9 +1,9 @@
-# Saisie Play Console — SOS Sécurité Mali 1.0.0
+# Saisie Play Console — Nafalan 1.0.2
 
 ## Passage en production — 6 novembre 2026
 
 Le propriétaire a expressément demandé le passage en production et la fusion de la
-PR après le test interne. La version **1.0.0 (5)**, identique au bundle testé, a été
+PR après le test interne. La version **1.0.2 (5)**, identique au bundle testé, a été
 ajoutée au canal de production `4697930975691391093`, pour **le Mali**.
 Les dix modifications (release, pays, fiche française et déclarations) ont été
 envoyées : Play affiche « Modifications en cours d’examen », avec les vérifications
@@ -24,7 +24,7 @@ Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 
 | Champ | Valeur à saisir |
 | --- | --- |
-| Nom | SOS Sécurité Mali |
+| Nom | Nafalan — SOS & secours |
 | Langue par défaut | Français (fr-FR) |
 | Type | Application |
 | Catégorie | Médecine |
@@ -80,7 +80,7 @@ corporels, recherche clinique, vente de médicaments ou télémédecine.
 
 Justification à copier :
 
-> SOS Sécurité Mali fournit des instructions générales de premiers secours, un
+> Nafalan fournit des instructions générales de premiers secours, un
 > métronome RCP, un annuaire d'urgence et un dossier médical facultatif stocké
 > localement. L'application n'est pas un dispositif médical et ne diagnostique, ne
 > traite, ne guérit ni ne prévient aucune affection. Pour tout conseil, diagnostic
@@ -119,7 +119,7 @@ Classification IARC enregistrée avec accord du propriétaire : PEGI 3,
 ESRB Everyone, USK 12 ; présence d’interactions utilisateurs et partage de position.
 La cible commerciale reste exclusivement **18 ans et plus**.
 La fiche complète est enregistrée avec les textes, l’icône d’origine, le nouveau
-visuel et les sept captures natives code 5 ordonnées. La release **1.0.0 (5)** est
+visuel et les sept captures natives code 5 ordonnées. La release **1.0.2 (5)** est
 **active et accessible aux testeurs internes** depuis le 6 novembre 2026, 11 h 25 UTC.
 Elle est **non examinée**, sous le nom temporaire `ml.sossecurite.app (unreviewed)`.
 Deux comptes propriétaires sont sélectionnés dans une liste SOS dédiée ; leurs

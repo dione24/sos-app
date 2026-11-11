@@ -1,17 +1,24 @@
-import { OfflineManager } from '@maplibre/maplibre-react-native';
-import { useRouter } from 'expo-router';
-import { BookOpen, Check, CloudSun, Download, FileLock2, Languages, MapPinned, ShieldCheck } from 'lucide-react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import BookOpen from 'lucide-react-native/icons/book-open';
+import Check from 'lucide-react-native/icons/check';
+import CloudSun from 'lucide-react-native/icons/cloud-sun';
+import Download from 'lucide-react-native/icons/download';
+import FileLock2 from 'lucide-react-native/icons/file-lock';
+import Languages from 'lucide-react-native/icons/languages';
+import MapPinned from 'lucide-react-native/icons/map-pinned';
+import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { Screen } from '@/components/Screen';
 import { Button, Card, IconTile, ListRow, Notice, SectionHeader, Tag } from '@/components/ui';
-import { MAP_PROVIDER_READY, MAP_STYLE_URL } from '@/constants/map';
+import { MAP_PROVIDER_READY } from '@/constants/map';
 import { PUBLISHER } from '@/constants/publisher';
-import { getSetting, setSetting } from '@/db/database';
+import { setSetting } from '@/db/database';
 import { useI18n } from '@/i18n/use-i18n';
+import { getOfflineMapController } from '@/services/offline-map';
 import { makeStyles, useTheme } from '@/theme';
 import type { Language } from '@/types/models';
 
@@ -21,11 +28,18 @@ export default function SettingsScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const { language, setLanguage, t } = useI18n();
-  const [mapReady, setMapReady] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const mapController = getOfflineMapController(db);
+  const [mapState, setMapState] = useState(mapController.getSnapshot);
+  const mapReady = mapState.status === 'ready';
+  const mapAvailable = MAP_PROVIDER_READY && mapState.status !== 'unavailable';
+  const downloading = mapState.status === 'downloading';
+  const progress = mapState.progress;
 
-  useEffect(() => { void getSetting(db, 'map_offline_ready').then((value) => setMapReady(value === '1' && MAP_PROVIDER_READY)); }, [db]);
+  useFocusEffect(useCallback(() => {
+    const unsubscribe = mapController.subscribe(setMapState);
+    void mapController.reconcile();
+    return unsubscribe;
+  }, [mapController]));
 
   async function chooseLanguage(next: Language) {
     setLanguage(next);
@@ -34,40 +48,7 @@ export default function SettingsScreen() {
   }
 
   async function downloadMap() {
-    if (downloading) return;
-    if (!MAP_STYLE_URL) {
-      Alert.alert('Carte indisponible', 'Utilisez la liste des lieux utiles pour le moment.');
-      return;
-    }
-    setDownloading(true);
-    setProgress(0);
-    try {
-      const pack = await OfflineManager.createPack(
-        {
-          mapStyle: MAP_STYLE_URL,
-          bounds: [-8.15, 12.50, -7.85, 12.75],
-          minZoom: 9,
-          maxZoom: 15,
-          metadata: { name: 'Bamako hors ligne', createdAt: Date.now() },
-        },
-        (_offlinePack, status) => {
-          setProgress(Math.round(status.percentage));
-          if (status.state === 'complete' || status.percentage >= 99) {
-            setDownloading(false);
-            setMapReady(true);
-            void setSetting(db, 'map_offline_ready', '1');
-          }
-        },
-        () => {
-          setDownloading(false);
-          Alert.alert('Téléchargement interrompu', "Vérifiez la connexion et l'espace disponible, puis réessayez.");
-        },
-      );
-      await pack.resume();
-    } catch {
-      setDownloading(false);
-      Alert.alert('Carte indisponible', 'Vérifiez votre connexion puis réessayez.');
-    }
+    await mapController.start();
   }
 
   return (
@@ -102,10 +83,10 @@ export default function SettingsScreen() {
         <View style={s.cardTop}>
           <IconTile tone={mapReady ? 'primary' : 'info'}>{mapReady ? <Check size={22} color={colors.primaryText} /> : <MapPinned size={22} color={colors.infoText} />}</IconTile>
           <View style={s.cardCopy}>
-            <Text maxFontSizeMultiplier={1.4} style={s.cardTitle}>{mapReady ? 'Carte de Bamako prête' : MAP_PROVIDER_READY ? 'Ajouter la carte de Bamako' : 'Liste des lieux prête'}</Text>
-            <Text maxFontSizeMultiplier={1.5} style={s.cardText}>{mapReady ? 'Vous pouvez maintenant afficher les lieux sur la carte.' : MAP_PROVIDER_READY ? 'Téléchargez-la une fois avec une connexion Wi-Fi.' : 'Hôpitaux, pharmacies et commissariats restent consultables.'}</Text>
+            <Text maxFontSizeMultiplier={1.4} style={s.cardTitle}>{mapReady ? 'Carte de Bamako prête' : mapAvailable ? 'Ajouter la carte de Bamako' : 'Liste des lieux prête'}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={s.cardText}>{mapReady ? 'Vous pouvez maintenant afficher les lieux sur la carte.' : mapAvailable ? 'Téléchargez-la une fois avec une connexion Wi-Fi.' : 'Hôpitaux, pharmacies et commissariats restent consultables.'}</Text>
           </View>
-          <Tag label={mapReady ? 'Prête' : MAP_PROVIDER_READY ? 'À télécharger' : 'Indisponible'} tone={mapReady ? 'primary' : MAP_PROVIDER_READY ? 'info' : 'neutral'} />
+          <Tag label={mapReady ? 'Prête' : mapAvailable ? 'À télécharger' : 'Indisponible'} tone={mapReady ? 'primary' : mapAvailable ? 'info' : 'neutral'} />
         </View>
         {downloading ? (
           <View style={s.progressWrap}>
@@ -113,8 +94,12 @@ export default function SettingsScreen() {
             <Text maxFontSizeMultiplier={1.3} style={s.progressText}>{progress}%</Text>
           </View>
         ) : null}
-        {!mapReady && MAP_PROVIDER_READY ? (
-          <Button label={downloading ? `Téléchargement ${progress}%` : 'Télécharger maintenant'} onPress={() => void downloadMap()} variant="secondary" disabled={downloading} icon={<Download size={20} color={colors.ink} />} />
+        {mapState.status === 'error' ? <Notice tone="warning" text="Téléchargement interrompu. Vérifiez la connexion et l’espace disponible, puis reprenez la carte." /> : null}
+        {!mapReady && mapAvailable ? (
+          <>
+            <Button label={downloading ? `Téléchargement ${progress}%` : mapState.packId ? 'Reprendre le téléchargement' : 'Télécharger maintenant'} onPress={() => void downloadMap()} variant="secondary" disabled={downloading || mapState.status === 'checking'} icon={<Download size={20} color={colors.ink} />} />
+            {downloading ? <Button label="Mettre en pause" size="md" variant="ghost" onPress={() => void mapController.pause().catch(() => undefined)} /> : null}
+          </>
         ) : mapReady ? (
           <Button label="Ouvrir la carte" onPress={() => router.replace('/map')} variant="secondary" />
         ) : null}

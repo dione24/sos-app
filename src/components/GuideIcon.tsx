@@ -1,15 +1,13 @@
-import {
-  BedSingle,
-  Bone,
-  Droplets,
-  Flame,
-  HeartCrack,
-  HeartPulse,
-  PersonStanding,
-  ShieldAlert,
-  Waves,
-  Zap,
-} from 'lucide-react-native';
+import BedSingle from 'lucide-react-native/icons/bed-single';
+import Bone from 'lucide-react-native/icons/bone';
+import Droplets from 'lucide-react-native/icons/droplets';
+import Flame from 'lucide-react-native/icons/flame';
+import HeartCrack from 'lucide-react-native/icons/heart-crack';
+import HeartPulse from 'lucide-react-native/icons/heart-pulse';
+import PersonStanding from 'lucide-react-native/icons/person-standing';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
+import Waves from 'lucide-react-native/icons/waves-horizontal';
+import Zap from 'lucide-react-native/icons/zap';
 
 const icons = {
   rcp: HeartPulse,

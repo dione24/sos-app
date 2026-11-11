@@ -1,5 +1,7 @@
 import { useRouter } from 'expo-router';
-import { ShieldAlert, ShieldCheck, WifiOff } from 'lucide-react-native';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
+import ShieldCheck from 'lucide-react-native/icons/shield-check';
+import WifiOff from 'lucide-react-native/icons/wifi-off';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
@@ -63,7 +65,7 @@ export default function OnboardingScreen() {
         <View style={s.mark}>
           <ShieldAlert size={30} color={colors.onColor} strokeWidth={2.2} />
         </View>
-        <Text maxFontSizeMultiplier={1.3} style={s.brandName}>SOS Sécurité Mali</Text>
+        <Text maxFontSizeMultiplier={1.3} style={s.brandName}>Nafalan</Text>
       </View>
 
       <Text accessibilityRole="header" maxFontSizeMultiplier={1.3} style={s.title}>Votre dossier d'urgence</Text>

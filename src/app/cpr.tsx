@@ -1,7 +1,14 @@
 import { useAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { Hand, HeartPulse, Pause, PhoneCall, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react-native';
+import Hand from 'lucide-react-native/icons/hand';
+import HeartPulse from 'lucide-react-native/icons/heart-pulse';
+import Pause from 'lucide-react-native/icons/pause';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import Play from 'lucide-react-native/icons/play';
+import RotateCcw from 'lucide-react-native/icons/rotate-ccw';
+import Volume2 from 'lucide-react-native/icons/volume-2';
+import VolumeX from 'lucide-react-native/icons/volume-x';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
 

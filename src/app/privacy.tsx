@@ -1,5 +1,13 @@
-import { BellRing, Database, FileLock2, ImageIcon, MapPinned, Mail, RadioTower, ShieldCheck, Trash2 } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import BellRing from 'lucide-react-native/icons/bell-ring';
+import Database from 'lucide-react-native/icons/database';
+import FileLock2 from 'lucide-react-native/icons/file-lock';
+import ImageIcon from 'lucide-react-native/icons/image';
+import MapPinned from 'lucide-react-native/icons/map-pinned';
+import Mail from 'lucide-react-native/icons/mail';
+import RadioTower from 'lucide-react-native/icons/radio-tower';
+import ShieldCheck from 'lucide-react-native/icons/shield-check';
+import Trash2 from 'lucide-react-native/icons/trash-2';
+import { useNavigationContainerRef } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { Alert, Linking, Text, View } from 'react-native';
@@ -9,7 +17,12 @@ import { Screen } from '@/components/Screen';
 import { Button, Card, Divider, IconTile, ListGroup, ListRow, Notice, SectionHeader, useToneColor, type Tone } from '@/components/ui';
 import { PRIVACY_MAILTO, PUBLISHER, SUPPORT_MAILTO } from '@/constants/publisher';
 import { clearAllUserData } from '@/db/database';
-import { stopBleAdvertising } from '@/services/ble-mesh';
+import { stopActiveMeshScans, stopBleAdvertising } from '@/services/ble-mesh';
+import { clearMedicalTemporaryFiles } from '@/services/medical-files';
+import { cancelAllPositionRequests } from '@/services/location';
+import { disposeOfflineMap } from '@/services/offline-map';
+import { invalidateWeather } from '@/services/weather';
+import { useAppStore } from '@/store/app-store';
 import { makeStyles, useTheme } from '@/theme';
 
 type Entry = { icon: typeof MapPinned; title: string; text: string; tone: Tone };
@@ -42,16 +55,23 @@ export default function PrivacyScreen() {
   const s = useStyles();
   const { colors } = useTheme();
   const db = useSQLiteContext();
-  const router = useRouter();
+  const navigation = useNavigationContainerRef();
   const [deleting, setDeleting] = useState(false);
 
   async function eraseEverything() {
     if (deleting) return;
     setDeleting(true);
     try {
+      cancelAllPositionRequests();
+      await Promise.all([invalidateWeather(db), disposeOfflineMap(db)]);
+      await stopActiveMeshScans();
       await stopBleAdvertising();
       await clearAllUserData(db);
-      router.replace('/onboarding');
+      useAppStore.getState().setLastPosition(null);
+      clearMedicalTemporaryFiles();
+      // Replace the entire history, not only Privacy: an old mounted dossier
+      // must never be reachable (or saved again) with Android's Back button.
+      navigation.resetRoot({ index: 0, routes: [{ name: 'onboarding' }] });
     } catch {
       Alert.alert('Suppression interrompue', "Les données n'ont pas pu être effacées complètement. Réessayez. Si le problème continue, redémarrez l'application.");
     } finally {

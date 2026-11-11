@@ -1,4 +1,4 @@
-# Politique de confidentialité — SOS Sécurité Mali
+# Politique de confidentialité — Nafalan
 
 **Version 1.0 — 17 août 2026**  
 **Source de publication :** `store-assets/privacy-policy.html`  

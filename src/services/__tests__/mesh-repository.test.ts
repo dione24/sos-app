@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@/db/write-transaction', () => ({
+  withExclusiveDatabaseTransaction: async (db: never, task: (db: never) => Promise<unknown>, options?: { prepare?: () => Promise<void> }) => {
+    await options?.prepare?.();
+    return task(db);
+  },
+}));
+
 vi.mock('expo-crypto', () => ({
   randomUUID: vi.fn(() => 'generated-id'),
 }));
@@ -28,7 +35,7 @@ const incoming: MeshMessage = {
 describe('mesh repository relay state', () => {
   it('stores an eligible packet as received until BLE advertising is confirmed', async () => {
     const calls: Array<{ sql: string; args: unknown[] }> = [];
-    const runAsync = vi.fn(async (sql: string, ...args: unknown[]) => { calls.push({ sql, args }); });
+    const runAsync = vi.fn(async (sql: string, ...args: unknown[]) => { calls.push({ sql, args }); return { changes: 1 }; });
     const getFirstAsync = vi.fn()
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(null);
@@ -49,8 +56,8 @@ describe('mesh repository relay state', () => {
 
     await markMessageRelayed(db, { ...incoming, hopsRemaining: 1 });
 
-    expect(runAsync).toHaveBeenCalledOnce();
-    expect(runAsync.mock.calls[0]?.[0]).toContain("SET direction = 'relayed'");
-    expect(runAsync.mock.calls[0]?.[3]).toBe(incoming.id);
+    const update = runAsync.mock.calls.find(([sql]) => sql.includes("SET direction = 'relayed'"));
+    expect(update?.[0]).toContain("WHERE direction = 'received'");
+    expect(update?.[3]).toBe(incoming.id);
   });
 });

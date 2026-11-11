@@ -1,6 +1,11 @@
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { HeartPulse, PhoneCall, Settings2, ShieldAlert, UserRoundPlus, WifiOff } from 'lucide-react-native';
+import HeartPulse from 'lucide-react-native/icons/heart-pulse';
+import PhoneCall from 'lucide-react-native/icons/phone-call';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
+import UserRoundPlus from 'lucide-react-native/icons/user-round-plus';
+import WifiOff from 'lucide-react-native/icons/wifi-off';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useRef, useState } from 'react';
 import { Animated, Pressable, Text, View, useWindowDimensions } from 'react-native';
@@ -62,7 +67,7 @@ export default function HomeScreen() {
   return (
     <Screen>
       <AppHeader
-        title={profileName ? `Bonjour, ${profileName.split(' ')[0]}` : 'SOS Sécurité Mali'}
+        title={profileName ? `Bonjour, ${profileName.split(' ')[0]}` : 'Nafalan'}
         subtitle={t('home_ready')}
         action={<IconButton accessibilityLabel={t('settings_title')} icon={<Settings2 size={22} color={colors.inkMuted} />} onPress={() => router.push('/settings')} />}
       />

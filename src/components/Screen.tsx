@@ -1,12 +1,16 @@
-import type { PropsWithChildren, ReactNode } from 'react';
+import { useIsFocused } from 'expo-router';
+import { useCallback, useEffect, useRef, type PropsWithChildren, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View, type ScrollViewProps, type ViewStyle } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EMERGENCY_FAB_SCROLL_CLEARANCE } from '@/components/EmergencyFab';
+import { reportAppReady } from '@/lib/app-readiness';
 import { makeStyles, spacing } from '@/theme';
 
 type ScreenProps = PropsWithChildren<{
   scroll?: boolean | undefined;
+  /** False while primary local data is loading; diagnostics wait for usable content. */
+  ready?: boolean | undefined;
   footer?: ReactNode | undefined;
   /** Dégagement supplémentaire pour le bouton SOS flottant (onglets). */
   clearFab?: boolean | undefined;
@@ -14,9 +18,23 @@ type ScreenProps = PropsWithChildren<{
   scrollProps?: ScrollViewProps | undefined;
 }>;
 
-export function Screen({ children, scroll = true, footer, clearFab = false, contentStyle, scrollProps }: ScreenProps) {
+export function Screen({ children, scroll = true, ready = true, footer, clearFab = false, contentStyle, scrollProps }: ScreenProps) {
   const s = useStyles();
   const insets = useSafeAreaInsets();
+  const focused = useIsFocused();
+  const hasLayout = useRef(false);
+  const frame = useRef<number | null>(null);
+  const scheduleReady = useCallback(() => {
+    if (!ready || !focused || frame.current != null) return;
+    frame.current = requestAnimationFrame(() => { void reportAppReady(); });
+  }, [focused, ready]);
+  useEffect(() => {
+    if (hasLayout.current) scheduleReady();
+    return () => {
+      if (frame.current != null) cancelAnimationFrame(frame.current);
+      frame.current = null;
+    };
+  }, [scheduleReady]);
   const fabPad = clearFab ? EMERGENCY_FAB_SCROLL_CLEARANCE : 0;
   const contentBottomPad = footer ? spacing.lg : spacing.xxl + Math.max(insets.bottom, spacing.sm) + fabPad;
   const footerBottomPad = spacing.sm + Math.max(insets.bottom, spacing.md);
@@ -36,7 +54,7 @@ export function Screen({ children, scroll = true, footer, clearFab = false, cont
   );
 
   return (
-    <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={s.safe} edges={['top', 'left', 'right']} onLayout={() => { hasLayout.current = true; scheduleReady(); }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={s.flex} keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}>
         {content}
         {footer ? <View style={[s.footer, { paddingBottom: footerBottomPad }]}>{footer}</View> : null}

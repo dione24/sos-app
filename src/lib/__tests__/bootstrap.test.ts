@@ -12,7 +12,8 @@ function setup({ profile = false, skipped, language = 'fr' }: { profile?: boolea
   const runAsync = vi.fn(async (_sql: string, key: string, value: string) => {
     data.settings[key] = value;
   });
-  const db = { getFirstAsync, runAsync } as never;
+  const withTransactionAsync = vi.fn(async (task: () => Promise<void>) => task());
+  const db = { getFirstAsync, runAsync, withTransactionAsync } as never;
   return { data, getFirstAsync, runAsync, createSession: () => createBootstrapSession(() => readBootstrapState(db)) };
 }
 

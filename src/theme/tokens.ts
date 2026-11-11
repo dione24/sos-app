@@ -1,7 +1,7 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
 /**
- * Système de design SOS Sécurité Mali — voir docs/design/DESIGN.md.
+ * Système de design Nafalan — voir docs/design/DESIGN.md.
  * Une seule famille (DM Sans), une grille 4/8, le rouge réservé au SOS.
  */
 

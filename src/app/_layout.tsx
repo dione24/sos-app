@@ -1,30 +1,23 @@
-import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
-import { TransformRequestManager } from '@maplibre/maplibre-react-native';
+import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
+import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
+import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
+import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
 import * as Crypto from 'expo-crypto';
-import { useFonts } from 'expo-font';
+import { isLoaded, useFonts } from 'expo-font';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, View } from 'react-native';
 
 import { migrateDatabase } from '@/db/database';
-import { MAP_REQUEST_USER_AGENT } from '@/constants/map';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { createBootstrapSession, readBootstrapState } from '@/lib/bootstrap';
 import { useAppStore } from '@/store/app-store';
 import { ThemeProvider, makeStyles, useTheme } from '@/theme';
 
 const DATABASE_KEY_NAME = 'sos_mali_database_key_v1';
-
-// Appliqué aussi aux ressources du pack hors ligne, avant le premier écran carte.
-TransformRequestManager.addHeader({
-  id: 'sos-maptiler-user-agent',
-  match: '^https://api\\.maptiler\\.com/',
-  name: 'User-Agent',
-  value: MAP_REQUEST_USER_AGENT,
-});
 
 async function getOrCreateDatabaseKey() {
   const saved = await SecureStore.getItemAsync(DATABASE_KEY_NAME);
@@ -98,9 +91,14 @@ function BootstrapGate() {
 
 function ThemedApp() {
   const { dark } = useTheme();
-  const [loaded, fontError] = useFonts({ DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold });
+  // Android release embeds these exact families through the font plugin. The
+  // runtime fallback keeps web, iOS and older native development clients usable.
+  const [loaded, fontError] = useFonts(Platform.OS === 'android' && isLoaded('DMSans_400Regular')
+    ? {}
+    : { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold });
   const [databaseKey, setDatabaseKey] = useState<string | null>(null);
   const [setupError, setSetupError] = useState<string | null>(null);
+  const [databaseReady, setDatabaseReady] = useState(false);
 
   useEffect(() => {
     void getOrCreateDatabaseKey()
@@ -111,18 +109,28 @@ function ThemedApp() {
   // Référence stable : un `onInit` recréé (ex. bascule clair/sombre) ferait
   // rouvrir la base par SQLiteProvider et démonterait les écrans en cours.
   const initDatabase = useCallback(
-    (db: Parameters<typeof migrateDatabase>[0]) => migrateDatabase(db, databaseKey ?? ''),
+    async (db: Parameters<typeof migrateDatabase>[0]) => {
+      await migrateDatabase(db, databaseKey ?? '');
+      setDatabaseReady(true);
+    },
     [databaseKey],
   );
+  const onDatabaseError = useCallback(() => {
+    // The provider calls onError while rendering: defer the parent state write.
+    void Promise.resolve().then(() => setSetupError("Impossible d'ouvrir le stockage chiffré de l'appareil."));
+  }, []);
 
   if (fontError || setupError) return <BootStatus label={setupError ?? 'Les polices intégrées sont indisponibles.'} error />;
-  if (!loaded || !databaseKey) return <BootStatus label="Préparation de SOS Mali…" />;
+  if (!databaseKey) return <BootStatus label="Préparation de Nafalan…" />;
 
   return (
-    <SQLiteProvider databaseName="sos-securite-mali-secure-v2.db" onInit={initDatabase}>
-      <StatusBar style={dark ? 'light' : 'dark'} />
-      <BootstrapGate />
-    </SQLiteProvider>
+    <View style={{ flex: 1 }}>
+      <SQLiteProvider databaseName="sos-securite-mali-secure-v2.db" onInit={initDatabase} onError={onDatabaseError}>
+        <StatusBar style={dark ? 'light' : 'dark'} />
+        {loaded ? <BootstrapGate /> : <BootStatus label="Préparation de l’affichage…" />}
+      </SQLiteProvider>
+      {!databaseReady ? <View style={{ position: 'absolute', inset: 0 }}><BootStatus label="Ouverture sécurisée…" /></View> : null}
+    </View>
   );
 }
 
