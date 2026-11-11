@@ -1,15 +1,16 @@
 # Nafalan 1.0.2 — fiabilité et réactivité
 
-Rapport du **11 novembre 2026**. Livraison en préparation sur
-`fix/reliability-performance-20261111`, version **1.0.2 (8)**.
+Rapport du **11 novembre 2026**, version **1.0.2 (8)**, fusionnée dans `main`.
 La source runtime courante est **`15bb5e5e27d7b049eb2268bd8cc0df2c43cb0db7`** :
 maintenance des dépendances `ba8ff2c`, charte rouge `636fc72`, puis adaptation des
 icônes de la barre système au thème actif `15bb5e5`.
 
-**Statut : branche fusionnée et soumission de production enregistrée le
-11 novembre 2026 vers 11:02 UTC. Les vérifications automatiques Google sont
-terminées et la Console affiche « Vos modifications sont en cours d’examen ».
-Aucune approbation ni disponibilité publique n'est encore confirmée.**
+**Dernière observation : après un refus concernant le lien de suppression des
+données, la correction web a été publiée et le renvoi de production enregistré
+le 11 novembre 2026 à 12:21 UTC. À 12:24 UTC, les contrôles automatiques sont
+terminés et la Console affiche « Vos modifications sont en cours d'examen ».
+Aucune approbation ni disponibilité publique n'est confirmée.** Le même AAB est
+conservé. Voir [le motif exact et le reçu de correction](GOOGLE_PLAY_REFUSAL_2026_11_11.md).
 
 [PR #6](https://github.com/dione24/sos-app/pull/6) fusionnée dans `main` :
 `e52db5214d46c174c9704030ec10098f27b76749`. La release **1.0.2 (8) — Nafalan**

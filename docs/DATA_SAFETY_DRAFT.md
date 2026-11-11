@@ -1,4 +1,4 @@
-# Google Play — Data safety (déclaration du 6 novembre 2026)
+# Google Play — Data safety (déclaration du 6 novembre, correction renvoyée le 11 novembre 2026)
 
 Éditeur : **SahelPay Technologies** · support@sahelpay.ml · application **gratuite**.  
 À reporter dans Play Console après vérification de l’AAB final et des SDK réellement
@@ -74,10 +74,30 @@ Références fournisseurs vérifiées le 10 août 2026 :
   de l’app, traitement non éphémère. Aucun identifiant publicitaire ajouté.
 - Aucun compte ni connexion ; aucune publicité ni analytics.
 - Chiffrement en transit pour les données collectées par les fournisseurs HTTPS.
-- Lien de demande de suppression : politique publique, sections effacement local
+- Lien de demande de suppression déclaré à cette date : politique publique, sections effacement local
   et contact support. Les transferts SMS / BLE / export sont déclenchés par
   l’utilisateur et décrits séparément dans la politique.
 
 Cette déclaration conservatrice ne présume pas d’une exception contractuelle
 « fournisseur de service » pour Open-Meteo ou MapTiler. Les données médicales
 restent uniquement locales tant que l’utilisateur n’initie pas un partage.
+
+## Correction après le refus du 11 novembre 2026
+
+La nouvelle URL de demande de suppression enregistrée dans la Console est
+**https://www.sahelpay.ml/apps/sos-securite-mali/delete-data**. Elle est distincte
+de l'URL de confidentialité,
+**https://www.sahelpay.ml/apps/sos-securite-mali/privacy**.
+
+La page dédiée présente explicitement **Nafalan — SOS & secours**, le package
+`ml.sossecurite.app`, le compte de publication **MHM Digital Agency** et l'éditeur
+**SahelPay Technologies**. Elle indique les étapes réelles d'effacement local et
+les contacts de demande, sans promettre une suppression distante du dossier
+médical conservé uniquement sur le téléphone.
+
+**Renvoi enregistré le 11 novembre 2026 à 12:21 UTC**. À 12:24 UTC, les contrôles
+automatiques sont terminés et la Console affiche « Vos modifications sont en
+cours d'examen ». Aucune approbation ni publication publique n'est confirmée.
+La page publique a été vérifiée dans le navigateur après le déploiement de production.
+Les autres réponses concernant les flux, fournisseurs et données locales ne sont
+pas modifiées. Voir [le dossier du refus](GOOGLE_PLAY_REFUSAL_2026_11_11.md).

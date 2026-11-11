@@ -36,6 +36,7 @@ Support : **support@sahelpay.ml** · Site : **https://sahelpay.ml**
 | Adresse e-mail | **support@sahelpay.ml** |
 | Site web | **https://sahelpay.ml** |
 | URL confidentialité | **https://www.sahelpay.ml/apps/sos-securite-mali/privacy** |
+| URL de demande de suppression des données | **https://www.sahelpay.ml/apps/sos-securite-mali/delete-data** — enregistrée et renvoyée le 11 novembre 2026 |
 | Package | `ml.sossecurite.app` |
 
 La description courte, la description complète et les notes de version prêtes à
@@ -66,6 +67,34 @@ destinataire explicitement choisi. Cette réponse évite de sous-déclarer un fl
   contractuelle sur leurs journaux.
 
 Détail : `DATA_SAFETY_DRAFT.md`.
+
+## Refus du 11 novembre 2026 et correction renvoyée
+
+Google a refusé les modifications de **Nafalan 1.0.2 (8)**. Le détail relatif à
+« Données de l'utilisateur – Exigence de suppression de compte » indique que le
+lien de suppression déclaré ne fait pas référence à l'entité de la fiche Play
+Store. La Console et l'e-mail citent bien
+`https://www.sahelpay.ml/apps/sos-securite-mali/privacy`.
+
+La page relue pendant le diagnostic mentionnait déjà Nafalan et SahelPay
+Technologies ; la cause exacte du constat du vérificateur n'est donc pas établie.
+Ne pas présenter un cache ancien ou le renommage de l'app comme une cause prouvée.
+
+La correction distingue une page dédiée
+`https://www.sahelpay.ml/apps/sos-securite-mali/delete-data` de la politique de
+confidentialité. Elle rend visibles les identités Nafalan/MHM/SahelPay, les étapes
+d'effacement et le contact de demande. Les changements web de la PR
+[sahelpay-landing #11](https://github.com/dione24/sahelpay-landing/pull/11) sont
+fusionnés au commit `6d1df2fb5e547f25706d5007b275ea51ca3f6b7f`. Le déploiement de
+production Vercel `dpl_3ok7K8VwBpcag1ze29TuAVJn3tNj` est prêt ; la page publique et
+l'enregistrement du nouveau lien ont été vérifiés dans le navigateur.
+
+**Le renvoi des dix modifications est enregistré à 12:21 UTC le 11 novembre
+2026.** À 12:24 UTC, les contrôles automatiques sont terminés et la Console
+affiche « Vos modifications sont en cours d'examen ». Ce reçu ne prouve pas
+l'approbation ni la disponibilité publique. Le même AAB 1.0.2 (8), le package,
+le Mali et le code applicatif sont conservés. Voir
+[le dossier du refus et le reçu de renvoi](GOOGLE_PLAY_REFUSAL_2026_11_11.md).
 
 ## Déclaration des fonctionnalités de santé
 

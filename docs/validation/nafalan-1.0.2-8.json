@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "submitted_to_google_in_review",
+  "status": "resubmitted_to_google_in_review",
   "version": "1.0.2",
   "android_version_code": 8,
   "package": "ml.sossecurite.app",
@@ -190,12 +190,15 @@
   "privacy_policy": {
     "status": "deployed_and_live_browser_verified",
     "web_repository": "dione24/sahelpay-landing",
-    "web_source_commit": "3eadcac6ec7b740728bfa9ab8577d31b8e1628d0",
+    "web_source_commit": "6d1df2fb5e547f25706d5007b275ea51ca3f6b7f",
     "public_url": "https://www.sahelpay.ml/apps/sos-securite-mali/privacy",
-    "live_browser_review": "Nafalan and red CSS confirmed"
+    "live_browser_review": "Policy version 1.1, Nafalan, MHM Digital Agency and dedicated deletion link confirmed",
+    "deletion_url": "https://www.sahelpay.ml/apps/sos-securite-mali/delete-data",
+    "deletion_page_browser_verified": true,
+    "production_deployment_id": "dpl_3ok7K8VwBpcag1ze29TuAVJn3tNj"
   },
   "delivery": {
-    "status": "submitted_to_google_in_review",
+    "status": "resubmitted_to_google_in_review",
     "play_release": "1.0.2 (8) — Nafalan",
     "play_track": "production",
     "submitted_at_utc": null,
@@ -225,7 +228,16 @@
     "managed_publishing": false,
     "previous_review_restarted": true,
     "automated_checks_completed": true,
-    "last_live_observed_at_utc": "2026-11-11T11:07:36.785472+00:00"
+    "last_live_observed_at_utc": "2026-11-11T12:24:34Z",
+    "first_submission_review_observed_at_utc": "2026-11-11T11:07:36.785472+00:00",
+    "refusal_observed_date_utc": "2026-11-11",
+    "refusal_reason": "Invalid data deletion link: missing reference to app or developer entity",
+    "refusal_issue_id": "4989387493725255449",
+    "resubmission_registered_at_utc": "2026-11-11T12:21:04Z",
+    "resubmission_change_count": 10,
+    "resubmission_same_aab": true,
+    "deletion_url_saved_in_console": "https://www.sahelpay.ml/apps/sos-securite-mali/delete-data",
+    "refusal_receipt": "docs/GOOGLE_PLAY_REFUSAL_2026_11_11.md"
   },
   "limits": [
     "historical code 7 API 32 ANR remains unexplained",
